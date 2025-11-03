@@ -152,7 +152,25 @@
                        // --- SAMPLE DATA ---
                        const getSampleData = () => ({
                            courses: [{ Code: 'FSK20119', Name: 'Cert II Skills for Work' }, { Code: '11225NAT', Name: 'Cert IV Tertiary Prep' }],
-                           teachers: [{ Name: 'Juan', Surname: 'Aburto', Initials: 'JA', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20 }, { Name: 'Cary', Surname: 'Buecher', Initials: 'CB', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 18 }],
+                           teachers: [
+                               { Name: 'Juan', Surname: 'Aburto', Initials: 'JA', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Cary', Surname: 'Buecher', Initials: 'CB', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 8 },
+                               { Name: 'Miroslav', Surname: 'Belik', Initials: 'MB', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10 },
+                               { Name: 'Carlie', Surname: 'Dally', Initials: 'CD', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Bernadette', Surname: 'Flynn-Whitehall', Initials: 'BF', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Cary', Surname: 'Buecher', Initials: 'CB2', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 8 },
+                               { Name: 'Christopher', Surname: 'Worland', Initials: 'CW', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 10 },
+                               { Name: 'David', Surname: 'Baird', Initials: 'DB', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'David', Surname: 'Cole', Initials: 'DC', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Georgina', Surname: 'Templeton', Initials: 'GT', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Ian', Surname: 'Willis', Initials: 'IW', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Karen', Surname: 'Gardner', Initials: 'KG', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Kerri-Anne', Surname: 'Smith', Initials: 'KS', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Rosalind', Surname: 'Phillips', Initials: 'RP', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Rosalind', Surname: 'Tuohy', Initials: 'RT', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10 },
+                               { Name: 'Susan', Surname: 'Neild', Initials: 'SN', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20 }
+                           ],
                            subjects: [{ Subject: 'Barista Expresso', Color: '#FFC0CB', Units: ['SITXFSA005'] }, { Subject: 'Math General', Color: '#ADD8E6', Units: ['FSKNUM014'] }],
                            schedule: [
                                { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', CourseCode: 'FSK20119', Subject: 'Barista Expresso', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },

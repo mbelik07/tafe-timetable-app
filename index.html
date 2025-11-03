@@ -97,7 +97,7 @@
 <!-- Modals -->
 <div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="modalTitle">Manage</h2><button class="text-3xl font-bold" id="closeModalBtn">×</button></div><div class="space-y-4" id="modalContent"></div></div></div>
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
-<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
+<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.8); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl">
 <h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
@@ -155,8 +155,8 @@
                            teachers: [{ Name: 'Juan', Surname: 'Aburto', Initials: 'JA', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20 }, { Name: 'Cary', Surname: 'Buecher', Initials: 'CB', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 18 }],
                            subjects: [{ Subject: 'Barista Expresso', Color: '#FFC0CB', Units: ['SITXFSA005'] }, { Subject: 'Math General', Color: '#ADD8E6', Units: ['FSKNUM014'] }],
                            schedule: [
-                               { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', CourseCode: 'FSK20119', Subject: 'Barista Expresso', Room: 'C1', college: 'Moss Vale', notes: 'Face-to-Face', dispute: null },
-                               { id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', CourseCode: '11225NAT', Subject: 'Math General', Room: 'C4', college: 'Goulburn', notes: 'Blended Delivery', dispute: null },
+                               { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', CourseCode: 'FSK20119', Subject: 'Barista Expresso', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
+                               { id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', CourseCode: '11225NAT', Subject: 'Math General', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
                            ]
                        });
 
@@ -210,7 +210,12 @@
                            for (let j = i + 1; j < semesterData.schedule.length; j++) {
                                const s1 = semesterData.schedule[i];
                                const s2 = semesterData.schedule[j];
-                               if (s1.Day !== s2.Day || s1.college !== s2.college) continue;
+                               
+                               // Check if sessions share any colleges
+                               const sharedColleges = s1.colleges?.filter(c => s2.colleges?.includes(c)) || [];
+                               if (sharedColleges.length === 0) continue;
+                               
+                               if (s1.Day !== s2.Day) continue;
                         
                                const timeOverlap = timeToMinutes(s1.ClassStart) < timeToMinutes(s2.ClassEnd) && timeToMinutes(s2.ClassStart) < timeToMinutes(s1.ClassEnd);
                                if (timeOverlap) {
@@ -476,7 +481,7 @@
 
                        const scheduleToRender = semesterData.currentCollege === 'Master View' 
                            ? semesterData.schedule 
-                           : semesterData.schedule.filter(s => s.college === semesterData.currentCollege);
+                           : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
             
                        scheduleToRender.forEach(session => {
                            const dayCol = grid.querySelector(`.day-column[data-day="${session.Day}"]`);
@@ -486,7 +491,7 @@
                            const subjectInfo = semesterData.subjects.find(s => s.Subject === session.Subject);
                            const teacherInfo = semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
                            const notesHTML = session.notes ? `<div class="text-xs italic text-gray-600 truncate" title="${session.notes}">${session.notes}</div>` : '';
-                           const collegeInfo = semesterData.currentCollege === 'Master View' ? `<div class="font-bold text-indigo-600 text-xs">${session.college}</div>` : '';
+                           const collegeInfo = semesterData.currentCollege === 'Master View' ? `<div class="font-bold text-indigo-600 text-xs">${session.colleges?.join(', ') || ''}</div>` : '';
 
                            const sessionBlock = document.createElement('div');
                            sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''}`;
@@ -669,6 +674,13 @@
                        courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
                        subjectSelect.innerHTML = semesterData.subjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
                        teacherSelect.innerHTML = semesterData.teachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
+                       
+                       // Check college checkboxes
+                       const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
+                       collegeCheckboxes.forEach(cb => {
+                           cb.checked = session?.colleges?.includes(cb.value) || (!session && cb.value === semesterData.currentCollege);
+                       });
+                       
                        document.getElementById('sessionModal').classList.add('active');
                    }
 
@@ -676,6 +688,10 @@
                        e.preventDefault();
                        const id = document.getElementById('sessionId').value;
                        const semesterData = getCurrentSemesterData();
+                       
+                       // Get selected colleges
+                       const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges"]:checked')).map(cb => cb.value);
+                       
                        const sessionData = {
                            Day: document.getElementById('sessionDay').value,
                            ClassStart: document.getElementById('sessionStartTime').value,
@@ -685,6 +701,7 @@
                            TeacherInitials: document.getElementById('sessionTeacher').value,
                            Room: document.getElementById('sessionRoom').value,
                            notes: document.getElementById('sessionNotes').value,
+                           colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
                            dispute: null
                        };
         
@@ -695,7 +712,6 @@
                            }
                        } else {
                            sessionData.id = Date.now();
-                           sessionData.college = semesterData.currentCollege;
                            semesterData.schedule.push(sessionData);
                        }
                        document.getElementById('sessionModal').classList.remove('active');
@@ -716,7 +732,7 @@
                        const semesterData = getCurrentSemesterData();
                        const scheduleToView = semesterData.currentCollege === 'Master View'
                            ? semesterData.schedule
-                           : semesterData.schedule.filter(s => s.college === semesterData.currentCollege);
+                           : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
         
                        if (!semesterData.teachers?.length) { container.innerHTML = `<p class="text-center text-gray-500">No teacher data.</p>`; return; }
         
@@ -755,7 +771,7 @@
                        if (disputedSessions.length === 0) {
                            contentHTML += `<p class="text-center text-gray-500">No disputes found in this view.</p>`;
                        } else {
-                           const headers = ['Day', 'Time', 'Course', 'Subject', 'Teacher', 'Room', 'College', 'Reason for Dispute'];
+                           const headers = ['Day', 'Time', 'Course', 'Subject', 'Teacher', 'Room', 'Colleges', 'Reason for Dispute'];
                            contentHTML += `<table class="w-full text-sm border-collapse"><thead><tr class="bg-red-800 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
                            disputedSessions.forEach(session => {
                                contentHTML += `<tr class="border-b hover:bg-red-50">
@@ -765,7 +781,7 @@
                                    <td class="border p-2">${session.Subject}</td>
                                    <td class="border p-2">${session.TeacherInitials}</td>
                                    <td class="border p-2">${session.Room}</td>
-                                   <td class="border p-2">${session.college}</td>
+                                   <td class="border p-2">${session.colleges?.join(', ') || ''}</td>
                                    <td class="border p-2 font-bold text-red-600">${session.dispute.reason}</td>
                                </tr>`;
                            });
@@ -800,7 +816,7 @@
                                    const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
                                    const teacherInfo = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
                                    const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-                                   const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.college}</div>` : '';
+                                   const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
                                    const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
                     
                                    if (!teacherInfo) return ''; // Prevent crash if teacher not found
@@ -837,7 +853,7 @@
         
                    const scheduleToFilter = semesterData.currentCollege === 'Master View'
                        ? semesterData.schedule
-                       : semesterData.schedule.filter(s => s.college === semesterData.currentCollege);
+                       : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
             
                    const sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
         
@@ -860,7 +876,7 @@
 
                    const scheduleToFilter = semesterData.currentCollege === 'Master View'
                        ? semesterData.schedule
-                       : semesterData.schedule.filter(s => s.college === semesterData.currentCollege);
+                       : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
                    const sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials);
         

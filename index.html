@@ -1,300 +1,1023 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Timetable App - Cloud-sync Prototype</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    body{font-family:Arial,Helvetica,sans-serif;margin:0;display:flex;min-height:100vh}
-    header{background:#222;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;width:100%}
-    #status{padding:6px 10px;border-radius:4px;background:#444}
-    #container{display:flex;flex:1}
-    #sidebar{width:260px;background:#f3f3f3;padding:12px;box-sizing:border-box;border-right:1px solid #ddd}
-    main{flex:1;padding:16px}
-    button{display:inline-block;margin:6px 0;padding:8px 10px;border-radius:4px;border:1px solid #888;background:#fff;cursor:pointer}
-    .green{background:#2ecc71;color:#fff;border-color:#2ecc71}
-    .red{background:#e74c3c;color:#fff;border-color:#e74c3c}
-    textarea{width:100%;height:200px;font-family:monospace}
-    .small{font-size:12px;color:#666}
-  </style>
-</head>
-<body>
-  <header>
-    <div><strong>Timetable App (cloud-sync prototype)</strong></div>
-    <div id="status">Sync: <span id="syncState">unknown</span></div>
-  </header>
-
-  <div id="container">
-    <aside id="sidebar">
-      <h3>Data Controls</h3>
-      <button id="btnExport">Export JSON</button><br>
-      <button id="btnImport">Import JSON</button><br>
-      <input type="file" id="fileInput" style="display:none" accept=".json,application/json">
-      <hr>
-      <button id="btnForceSave">Force Save (try GitHub)</button><br>
-      <button id="btnLoadSample">Load data/db.json</button><br>
-      <button id="btnClearLocal">Clear localStorage backup</button><br>
-      <hr>
-      <div class="small">
-        GitHub autosave requires configuring OWNER, REPO and a personal access token in the page (see comments in the JS).<br>
-        If GitHub save fails the app will fallback to localStorage and offer a manual download.
-      </div>
-    </aside>
-
-    <main>
-      <h2>Current Database Snapshot</h2>
-      <div><strong>Semester:</strong> <span id="currentSem">-</span></div>
-      <div><strong>Teachers:</strong> <span id="countTeachers">0</span></div>
-      <div><strong>Subjects:</strong> <span id="countSubjects">0</span></div>
-      <div style="margin-top:10px;">
-        <button id="btnShowJSON">Show raw JSON</button>
-      </div>
-      <div id="jsonArea" style="display:none;margin-top:12px;">
-        <textarea id="rawJSON"></textarea><br>
-        <button id="btnSaveFromEditor">Save changes</button>
-      </div>
-    </main>
-  </div>
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="TAFE Interactive Timetabling Application" property="og:title"/>
+<meta content="A multi-college, interactive timetabling solution for TAFE NSW with data persistence and class notes." property="og:description"/>
+<meta content="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762158838/u1103083349_img_120x40_8aa3ecf2_m66f6i.png" property="og:image"/>
+<meta content="website" property="og:type"/>
+<link href="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762158838/u1103083350_img_64x64_ad306614_xji6gn.png" rel="icon"/>
+<title>TAFE Interactive Timetabling Application</title>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+                   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+                   .sidebar { transition: transform 0.3s ease-in-out; }
+                   .sidebar-open { transform: translateX(0) !important; }
+                   .view-container { display: none; }
+                   .view-container.active { display: block; }
+                   .college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; }
+                   .college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
+                   .timetable-main-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(200px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
+                   .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
+                   .time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
+                   .time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
+                   .day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; }
+                   .time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
+                   .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
+                   .time-slot.slot-selected { background-color: rgba(59, 130, 246, 0.3); }
+                   .session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
+                   .dispute-warning { border: 3px solid #ef4444 !important; z-index: 15; animation: pulse-border 1.5s infinite; }
+                   .dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
+                   @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+                   .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
+                   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
+                   .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; z-index: 101; }
+                   .modal-overlay.active { display: block; }
+                   .print-grid { display: grid; grid-template-columns: 100px repeat(5, 1fr); border: 2px solid #000; grid-auto-rows: minmax(160px, auto); }
+                   .print-header { font-weight: bold; text-align: center; padding: 8px; border: 1px solid #999; background: #d9d9d9; }
+                   .print-day-header { background: #595959; color: white; }
+                   .print-period-label { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; background: #fde9d9; border: 1px solid #999; }
+                   .print-cell { border: 1px solid #999; padding: 4px; vertical-align: top; }
+                   .print-session { border-radius: 4px; padding: 6px; font-size: 15px; margin-top: 5px; border: 1px solid black; line-height: 1.3; }
+                   @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } }
+               </style>
 <script>
-/*
-  index.html sync behaviour (prototype)
-  - Loads data from data/db.json on startup using fetch()
-  - Tries to save to GitHub using the Contents API (PUT to https://api.github.com/repos/OWNER/REPO/contents/data/db.json)
-    * You MUST set OWNER, REPO and TOKEN variables below for that to work.
-  - If GitHub save isn't configured or fails, falls back to localStorage and offers manual export.
-  - There is a sync status indicator in the header and Export/Import JSON controls in the sidebar.
-  - This file is intended as a drop-in prototype. Real server-side storage is recommended for production.
-*/
+                window.load_data_from_csv = (filename) => {
+                    // Implementation needed when code is downloaded
+                };
 
-const DB_JSON_PATH = 'data/db.json'; // where the app expects the JSON when hosted
-let db = null;
-let currentSha = null; // used when saving to GitHub (if available)
+                window.save_data_to_csv = (filename, data) => {
+                    // Implementation needed when code is downloaded
+                };
 
-// Configure these if you want the page to attempt GitHub saves. DO NOT hardcode tokens in public pages.
-// For testing locally you may set them in the browser console, e.g. window.GH = {owner:'mbelik07', repo:'tafe-timetable-app', token:'ghp_......'}
-window.GH = window.GH || {
-  owner: '', // e.g. 'mbelik07'
-  repo: '',  // e.g. 'tafe-timetable-app'
-  token: ''  // personal access token with repo:contents permissions
-};
+                window.call_llm = (system_prompt, user_messages, json_fields) => {
+                    // Implementation needed when code is downloaded
+                };
+            </script></head>
+<body class="bg-gray-100">
+<!-- Sidebar for Data Management -->
+<div class="sidebar fixed top-0 left-0 h-full w-80 bg-white shadow-lg z-50 -translate-x-full" id="sidebar">
+<div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
+<div class="p-4 space-y-3 no-print">
+<h3 class="text-lg font-bold text-gray-700 border-b pb-2">Management</h3>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn">🗓️ Manage Semesters</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn">👨‍🏫 Manage Teachers</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn">📚 Manage Courses</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn">🎨 Manage Subjects</button>
+<hr class="my-4"/>
+<h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
+<button class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" id="loadSampleDataBtn">🔄 Load Sample Data</button>
+</div>
+</div>
+<!-- Main Content -->
+<div class="transition-all duration-300" id="mainContent">
+<header class="bg-white shadow-md p-4 flex justify-between items-center no-print">
+<div class="flex items-center gap-4"><img alt="TAFE NSW Logo" src="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762158838/u1103083349_img_120x40_8aa3ecf2_m66f6i.png"/><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
+<div class="flex items-center gap-3">
+<button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn">Open Menu</button>
+<select class="border border-gray-300 rounded px-3 py-2 font-bold" id="semesterSelector"></select>
+<select class="border border-gray-300 rounded px-3 py-2" id="viewSelector"><option value="main-timetable">Main Timetable</option><option value="staff-summary">Staff Summary</option><option value="dispute-log">Dispute Log</option><option value="course-print">Course Print</option><option value="teacher-print">Teacher Print</option></select>
+<div class="flex gap-2" id="secondary-selectors"></div>
+<button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded" id="printBtn">📄 Download PDF</button>
+</div>
+</header>
+<main class="p-4">
+<div class="flex items-center gap-2 mb-[-1px] no-print" id="college-tabs-container"></div>
+<div id="print-area">
+<div class="view-container active" id="main-timetable-view"><div class="bg-white p-4 rounded-lg shadow-lg"><h2 class="text-xl font-bold text-center mb-4" id="main-timetable-title"></h2><div class="timetable-grid-container"><div class="timetable-main-grid" id="main-timetable-grid"><div class="text-center p-10 col-span-6 text-gray-500">Load sample data or add your own to begin.</div></div></div></div></div>
+<div class="view-container" id="staff-summary-view"><div class="bg-white p-4 rounded-lg shadow-lg overflow-x-auto"><h2 class="text-xl font-bold text-center mb-4" id="staff-summary-title"></h2><div id="staff-summary-table"></div></div></div>
+<div class="view-container" id="dispute-log-view"></div>
+<div class="view-container" id="course-print-view"></div>
+<div class="view-container" id="teacher-print-view"></div>
+</div>
+</main>
+</div>
+<!-- Modals -->
+<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="modalTitle">Manage</h2><button class="text-3xl font-bold" id="closeModalBtn">×</button></div><div class="space-y-4" id="modalContent"></div></div></div>
+<div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
+<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
+<div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.8); z-index: 200;">
+<div class="text-center p-8 bg-white rounded-lg shadow-xl">
+<h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
+<p class="text-gray-600">Please wait, this may take a moment.</p>
+</div>
+</div>
+<script>
+                   document.addEventListener('DOMContentLoaded', () => {
+                       // --- DATABASE ---
+                       let db = {};
+                       const colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
+                       const getNewSemesterData = () => ({ courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale' });
 
-const syncStateEl = document.getElementById('syncState');
-function setSyncState(s) {
-  syncStateEl.textContent = s;
-  const status = document.getElementById('status');
-  if (s === 'synced') status.style.background = '#2ecc71';
-  else if (s === 'saving') status.style.background = '#f1c40f';
-  else if (s === 'remote-failed') status.style.background = '#e67e22';
-  else if (s === 'local-only') status.style.background = '#3498db';
-  else if (s === 'offline') status.style.background = '#e74c3c';
-  else status.style.background = '#444';
-}
+                       // --- DATA PERSISTENCE ---
+                       const saveData = () => localStorage.setItem('timetableDataV2', JSON.stringify(db));
+                       const loadData = () => {
+                           const savedData = localStorage.getItem('timetableDataV2');
+                           if (savedData) {
+                               db = JSON.parse(savedData);
+                           } else {
+                               // Initialize with default semester if no data
+                               db = {
+                                   semesters: { 'Semester 1 2024': getNewSemesterData() },
+                                   currentSemester: 'Semester 1 2024'
+                               };
+                           }
+                       };
 
-// Utility: base64 encode Unicode string
-function base64EncodeUnicode(str) {
-  return btoa(unescape(encodeURIComponent(str)));
-}
+                       // --- HELPER FUNCTIONS ---
+                       const getCurrentSemesterData = () => {
+                           if (!db.semesters[db.currentSemester]) {
+                               const firstSemester = Object.keys(db.semesters)[0];
+                               if (firstSemester) {
+                                   db.currentSemester = firstSemester;
+                               } else {
+                                   db.semesters['Default Semester'] = getNewSemesterData();
+                                   db.currentSemester = 'Default Semester';
+                               }
+                           }
+                           return db.semesters[db.currentSemester];
+                       };
 
-// Attempt to load the JSON file from data/db.json
-async function loadData() {
-  setSyncState('loading');
-  try {
-    const res = await fetch(DB_JSON_PATH, {cache: 'no-store'});
-    if (!res.ok) throw new Error('Fetch failed: ' + res.status);
-    const json = await res.json();
-    db = json;
-    // try to get GitHub SHA (if hosted on GitHub) by hitting the GitHub API anonymously - this only works for public repos
-    try {
-      // Attempt to deduce owner/repo from location when served via GitHub Pages (common pattern)
-      // But this is optional and may not succeed.
-      const ghResp = await fetch('https://api.github.com/repos/' + (window.GH.owner || '') + '/' + (window.GH.repo || '') + '/contents/' + DB_JSON_PATH);
-      if (ghResp.ok) {
-        const ghJson = await ghResp.json();
-        currentSha = ghJson.sha;
-      }
-    } catch(e) {/* ignore */}
-    localStorage.setItem('timetable_backup', JSON.stringify(db));
-    updateUI();
-    setSyncState('synced');
-    console.log('Loaded data from', DB_JSON_PATH);
-  } catch (err) {
-    console.warn('Could not load', DB_JSON_PATH, err);
-    // fallback to localStorage
-    const local = localStorage.getItem('timetable_backup');
-    if (local) {
-      db = JSON.parse(local);
-      updateUI();
-      setSyncState('local-only');
-      console.log('Loaded data from localStorage backup');
-    } else {
-      // last resort: empty template
-      db = { semesters: {}, currentSemester: null };
-      updateUI();
-      setSyncState('offline');
-      console.log('No data available, started with empty DB');
-    }
-  }
-}
+                       // --- DOM ELEMENTS ---
+                       const collegeTabsContainer = document.getElementById('college-tabs-container');
+                       const sessionForm = document.getElementById('sessionForm');
+                       const managementModal = document.getElementById('managementModal');
+                       const semesterModal = document.getElementById('semesterModal');
+                       const secondarySelectorsContainer = document.getElementById('secondary-selectors');
+                       const viewSelector = document.getElementById('viewSelector');
+                       const semesterSelector = document.getElementById('semesterSelector');
 
-function updateUI() {
-  const sem = db.currentSemester || '-';
-  document.getElementById('currentSem').textContent = sem;
-  const semObj = (db.semesters && db.semesters[sem]) ? db.semesters[sem] : null;
-  document.getElementById('countTeachers').textContent = semObj ? (semObj.teachers||[]).length : 0;
-  document.getElementById('countSubjects').textContent = semObj ? (semObj.subjects||[]).length : 0;
-  const raw = document.getElementById('rawJSON');
-  if (raw) raw.value = JSON.stringify(db, null, 2);
-}
+                       // --- SAMPLE DATA ---
+                       const getSampleData = () => ({
+                           courses: [{ Code: 'FSK20119', Name: 'Cert II Skills for Work' }, { Code: '11225NAT', Name: 'Cert IV Tertiary Prep' }],
+                           teachers: [
+                               { Name: 'Juan', Surname: 'Aburto', Initials: 'JA', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Cary', Surname: 'Buecher', Initials: 'CB', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 8 },
+                               { Name: 'Miroslav', Surname: 'Belik', Initials: 'MB', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10 },
+                               { Name: 'Carlie', Surname: 'Dally', Initials: 'CD', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Bernadette', Surname: 'Flynn-Whitehall', Initials: 'BF', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Cary', Surname: 'Buecher', Initials: 'CB2', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 8 },
+                               { Name: 'Christopher', Surname: 'Worland', Initials: 'CW', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 10 },
+                               { Name: 'David', Surname: 'Baird', Initials: 'DB', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'David', Surname: 'Cole', Initials: 'DC', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Georgina', Surname: 'Templeton', Initials: 'GT', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Ian', Surname: 'Willis', Initials: 'IW', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Karen', Surname: 'Gardner', Initials: 'KG', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20 },
+                               { Name: 'Kerri-Anne', Surname: 'Smith', Initials: 'KS', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Rosalind', Surname: 'Phillips', Initials: 'RP', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Rosalind', Surname: 'Tuohy', Initials: 'RT', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10 },
+                               { Name: 'Susan', Surname: 'Neild', Initials: 'SN', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4 },
+                               { Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20 }
+                           ],
+                           subjects: [
+                               { Subject: 'Health TPC', Color: '#ffa57d', Units: ['NAT11225026'] },
+                               { Subject: 'Maths B TPC', Color: '#ffa57d', Units: ['NAT11225020'] },
+                               { Subject: 'History TPC', Color: '#ffa57d', Units: ['NAT11225017'] },
+                               { Subject: 'Film and Media TPC', Color: '#ffa57d', Units: ['NAT11225015'] },
+                               { Subject: 'English B TPC', Color: '#ffa57d', Units: ['NAT11225002'] },
+                               { Subject: 'Maths B Calculus TPC', Color: '#ffa57d', Units: ['NAT11225021'] },
+                               { Subject: 'Compulsory Dig Lit Units PFS', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'] },
+                               { Subject: 'English A PFS', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'] },
+                               { Subject: 'Human Rights PFS', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'] }
+                           ],
+                           schedule: [
+                               { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
+                               { id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
+                           ]
+                       });
 
-// Save data (attempt GitHub, fallback to localStorage and manual download)
-// This is a prototype: to actually write to GitHub contents API you must configure GH.owner, GH.repo and GH.token
-async function saveData(message='Auto-save') {
-  setSyncState('saving');
-  // Update local backup immediately
-  try { localStorage.setItem('timetable_backup', JSON.stringify(db)); } catch(e){console.warn('localStorage save failed',e);}
-  // If GH token configured, try to save to GitHub via Contents API
-  if (window.GH && window.GH.owner && window.GH.repo && window.GH.token) {
-    try {
-      // Get current SHA if not known
-      if (!currentSha) {
-        const getUrl = `https://api.github.com/repos/${window.GH.owner}/${window.GH.repo}/contents/${DB_JSON_PATH}`;
-        const getResp = await fetch(getUrl, {headers: {'Authorization':'token ' + window.GH.token}});
-        if (getResp.ok) {
-          const getJson = await getResp.json();
-          currentSha = getJson.sha;
-        }
-      }
-      const putUrl = `https://api.github.com/repos/${window.GH.owner}/${window.GH.repo}/contents/${DB_JSON_PATH}`;
-      const content = base64EncodeUnicode(JSON.stringify(db, null, 2));
-      const body = { message: message, content: content };
-      if (currentSha) body.sha = currentSha;
-      const putResp = await fetch(putUrl, {
-        method: 'PUT',
-        headers: {
-          'Authorization': 'token ' + window.GH.token,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      });
-      if (!putResp.ok) {
-        const txt = await putResp.text();
-        throw new Error('GitHub save failed: ' + putResp.status + ' ' + txt);
-      }
-      const putJson = await putResp.json();
-      currentSha = putJson.content.sha;
-      setSyncState('synced');
-      console.log('Saved to GitHub successfully.');
-      return { ok:true, where:'github' };
-    } catch (err) {
-      console.warn('GitHub save failed', err);
-      setSyncState('remote-failed');
-      // fall through to local fallback
-    }
-  } else {
-    console.log('GitHub credentials not configured - skipping remote save.');
-  }
+                       // --- EVENT LISTENERS ---
+                       document.getElementById('openSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.add('sidebar-open'));
+                       document.getElementById('closeSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.remove('sidebar-open'));
+                       document.getElementById('printBtn').addEventListener('click', generatePdf);
+                       viewSelector.addEventListener('change', handleViewChange);
+                       semesterSelector.addEventListener('change', (e) => {
+                           db.currentSemester = e.target.value;
+                           processAndRenderAll();
+                       });
+                       document.getElementById('closeModalBtn').addEventListener('click', () => managementModal.classList.remove('active'));
+                       document.getElementById('closeSemesterModalBtn').addEventListener('click', () => semesterModal.classList.remove('active'));
+                       document.getElementById('closeSessionModalBtn').addEventListener('click', () => document.getElementById('sessionModal').classList.remove('active'));
+                       document.getElementById('loadSampleDataBtn').addEventListener('click', () => {
+                           const currentData = getCurrentSemesterData();
+                           const sampleData = getSampleData();
+                           currentData.courses = sampleData.courses;
+                           currentData.teachers = sampleData.teachers;
+                           currentData.subjects = sampleData.subjects;
+                           currentData.schedule = sampleData.schedule;
+                           processAndRenderAll();
+                           alert(`Sample data loaded into ${db.currentSemester}!`);
+                       });
+        
+                   document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterModal);
+                   document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'HomeCollege', 'TotalHours']));
+                   document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
+                   document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'Color', 'Units']));
+                   sessionForm.addEventListener('submit', handleSessionFormSubmit);
+                   document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
+                   document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
 
-  // Fallback: localStorage already written. Offer a download blob to let user save the file manually.
-  try {
-    const blob = new Blob([JSON.stringify(db, null, 2)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'db.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    setSyncState('local-only');
-    console.log('Saved locally (downloaded) and to localStorage backup.');
-    return { ok:true, where:'local' };
-  } catch (e) {
-    console.error('Local download failed', e);
-    setSyncState('offline');
-    return { ok:false };
-  }
-}
+                   // --- CORE PROCESSING & RENDERING ---
+                   function processAndRenderAll() {
+                       detectDisputes();
+                       renderSemesterSelector();
+                       renderCollegeTabs();
+                       handleViewChange(); // This will call populateSelectors and the correct render function
+                       saveData();
+                   }
 
-// Export current DB (download)
-function exportJSON() {
-  const blob = new Blob([JSON.stringify(db, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'db.json';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
+                   const timeToMinutes = (timeStr) => !timeStr ? 0 : timeStr.split(':').map(Number).reduce((h, m) => h * 60 + m);
+    
+                   function detectDisputes() {
+                       const semesterData = getCurrentSemesterData();
+                       if (!semesterData.schedule) semesterData.schedule = [];
+                       semesterData.schedule.forEach(s => s.dispute = null); // Reset disputes
+                       for (let i = 0; i < semesterData.schedule.length; i++) {
+                           for (let j = i + 1; j < semesterData.schedule.length; j++) {
+                               const s1 = semesterData.schedule[i];
+                               const s2 = semesterData.schedule[j];
+                               
+                               // Check if sessions share any colleges
+                               const sharedColleges = s1.colleges?.filter(c => s2.colleges?.includes(c)) || [];
+                               if (sharedColleges.length === 0) continue;
+                               
+                               if (s1.Day !== s2.Day) continue;
+                        
+                               const timeOverlap = timeToMinutes(s1.ClassStart) < timeToMinutes(s2.ClassEnd) && timeToMinutes(s2.ClassStart) < timeToMinutes(s1.ClassEnd);
+                               if (timeOverlap) {
+                                   let reason = null;
+                                   if (s1.TeacherInitials === s2.TeacherInitials) reason = `Teacher Conflict: ${s1.TeacherInitials}`;
+                                   else if (s1.Room === s2.Room) reason = `Room Conflict: ${s1.Room}`;
 
-// Import JSON from file input
-function importJSONFile(file) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const parsed = JSON.parse(e.target.result);
-      db = parsed;
-      updateUI();
-      saveData('Import JSON file');
-      alert('Import successful and saved (attempted).');
-    } catch (err) {
-      alert('Invalid JSON: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-}
+                                   if (reason) {
+                                       s1.dispute = { reason: reason, conflictingSessionId: s2.id };
+                                       s2.dispute = { reason: reason, conflictingSessionId: s1.id };
+                                   }
+                               }
+                           }
+                       }
+                   }
+    
+                   function renderSemesterSelector() {
+                       semesterSelector.innerHTML = Object.keys(db.semesters).map(name => `<option value="${name}" ${db.currentSemester === name ? 'selected' : ''}>${name}</option>`).join('');
+                   }
 
-// Small helpers for UI buttons
-document.getElementById('btnExport').addEventListener('click', exportJSON);
-document.getElementById('btnImport').addEventListener('click', ()=> document.getElementById('fileInput').click());
-document.getElementById('fileInput').addEventListener('change', (e)=> {
-  if (e.target.files && e.target.files[0]) importJSONFile(e.target.files[0]);
-});
-document.getElementById('btnForceSave').addEventListener('click', ()=> saveData('Manual save'));
-document.getElementById('btnLoadSample').addEventListener('click', ()=> loadData());
-document.getElementById('btnClearLocal').addEventListener('click', ()=> { localStorage.removeItem('timetable_backup'); alert('localStorage backup cleared'); });
-document.getElementById('btnShowJSON').addEventListener('click', ()=> {
-  const area = document.getElementById('jsonArea');
-  area.style.display = area.style.display === 'none' ? 'block' : 'none';
-  if (area.style.display === 'block') {
-    document.getElementById('rawJSON').value = JSON.stringify(db, null, 2);
-  }
-});
-document.getElementById('btnSaveFromEditor').addEventListener('click', ()=> {
-  try {
-    const parsed = JSON.parse(document.getElementById('rawJSON').value);
-    db = parsed;
-    updateUI();
-    saveData('Edited raw JSON saved');
-    alert('Saved (attempted).');
-  } catch (err) {
-    alert('Invalid JSON: ' + err.message);
-  }
-});
+                   function renderCollegeTabs() {
+                       const currentData = getCurrentSemesterData();
+                       let tabsHTML = `<button class="college-tab ${currentData.currentCollege === 'Master View' ? 'active' : ''}" data-college="Master View">Master View</button>`;
+                       tabsHTML += colleges.map(c => `<button class="college-tab ${currentData.currentCollege === c ? 'active' : ''}" data-college="${c}">${c}</button>`).join('');
+                       collegeTabsContainer.innerHTML = tabsHTML;
+                       collegeTabsContainer.querySelectorAll('.college-tab').forEach(tab => tab.addEventListener('click', (e) => {
+                           getCurrentSemesterData().currentCollege = e.target.dataset.college;
+                           processAndRenderAll();
+                       }));
+                   }
 
-// Example API that other parts of your app can call to persist changes:
-// call markDirty() whenever you update the db object.
-let saveTimeout = null;
-function markDirty() {
-  // debounce saves to avoid too many requests
-  if (saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(()=> { saveTimeout = null; saveData('Auto-save after changes'); }, 900);
-}
 
-// Initialize
-document.addEventListener('DOMContentLoaded', ()=> {
-  loadData();
-  // expose a global API for quick testing in console
-  window.timetableDB = {
-    getDB: ()=> db,
-    saveNow: ()=> saveData('Manual save from console'),
-    markDirty: markDirty,
-    exportJSON: exportJSON
-  };
-});
-</script>
+                   function openSemesterModal() {
+                       const contentEl = document.getElementById('semesterModalContent');
+                       let contentHTML = `<h3 class="text-lg font-bold mb-2">Existing Semesters</h3><div class="space-y-2 mb-6 border p-2 rounded bg-gray-50 max-h-48 overflow-y-auto">`;
+                
+                       const semesterNames = Object.keys(db.semesters);
+                       semesterNames.forEach(name => {
+                           contentHTML += `<div class="flex justify-between items-center p-2 border-b"><span>${name}</span>
+                           <button class="text-red-500 hover:text-red-700 ${semesterNames.length <= 1 ? 'opacity-50 cursor-not-allowed' : ''}" data-action="delete-semester" data-name="${name}" ${semesterNames.length <= 1 ? 'disabled' : ''}>Delete</button></div>`;
+                       });
+                       contentHTML += `</div>`;
+
+                       contentHTML += `<form id="addSemesterForm" class="border-t pt-4">
+                           <h3 class="text-lg font-bold mb-2">Create New Semester</h3>
+                           <div class="flex gap-2">
+                               <input type="text" name="semesterName" placeholder="e.g., Semester 2 2024" class="flex-grow border p-2 rounded" required>
+                               <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create</button>
+                           </div>
+                       </form>`;
+
+                       contentEl.innerHTML = contentHTML;
+                       semesterModal.classList.add('active');
+
+                       contentEl.querySelector('#addSemesterForm').addEventListener('submit', e => {
+                           e.preventDefault();
+                           const newName = e.target.elements.semesterName.value.trim();
+                           if (newName && !db.semesters[newName]) {
+                               db.semesters[newName] = getNewSemesterData();
+                               db.currentSemester = newName;
+                               semesterModal.classList.remove('active');
+                               processAndRenderAll();
+                           } else {
+                               alert('Semester name is empty or already exists.');
+                           }
+                       });
+
+                       contentEl.querySelectorAll('[data-action="delete-semester"]').forEach(btn => {
+                           btn.addEventListener('click', e => {
+                               const nameToDelete = e.target.dataset.name;
+                               if (confirm(`Are you sure you want to delete "${nameToDelete}"? This action cannot be undone.`)) {
+                                   delete db.semesters[nameToDelete];
+                                   if (db.currentSemester === nameToDelete) {
+                                       db.currentSemester = Object.keys(db.semesters)[0];
+                                   }
+                                   openSemesterModal(); // Re-render modal content
+                                   processAndRenderAll();
+                               }
+                           });
+                       });
+                   }
+
+                   function openManagementModal(title, data, fields) {
+                       document.getElementById('modalTitle').textContent = `Manage ${title}`;
+                       let contentHTML = `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">${fields.map(f => `<th class="p-2 text-left">${f}</th>`).join('')}<th class="p-2">Actions</th></tr></thead><tbody>`;
+                       data.forEach((item, index) => {
+                           contentHTML += `<tr class="border-b">${fields.map(f => `<td class="p-2">${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="${title.toLowerCase()}" data-index="${index}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="${title.toLowerCase()}" data-index="${index}" data-action="delete">Delete</button></td></tr>`;
+                       });
+                       contentHTML += `</tbody></table></div>`;
+        
+                       let formHTML = '';
+                       if (title === 'Teachers') {
+                           formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 border-t pt-4">
+                               <h3 class="text-lg font-bold col-span-full mb-2">Add / Edit Teacher</h3>
+                               <div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div>
+                               <div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div>
+                               <div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div>
+                               <div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" class="w-full border p-2 rounded" required>${colleges.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div>
+                               <div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div>
+                               <div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div>
+                               <input type="hidden" name="editIndex">
+                               <div class="col-span-full flex items-center gap-4">
+                                   <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Teacher</button>
+                                   <button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
+                               </div>
+                           </form>`;
+                       } else {
+                           formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 border-t pt-4">
+                              <h3 class="text-lg font-bold col-span-full mb-2">Add / Edit ${title.slice(0, -1)}</h3>
+                              ${fields.map(f => `<div><label class="block text-sm font-medium">${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" class="w-full border p-2 rounded" required></div>`).join('')}
+                              <input type="hidden" name="editIndex">
+                              <div class="col-span-full flex items-center gap-4">
+                                  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add ${title.slice(0, -1)}</button>
+                                  <button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
+                              </div>
+                          </form>`;
+                       }
+        
+                       document.getElementById('modalContent').innerHTML = contentHTML + formHTML;
+                       managementModal.classList.add('active');
+
+                       const form = document.getElementById('addForm');
+                       const cancelBtn = document.getElementById('cancelEditBtn');
+
+                       cancelBtn.addEventListener('click', () => {
+                           form.reset();
+                           form.querySelector('[name="editIndex"]').value = '';
+                           form.querySelector('button[type="submit"]').textContent = `Add ${title.slice(0, -1)}`;
+                           cancelBtn.classList.add('hidden');
+                           if (title === 'Teachers') {
+                               const initialsInput = form.querySelector('input[name="Initials"]');
+                               initialsInput.value = '';
+                           }
+                       });
+
+                       if (title === 'Teachers') {
+                           const nameInput = form.querySelector('input[name="Name"]');
+                           const surnameInput = form.querySelector('input[name="Surname"]');
+                           const initialsInput = form.querySelector('input[name="Initials"]');
+                           const updateInitials = () => {
+                               const firstInitial = nameInput.value.trim()[0]?.toUpperCase() || '';
+                               const secondInitial = surnameInput.value.trim()[0]?.toUpperCase() || '';
+                               initialsInput.value = `${firstInitial}${secondInitial}`;
+                           };
+                           nameInput.addEventListener('input', updateInitials);
+                           surnameInput.addEventListener('input', updateInitials);
+                       }
+
+                       form.addEventListener('submit', (e) => {
+                           e.preventDefault();
+                           const formData = new FormData(e.target);
+                           const editIndex = formData.get('editIndex');
+                           const semesterData = getCurrentSemesterData();
+            
+                           if (title === 'Teachers') {
+                               const teacherData = {
+                                   Name: formData.get('Name'),
+                                   Surname: formData.get('Surname'),
+                                   Initials: formData.get('Initials'),
+                                   HomeCollege: formData.get('HomeCollege'),
+                                   EmploymentType: formData.get('EmploymentType'),
+                                   TotalHours: parseFloat(formData.get('TotalHours')) || 0,
+                               };
+                               if (editIndex) {
+                                   semesterData.teachers[parseInt(editIndex, 10)] = teacherData;
+                               } else {
+                                   semesterData.teachers.push(teacherData);
+                               }
+                           } else {
+                               const newItem = {};
+                               fields.forEach(f => {
+                                  const value = formData.get(f)
+                                  newItem[f] = f === 'Units' ? (value ? value.split(',').map(u => u.trim()).filter(Boolean) : []) : value
+                               });
+                               if (editIndex) {
+                                   data[parseInt(editIndex, 10)] = newItem;
+                               } else {
+                                   data.push(newItem);
+                               }
+                           }
+                           openManagementModal(title, data, fields);
+                           processAndRenderAll();
+                       });
+
+                       document.getElementById('modalContent').querySelectorAll('button[data-action]').forEach(btn => btn.addEventListener('click', (e) => {
+                           const { type, index, action } = e.currentTarget.dataset;
+                           const dataCollection = getCurrentSemesterData()[type];
+
+                           if (action === 'delete') {
+                               if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                                   dataCollection.splice(index, 1);
+                                   openManagementModal(title, dataCollection, fields);
+                                   processAndRenderAll();
+                               }
+                           } else if (action === 'edit') {
+                               const item = dataCollection[index];
+                               for (const key in item) {
+                                   const input = form.querySelector(`[name="${key}"]`);
+                                   if (input) {
+                                       input.value = Array.isArray(item[key]) ? item[key].join(', ') : item[key];
+                                   }
+                               }
+                               form.querySelector('[name="editIndex"]').value = index;
+                               form.querySelector('button[type="submit"]').textContent = `Update ${title.slice(0, -1)}`;
+                               cancelBtn.classList.remove('hidden');
+                           }
+                       }));
+                   }
+        
+
+                   // --- VIEW RENDERING ---
+                   const renderers = { 'main-timetable': renderMainTimetableView, 'staff-summary': renderStaffSummaryView, 'dispute-log': renderDisputeLogView, 'course-print': renderCoursePrintView, 'teacher-print': renderTeacherPrintView };
+                   function handleViewChange() {
+                       const selectedView = viewSelector.value;
+                       document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
+                       document.getElementById(`${selectedView}-view`).classList.add('active');
+                       populateSelectors();
+                       renderers[selectedView]?.();
+                   }
+
+                   function populateSelectors() {
+                       const selectedView = viewSelector.value;
+                       const semesterData = getCurrentSemesterData();
+                       secondarySelectorsContainer.innerHTML = '';
+                       if (selectedView === 'course-print') {
+                           if (semesterData.courses.length > 0) {
+                               let selector = `<select id="course-selector" class="border border-gray-300 rounded px-3 py-2">${semesterData.courses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('')}</select>`;
+                               secondarySelectorsContainer.innerHTML = selector;
+                               document.getElementById('course-selector').addEventListener('change', renderCoursePrintView);
+                           }
+                       } else if (selectedView === 'teacher-print') {
+                           if (semesterData.teachers.length > 0) {
+                               let selector = `<select id="teacher-selector" class="border border-gray-300 rounded px-3 py-2">${semesterData.teachers.map(t => `<option value="${t.Initials}">${t.Name} ${t.Surname}</option>`).join('')}</select>`;
+                               secondarySelectorsContainer.innerHTML = selector;
+                               document.getElementById('teacher-selector').addEventListener('change', renderTeacherPrintView);
+                           }
+                       }
+                   }
+
+                   function arrangeOverlappingSessions(dayCol, sessions) {
+                       // Group sessions by time overlap
+                       const groups = [];
+                       sessions.forEach(session => {
+                           let addedToGroup = false;
+                           for (let group of groups) {
+                               // Check if this session overlaps with any in the group
+                               const overlaps = group.some(s => {
+                                   const s1Start = timeToMinutes(session.ClassStart);
+                                   const s1End = timeToMinutes(session.ClassEnd);
+                                   const s2Start = timeToMinutes(s.ClassStart);
+                                   const s2End = timeToMinutes(s.ClassEnd);
+                                   return s1Start < s2End && s2Start < s1End;
+                               });
+                               if (overlaps) {
+                                   group.push(session);
+                                   addedToGroup = true;
+                                   break;
+                               }
+                           }
+                           if (!addedToGroup) {
+                               groups.push([session]);
+                           }
+                       });
+                       
+                       // Arrange each group side-by-side
+                       groups.forEach(group => {
+                           const count = group.length;
+                           if (count > 1) {
+                               group.forEach((session, index) => {
+                                   const block = dayCol.querySelector(`[data-session-id="${session.id}"]`);
+                                   if (block) {
+                                       const widthPercent = (100 / count);
+                                       const leftPercent = (100 / count) * index;
+                                       block.style.left = `${leftPercent}%`;
+                                       block.style.right = `${100 - leftPercent - widthPercent}%`;
+                                       block.style.width = 'auto';
+                                   }
+                               });
+                           }
+                       });
+                   }
+
+
+                   function renderMainTimetableView() {
+                       const grid = document.getElementById('main-timetable-grid');
+                       const titleEl = document.getElementById('main-timetable-title');
+                       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                       const startTime = 8, endTime = 22, slotHeight = 30;
+                       const totalRows = (endTime - startTime) * 2;
+                       const semesterData = getCurrentSemesterData();
+                
+                       titleEl.textContent = `${semesterData.currentCollege} Timetable - ${db.currentSemester}`;
+
+                       let gridHTML = `<div style="grid-row: 1; grid-column: 1;"></div>` + days.map((day, i) => `<div class="timetable-header" style="grid-column: ${i + 2};">${day}</div>`).join('');
+                       gridHTML += `<div class="time-labels">${Array.from({length: totalRows}, (_, i) => `<div class="time-label">${(i % 2 === 0) ? `<strong>${startTime + i/2}:00</strong>` : ''}</div>`).join('')}</div>`;
+                       gridHTML += days.map((day, i) => {
+                           let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2}; height: ${totalRows * slotHeight}px">`;
+                           for (let j = 0; j < totalRows; j++) {
+                               const time = startTime + j * 0.5;
+                               const timeString = `${Math.floor(time).toString().padStart(2, '0')}:${((time % 1) * 60).toString().padStart(2, '0')}`;
+                               dayColHTML += `<div class="time-slot" data-day="${day}" data-time="${timeString}" data-slot-index="${j}"></div>`;
+                           }
+                           return dayColHTML + `</div>`;
+                       }).join('');
+                       grid.innerHTML = gridHTML;
+
+                       const scheduleToRender = semesterData.currentCollege === 'Master View' 
+                           ? semesterData.schedule 
+                           : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+            
+                       // Group sessions by day for overlap detection
+                       const sessionsByDay = {};
+                       days.forEach(day => sessionsByDay[day] = []);
+                       
+                       scheduleToRender.forEach(session => {
+                           const dayCol = grid.querySelector(`.day-column[data-day="${session.Day}"]`);
+                           if (!dayCol) return;
+                           
+                           sessionsByDay[session.Day].push(session);
+                           
+                           const start = timeToMinutes(session.ClassStart) / 30 - startTime * 2;
+                           const height = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 30 * slotHeight;
+                           const subjectInfo = semesterData.subjects.find(s => s.Subject === session.Subject);
+                           const teacherInfo = semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
+                           const notesHTML = session.notes ? `<div class="text-xs italic text-gray-600 truncate" title="${session.notes}">${session.notes}</div>` : '';
+                           const collegeInfo = semesterData.currentCollege === 'Master View' ? `<div class="font-bold text-indigo-600 text-xs">${session.colleges?.join(', ') || ''}</div>` : '';
+
+                           const sessionBlock = document.createElement('div');
+                           sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''}`;
+                           sessionBlock.setAttribute('data-session-id', session.id);
+                           Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
+                           sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div><div>${teacherInfo ? `${teacherInfo.Name} ${teacherInfo.Surname}` : session.TeacherInitials} | ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
+                           sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
+                           dayCol.appendChild(sessionBlock);
+                           makeDraggable(sessionBlock, session);
+                           makeResizable(sessionBlock, session);
+                       });
+                       
+                       // Arrange overlapping sessions side-by-side for each day
+                       days.forEach(day => {
+                           const dayCol = grid.querySelector(`.day-column[data-day="${day}"]`);
+                           if (dayCol && sessionsByDay[day].length > 0) {
+                               arrangeOverlappingSessions(dayCol, sessionsByDay[day]);
+                           }
+                       });
+                       
+                       addSlotSelectionListeners();
+                   }
+        
+    
+
+                   function addSlotSelectionListeners() {
+                       if (getCurrentSemesterData().currentCollege === 'Master View') return;
+                       let isSelecting = false, startSlot = null, dayOfSelection = null;
+                       const grid = document.getElementById('main-timetable-grid');
+
+                       grid.addEventListener('mousedown', (e) => {
+                           const slot = e.target.closest('.time-slot');
+                           if (!slot || e.target.closest('.session-block')) return;
+                           isSelecting = true;
+                           dayOfSelection = slot.dataset.day;
+                           startSlot = slot;
+                           clearSlotSelection();
+                           slot.classList.add('slot-selected');
+                           document.addEventListener('mousemove', onMouseMove);
+                           document.addEventListener('mouseup', onMouseUp);
+                       });
+
+                       function onMouseMove(e) {
+                           if (!isSelecting) return;
+                           const slot = e.target.closest('.time-slot');
+                           if (!slot || slot.dataset.day !== dayOfSelection) return;
+                           clearSlotSelection();
+                           const startIndex = parseInt(startSlot.dataset.slotIndex, 10);
+                           const currentIndex = parseInt(slot.dataset.slotIndex, 10);
+                           const [minIndex, maxIndex] = [Math.min(startIndex, currentIndex), Math.max(startIndex, currentIndex)];
+                           const dayColumn = grid.querySelector(`.day-column[data-day="${dayOfSelection}"]`);
+                           const slotsInDay = dayColumn.querySelectorAll('.time-slot');
+                           for (let i = minIndex; i <= maxIndex; i++) {
+                               if (slotsInDay[i]) slotsInDay[i].classList.add('slot-selected');
+                           }
+                       }
+
+                       function onMouseUp() {
+                           if (!isSelecting) return;
+                           isSelecting = false;
+                           document.removeEventListener('mousemove', onMouseMove);
+                           document.removeEventListener('mouseup', onMouseUp);
+                           const selected = grid.querySelectorAll('.slot-selected');
+                           if (selected.length > 0) {
+                               const day = selected[0].dataset.day, startTime = selected[0].dataset.time;
+                               const lastSlotIndex = parseInt(selected[selected.length - 1].dataset.slotIndex, 10);
+                               const endMinutes = (8 * 60) + ((lastSlotIndex + 1) * 30);
+                               const endTime = `${Math.floor(endMinutes / 60).toString().padStart(2, '0')}:${(endMinutes % 60).toString().padStart(2, '0')}`;
+                               openSessionModal(null, day, startTime, endTime);
+                           }
+                       }
+                       const clearSlotSelection = () => grid.querySelectorAll('.slot-selected').forEach(s => s.classList.remove('slot-selected'));
+                   }
+        
+
+
+
+                   function makeDraggable(element, session) {
+                       let clone, offsetX, offsetY;
+                       let isDragging = false;
+                       let startX, startY;
+
+                       const onMouseDown = (e) => {
+                           if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
+                    
+                           isDragging = false;
+                           startX = e.clientX;
+                           startY = e.clientY;
+
+                           // Do not prevent default here, to allow click and dblclick events to fire.
+                           e.stopPropagation();
+
+                           document.addEventListener('mousemove', onMouseMove);
+                           document.addEventListener('mouseup', onMouseUp);
+                       };
+
+                       const onMouseMove = (e) => {
+                           // If we haven't started dragging, and the mouse has moved a small threshold distance, start the drag.
+                           if (!isDragging && (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5)) {
+                               isDragging = true;
+                               // Now that we are dragging, prevent default behaviors like text selection.
+                               e.preventDefault();
+
+                               clone = element.cloneNode(true);
+                               Object.assign(clone.style, { position: 'absolute', zIndex: '1000', opacity: '0.7', pointerEvents: 'none' });
+                               document.body.appendChild(clone);
+                               const rect = element.getBoundingClientRect();
+                               offsetX = startX - rect.left;
+                               offsetY = startY - rect.top;
+                               clone.style.left = `${startX - offsetX}px`;
+                               clone.style.top = `${startY - offsetY}px`;
+                               element.style.visibility = 'hidden';
+                           }
+
+                           if (isDragging) {
+                               e.preventDefault();
+                               clone.style.left = `${e.clientX - offsetX}px`;
+                               clone.style.top = `${e.clientY - offsetY}px`;
+                           }
+                       };
+                
+                       const onMouseUp = (e) => {
+                           document.removeEventListener('mousemove', onMouseMove);
+                           document.removeEventListener('mouseup', onMouseUp);
+
+                           if (isDragging) {
+                               clone.style.visibility = 'hidden';
+                               const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+                               const timeSlot = dropTarget?.closest('.time-slot');
+                        
+                               if (timeSlot) {
+                                   const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
+                                   const startMins = (8 * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
+                                   const endMins = startMins + duration;
+                                   const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
+                                   session.Day = timeSlot.dataset.day;
+                                   session.ClassStart = format(startMins);
+                                   session.ClassEnd = format(endMins);
+                               }
+                               document.body.removeChild(clone);
+                               // Re-render will make the original block visible in its new position
+                               processAndRenderAll(); 
+                           } else {
+                               // If not dragging, it was a click/dblclick. Do nothing, let the browser handle it.
+                           }
+                           // Ensure the original element is visible again, in case a drag was initiated but cancelled, etc.
+                           element.style.visibility = 'visible';
+                       };
+
+                       element.addEventListener('mousedown', onMouseDown);
+                   }
+        
+        
+
+                   function makeResizable(element, session) {
+                       const handle = element.querySelector('.resize-handle');
+                       handle.addEventListener('mousedown', (e) => {
+                           e.stopPropagation();
+                           const startY = e.clientY, startHeight = element.offsetHeight, slotHeight = 30;
+                           const onMouseMove = (e) => { element.style.height = `${Math.max(slotHeight, startHeight + (e.clientY - startY))}px`; };
+                           const onMouseUp = () => {
+                               document.removeEventListener('mousemove', onMouseMove);
+                               document.removeEventListener('mouseup', onMouseUp);
+                               const finalHeight = Math.round(element.offsetHeight / slotHeight) * slotHeight;
+                               const duration = (finalHeight / slotHeight) * 30;
+                               const endMins = timeToMinutes(session.ClassStart) + duration;
+                               session.ClassEnd = `${Math.floor(endMins / 60).toString().padStart(2, '0')}:${(endMins % 60).toString().padStart(2, '0')}`;
+                               processAndRenderAll();
+                           };
+                           document.addEventListener('mousemove', onMouseMove);
+                           document.addEventListener('mouseup', onMouseUp);
+                       });
+                   }
+
+                   function openSessionModal(session, day = null, startTime = null, endTime = null) {
+                       sessionForm.reset();
+                       const semesterData = getCurrentSemesterData();
+                       document.getElementById('sessionModalTitle').textContent = session ? 'Edit Session' : 'Add New Session';
+                       document.getElementById('sessionId').value = session?.id || '';
+                       document.getElementById('sessionDay').value = session?.Day || day;
+                       document.getElementById('sessionStartTime').value = session?.ClassStart || startTime;
+                       document.getElementById('sessionEndTime').value = session?.ClassEnd || endTime || '';
+                       document.getElementById('sessionRoom').value = session?.Room || '';
+                       document.getElementById('sessionNotes').value = session?.notes || '';
+                       document.getElementById('deleteSessionBtn').style.display = session ? 'block' : 'none';
+
+                       const courseSelect = document.getElementById('sessionCourse');
+                       const subjectSelect = document.getElementById('sessionSubject');
+                       const teacherSelect = document.getElementById('sessionTeacher');
+                       courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
+                       subjectSelect.innerHTML = semesterData.subjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
+                       teacherSelect.innerHTML = semesterData.teachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
+                       
+                       // Check college checkboxes
+                       const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
+                       collegeCheckboxes.forEach(cb => {
+                           cb.checked = session?.colleges?.includes(cb.value) || (!session && cb.value === semesterData.currentCollege);
+                       });
+                       
+                       document.getElementById('sessionModal').classList.add('active');
+                   }
+
+                   function handleSessionFormSubmit(e) {
+                       e.preventDefault();
+                       const id = document.getElementById('sessionId').value;
+                       const semesterData = getCurrentSemesterData();
+                       
+                       // Get selected colleges
+                       const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges"]:checked')).map(cb => cb.value);
+                       
+                       const sessionData = {
+                           Day: document.getElementById('sessionDay').value,
+                           ClassStart: document.getElementById('sessionStartTime').value,
+                           ClassEnd: document.getElementById('sessionEndTime').value,
+                           CourseCode: document.getElementById('sessionCourse').value,
+                           Subject: document.getElementById('sessionSubject').value,
+                           TeacherInitials: document.getElementById('sessionTeacher').value,
+                           Room: document.getElementById('sessionRoom').value,
+                           notes: document.getElementById('sessionNotes').value,
+                           colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
+                           dispute: null
+                       };
+        
+                       if (id) {
+                           const index = semesterData.schedule.findIndex(s => s.id == id);
+                           if (index !== -1) {
+                               semesterData.schedule[index] = { ...semesterData.schedule[index], ...sessionData };
+                           }
+                       } else {
+                           sessionData.id = Date.now();
+                           semesterData.schedule.push(sessionData);
+                       }
+                       document.getElementById('sessionModal').classList.remove('active');
+                       processAndRenderAll();
+                   }
+
+                   function handleDeleteSession() {
+                       const id = document.getElementById('sessionId').value;
+                       const semesterData = getCurrentSemesterData();
+                       semesterData.schedule = semesterData.schedule.filter(s => s.id != id);
+                       document.getElementById('sessionModal').classList.remove('active');
+                       processAndRenderAll();
+                   }
+
+                   function renderStaffSummaryView() {
+                       const container = document.getElementById('staff-summary-table');
+                       const titleEl = document.getElementById('staff-summary-title');
+                       const semesterData = getCurrentSemesterData();
+                       const scheduleToView = semesterData.currentCollege === 'Master View'
+                           ? semesterData.schedule
+                           : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+        
+                       if (!semesterData.teachers?.length) { container.innerHTML = `<p class="text-center text-gray-500">No teacher data.</p>`; return; }
+        
+                       titleEl.textContent = `Teaching Program Summary - ${semesterData.currentCollege} (${db.currentSemester})`;
+
+                       const headers = ['Initials', 'Name', 'Surname', ...semesterData.courses.map(c => c.Code), 'Direct Teaching', 'Total Hours', 'Remaining Hours'];
+                       let tableHTML = `<table class="w-full text-sm border-collapse"><thead><tr class="bg-blue-900 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
+        
+                       semesterData.teachers.forEach(teacher => {
+                           tableHTML += `<tr class="border-b hover:bg-gray-100"><td class="border p-2 font-bold">${teacher.Initials}</td><td class="border p-2">${teacher.Name}</td><td class="border p-2">${teacher.Surname}</td>`;
+                           let directTeachingHours = 0;
+                           semesterData.courses.forEach(course => {
+                               const hours = scheduleToView.filter(s => s.TeacherInitials === teacher.Initials && s.CourseCode === course.Code).reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+                               tableHTML += `<td class="border p-2 text-center">${hours ? hours.toFixed(2) : ''}</td>`;
+                               directTeachingHours += hours;
+                           });
+                           const totalHours = teacher.TotalHours || 0;
+                           const remainingHours = totalHours - directTeachingHours;
+                           const remainingHoursClass = remainingHours < 0 ? 'text-red-600 font-bold' : '';
+
+                           tableHTML += `<td class="border p-2 text-center font-bold bg-cyan-100">${directTeachingHours.toFixed(2)}</td>`;
+                           tableHTML += `<td class="border p-2 text-center font-bold bg-yellow-100">${totalHours.toFixed(2)}</td>`;
+                           tableHTML += `<td class="border p-2 text-center font-bold bg-green-100 ${remainingHoursClass}">${remainingHours.toFixed(2)}</td></tr>`;
+                       });
+                       container.innerHTML = tableHTML + `</tbody></table>`;
+                   }
+
+                   function renderDisputeLogView() {
+                       const container = document.getElementById('dispute-log-view');
+                       const semesterData = getCurrentSemesterData();
+                       const disputedSessions = semesterData.schedule.filter(s => s.dispute);
+
+                       let contentHTML = `<div class="bg-white p-4 rounded-lg shadow-lg overflow-x-auto">
+                           <h2 class="text-xl font-bold text-center mb-4">Dispute Log - ${semesterData.currentCollege} (${db.currentSemester})</h2>`;
+
+                       if (disputedSessions.length === 0) {
+                           contentHTML += `<p class="text-center text-gray-500">No disputes found in this view.</p>`;
+                       } else {
+                           const headers = ['Day', 'Time', 'Course', 'Subject', 'Teacher', 'Room', 'Colleges', 'Reason for Dispute'];
+                           contentHTML += `<table class="w-full text-sm border-collapse"><thead><tr class="bg-red-800 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
+                           disputedSessions.forEach(session => {
+                               contentHTML += `<tr class="border-b hover:bg-red-50">
+                                   <td class="border p-2">${session.Day}</td>
+                                   <td class="border p-2">${session.ClassStart} - ${session.ClassEnd}</td>
+                                   <td class="border p-2">${session.CourseCode}</td>
+                                   <td class="border p-2">${session.Subject}</td>
+                                   <td class="border p-2">${session.TeacherInitials}</td>
+                                   <td class="border p-2">${session.Room}</td>
+                                   <td class="border p-2">${session.colleges?.join(', ') || ''}</td>
+                                   <td class="border p-2 font-bold text-red-600">${session.dispute.reason}</td>
+                               </tr>`;
+                           });
+                           contentHTML += `</tbody></table>`;
+                       }
+                       contentHTML += `</div>`;
+                       container.innerHTML = contentHTML;
+                   }
+
+                   function renderGenericPrintView(containerId, title, sessions) {
+                       const container = document.getElementById(containerId);
+                       const semesterData = getCurrentSemesterData();
+                       const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+        
+                       let gridHTML = `<div class="print-grid">
+                           <div class="print-header"></div>
+                           ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
+
+                       ['Morning', 'Afternoon', 'Night'].forEach(period => {
+                           gridHTML += `<div class="print-period-label">${period}</div>`;
+                           ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+                               const daySessions = sessions.filter(s => {
+                                   const start = timeToMinutes(s.ClassStart);
+                                   return s.Day === day && (
+                                       (period === 'Morning' && start < 720) ||
+                                       (period === 'Afternoon' && start >= 720 && start < 1020) || 
+                                       (period === 'Night' && start >= 1020)
+                                   );
+                               });
+                
+                               const sessionsHTML = daySessions.map(s => {
+                                   const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+                                   const teacherInfo = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+                                   const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+                                   const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+                                   const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+                    
+                                   if (!teacherInfo) return ''; // Prevent crash if teacher not found
+
+                                   return `<div class="print-session" style="background-color:${subjectInfo?.Color || '#eee'}">
+                                       ${collegeHTML}
+                                       <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
+                                       <div>${teacherInfo.Name} ${teacherInfo.Surname} | ${hours.toFixed(2)} Hrs | ${s.Room}</div>
+                                       ${notesHTML}
+                                       <div>${s.ClassStart} - ${s.ClassEnd}</div>
+                                   </div>`;
+                               }).join('');
+                               gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
+                           });
+                       });
+                       gridHTML += `</div>`;
+
+                       container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div></div>`;
+                   }
+        
+
+                function renderCoursePrintView() {
+                   const container = document.getElementById('course-print-view');
+                   const selector = document.getElementById('course-selector');
+                   const semesterData = getCurrentSemesterData();
+        
+                   if (!selector) {
+                       container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
+                       return;
+                   }
+        
+                   const courseCode = selector.value;
+                   const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
+        
+                   const scheduleToFilter = semesterData.currentCollege === 'Master View'
+                       ? semesterData.schedule
+                       : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+            
+                   const sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
+        
+                   const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentCollege}`;
+                   renderGenericPrintView('course-print-view', title, sessions);
+                }
+
+                function renderTeacherPrintView() {
+                   const container = document.getElementById('teacher-print-view');
+                   const selector = document.getElementById('teacher-selector');
+                   const semesterData = getCurrentSemesterData();
+
+                   if (!selector) {
+                       container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
+                       return;
+                   }
+
+                   const teacherInitials = selector.value;
+                   const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
+
+                   const scheduleToFilter = semesterData.currentCollege === 'Master View'
+                       ? semesterData.schedule
+                       : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+
+                   const sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials);
+        
+                   const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
+                   renderGenericPrintView('teacher-print-view', title, sessions);
+                }
+
+                function generatePdf() {
+                  const loadingOverlay = document.getElementById('loadingOverlay');
+                  const activeView = document.querySelector('.view-container.active');
+                  const semesterData = getCurrentSemesterData();
+
+                  if (!activeView) {
+                      alert('Could not find an active view to print.');
+                      return;
+                  }
+                  loadingOverlay.style.display = 'flex';
+
+                  const selectedViewText = viewSelector.options[viewSelector.selectedIndex].text;
+        
+                  let filename = `${db.currentSemester} - ${semesterData.currentCollege} - ${selectedViewText}.pdf`.replace(/[\s/]/g, '_');
+
+                  if (selectedViewText === 'Course Print' || selectedViewText === 'Teacher Print') {
+                      const secondarySelector = document.getElementById('course-selector') || document.getElementById('teacher-selector');
+                      if (secondarySelector && secondarySelector.options.length > 0) {
+                          const selectedOptionText = secondarySelector.options[secondarySelector.selectedIndex].text;
+                          filename = `${db.currentSemester} - ${selectedOptionText} - ${semesterData.currentCollege}.pdf`.replace(/[\s/]/g, '_');
+                      }
+                  }
+        
+                  const elementToPrint = activeView.firstElementChild || activeView;
+
+                  const opt = {
+                      margin:       [0.5, 0.5, 0.5, 0.5],
+                      filename:     filename,
+                      image:        { type: 'jpeg', quality: 0.98 },
+                      html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: -window.scrollY },
+                      jsPDF:        { unit: 'in', format: 'a3', orientation: 'landscape' }
+                  };
+
+                  html2pdf().from(elementToPrint).set(opt).save().then(() => {
+                      loadingOverlay.style.display = 'none';
+                  }).catch(err => {
+                      console.error("PDF generation failed:", err);
+                      alert("Sorry, there was an error generating the PDF.");
+                      loadingOverlay.style.display = 'none';
+                  });
+               }
+    
+                // --- INITIALIZATION ---
+                loadData();
+                processAndRenderAll();
+            });
+            </script>
 </body>
 </html>

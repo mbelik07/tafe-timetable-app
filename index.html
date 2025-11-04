@@ -1,0 +1,300 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Timetable App - Cloud-sync Prototype</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:0;display:flex;min-height:100vh}
+    header{background:#222;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;width:100%}
+    #status{padding:6px 10px;border-radius:4px;background:#444}
+    #container{display:flex;flex:1}
+    #sidebar{width:260px;background:#f3f3f3;padding:12px;box-sizing:border-box;border-right:1px solid #ddd}
+    main{flex:1;padding:16px}
+    button{display:inline-block;margin:6px 0;padding:8px 10px;border-radius:4px;border:1px solid #888;background:#fff;cursor:pointer}
+    .green{background:#2ecc71;color:#fff;border-color:#2ecc71}
+    .red{background:#e74c3c;color:#fff;border-color:#e74c3c}
+    textarea{width:100%;height:200px;font-family:monospace}
+    .small{font-size:12px;color:#666}
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>Timetable App (cloud-sync prototype)</strong></div>
+    <div id="status">Sync: <span id="syncState">unknown</span></div>
+  </header>
+
+  <div id="container">
+    <aside id="sidebar">
+      <h3>Data Controls</h3>
+      <button id="btnExport">Export JSON</button><br>
+      <button id="btnImport">Import JSON</button><br>
+      <input type="file" id="fileInput" style="display:none" accept=".json,application/json">
+      <hr>
+      <button id="btnForceSave">Force Save (try GitHub)</button><br>
+      <button id="btnLoadSample">Load data/db.json</button><br>
+      <button id="btnClearLocal">Clear localStorage backup</button><br>
+      <hr>
+      <div class="small">
+        GitHub autosave requires configuring OWNER, REPO and a personal access token in the page (see comments in the JS).<br>
+        If GitHub save fails the app will fallback to localStorage and offer a manual download.
+      </div>
+    </aside>
+
+    <main>
+      <h2>Current Database Snapshot</h2>
+      <div><strong>Semester:</strong> <span id="currentSem">-</span></div>
+      <div><strong>Teachers:</strong> <span id="countTeachers">0</span></div>
+      <div><strong>Subjects:</strong> <span id="countSubjects">0</span></div>
+      <div style="margin-top:10px;">
+        <button id="btnShowJSON">Show raw JSON</button>
+      </div>
+      <div id="jsonArea" style="display:none;margin-top:12px;">
+        <textarea id="rawJSON"></textarea><br>
+        <button id="btnSaveFromEditor">Save changes</button>
+      </div>
+    </main>
+  </div>
+
+<script>
+/*
+  index.html sync behaviour (prototype)
+  - Loads data from data/db.json on startup using fetch()
+  - Tries to save to GitHub using the Contents API (PUT to https://api.github.com/repos/OWNER/REPO/contents/data/db.json)
+    * You MUST set OWNER, REPO and TOKEN variables below for that to work.
+  - If GitHub save isn't configured or fails, falls back to localStorage and offers manual export.
+  - There is a sync status indicator in the header and Export/Import JSON controls in the sidebar.
+  - This file is intended as a drop-in prototype. Real server-side storage is recommended for production.
+*/
+
+const DB_JSON_PATH = 'data/db.json'; // where the app expects the JSON when hosted
+let db = null;
+let currentSha = null; // used when saving to GitHub (if available)
+
+// Configure these if you want the page to attempt GitHub saves. DO NOT hardcode tokens in public pages.
+// For testing locally you may set them in the browser console, e.g. window.GH = {owner:'mbelik07', repo:'tafe-timetable-app', token:'ghp_......'}
+window.GH = window.GH || {
+  owner: '', // e.g. 'mbelik07'
+  repo: '',  // e.g. 'tafe-timetable-app'
+  token: ''  // personal access token with repo:contents permissions
+};
+
+const syncStateEl = document.getElementById('syncState');
+function setSyncState(s) {
+  syncStateEl.textContent = s;
+  const status = document.getElementById('status');
+  if (s === 'synced') status.style.background = '#2ecc71';
+  else if (s === 'saving') status.style.background = '#f1c40f';
+  else if (s === 'remote-failed') status.style.background = '#e67e22';
+  else if (s === 'local-only') status.style.background = '#3498db';
+  else if (s === 'offline') status.style.background = '#e74c3c';
+  else status.style.background = '#444';
+}
+
+// Utility: base64 encode Unicode string
+function base64EncodeUnicode(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+// Attempt to load the JSON file from data/db.json
+async function loadData() {
+  setSyncState('loading');
+  try {
+    const res = await fetch(DB_JSON_PATH, {cache: 'no-store'});
+    if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+    const json = await res.json();
+    db = json;
+    // try to get GitHub SHA (if hosted on GitHub) by hitting the GitHub API anonymously - this only works for public repos
+    try {
+      // Attempt to deduce owner/repo from location when served via GitHub Pages (common pattern)
+      // But this is optional and may not succeed.
+      const ghResp = await fetch('https://api.github.com/repos/' + (window.GH.owner || '') + '/' + (window.GH.repo || '') + '/contents/' + DB_JSON_PATH);
+      if (ghResp.ok) {
+        const ghJson = await ghResp.json();
+        currentSha = ghJson.sha;
+      }
+    } catch(e) {/* ignore */}
+    localStorage.setItem('timetable_backup', JSON.stringify(db));
+    updateUI();
+    setSyncState('synced');
+    console.log('Loaded data from', DB_JSON_PATH);
+  } catch (err) {
+    console.warn('Could not load', DB_JSON_PATH, err);
+    // fallback to localStorage
+    const local = localStorage.getItem('timetable_backup');
+    if (local) {
+      db = JSON.parse(local);
+      updateUI();
+      setSyncState('local-only');
+      console.log('Loaded data from localStorage backup');
+    } else {
+      // last resort: empty template
+      db = { semesters: {}, currentSemester: null };
+      updateUI();
+      setSyncState('offline');
+      console.log('No data available, started with empty DB');
+    }
+  }
+}
+
+function updateUI() {
+  const sem = db.currentSemester || '-';
+  document.getElementById('currentSem').textContent = sem;
+  const semObj = (db.semesters && db.semesters[sem]) ? db.semesters[sem] : null;
+  document.getElementById('countTeachers').textContent = semObj ? (semObj.teachers||[]).length : 0;
+  document.getElementById('countSubjects').textContent = semObj ? (semObj.subjects||[]).length : 0;
+  const raw = document.getElementById('rawJSON');
+  if (raw) raw.value = JSON.stringify(db, null, 2);
+}
+
+// Save data (attempt GitHub, fallback to localStorage and manual download)
+// This is a prototype: to actually write to GitHub contents API you must configure GH.owner, GH.repo and GH.token
+async function saveData(message='Auto-save') {
+  setSyncState('saving');
+  // Update local backup immediately
+  try { localStorage.setItem('timetable_backup', JSON.stringify(db)); } catch(e){console.warn('localStorage save failed',e);}
+  // If GH token configured, try to save to GitHub via Contents API
+  if (window.GH && window.GH.owner && window.GH.repo && window.GH.token) {
+    try {
+      // Get current SHA if not known
+      if (!currentSha) {
+        const getUrl = `https://api.github.com/repos/${window.GH.owner}/${window.GH.repo}/contents/${DB_JSON_PATH}`;
+        const getResp = await fetch(getUrl, {headers: {'Authorization':'token ' + window.GH.token}});
+        if (getResp.ok) {
+          const getJson = await getResp.json();
+          currentSha = getJson.sha;
+        }
+      }
+      const putUrl = `https://api.github.com/repos/${window.GH.owner}/${window.GH.repo}/contents/${DB_JSON_PATH}`;
+      const content = base64EncodeUnicode(JSON.stringify(db, null, 2));
+      const body = { message: message, content: content };
+      if (currentSha) body.sha = currentSha;
+      const putResp = await fetch(putUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'token ' + window.GH.token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      if (!putResp.ok) {
+        const txt = await putResp.text();
+        throw new Error('GitHub save failed: ' + putResp.status + ' ' + txt);
+      }
+      const putJson = await putResp.json();
+      currentSha = putJson.content.sha;
+      setSyncState('synced');
+      console.log('Saved to GitHub successfully.');
+      return { ok:true, where:'github' };
+    } catch (err) {
+      console.warn('GitHub save failed', err);
+      setSyncState('remote-failed');
+      // fall through to local fallback
+    }
+  } else {
+    console.log('GitHub credentials not configured - skipping remote save.');
+  }
+
+  // Fallback: localStorage already written. Offer a download blob to let user save the file manually.
+  try {
+    const blob = new Blob([JSON.stringify(db, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'db.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setSyncState('local-only');
+    console.log('Saved locally (downloaded) and to localStorage backup.');
+    return { ok:true, where:'local' };
+  } catch (e) {
+    console.error('Local download failed', e);
+    setSyncState('offline');
+    return { ok:false };
+  }
+}
+
+// Export current DB (download)
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'db.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// Import JSON from file input
+function importJSONFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      db = parsed;
+      updateUI();
+      saveData('Import JSON file');
+      alert('Import successful and saved (attempted).');
+    } catch (err) {
+      alert('Invalid JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Small helpers for UI buttons
+document.getElementById('btnExport').addEventListener('click', exportJSON);
+document.getElementById('btnImport').addEventListener('click', ()=> document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change', (e)=> {
+  if (e.target.files && e.target.files[0]) importJSONFile(e.target.files[0]);
+});
+document.getElementById('btnForceSave').addEventListener('click', ()=> saveData('Manual save'));
+document.getElementById('btnLoadSample').addEventListener('click', ()=> loadData());
+document.getElementById('btnClearLocal').addEventListener('click', ()=> { localStorage.removeItem('timetable_backup'); alert('localStorage backup cleared'); });
+document.getElementById('btnShowJSON').addEventListener('click', ()=> {
+  const area = document.getElementById('jsonArea');
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+  if (area.style.display === 'block') {
+    document.getElementById('rawJSON').value = JSON.stringify(db, null, 2);
+  }
+});
+document.getElementById('btnSaveFromEditor').addEventListener('click', ()=> {
+  try {
+    const parsed = JSON.parse(document.getElementById('rawJSON').value);
+    db = parsed;
+    updateUI();
+    saveData('Edited raw JSON saved');
+    alert('Saved (attempted).');
+  } catch (err) {
+    alert('Invalid JSON: ' + err.message);
+  }
+});
+
+// Example API that other parts of your app can call to persist changes:
+// call markDirty() whenever you update the db object.
+let saveTimeout = null;
+function markDirty() {
+  // debounce saves to avoid too many requests
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(()=> { saveTimeout = null; saveData('Auto-save after changes'); }, 900);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', ()=> {
+  loadData();
+  // expose a global API for quick testing in console
+  window.timetableDB = {
+    getDB: ()=> db,
+    saveNow: ()=> saveData('Manual save from console'),
+    markDirty: markDirty,
+    exportJSON: exportJSON
+  };
+});
+</script>
+</body>
+</html>

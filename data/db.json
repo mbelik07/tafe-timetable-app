@@ -1,0 +1,43 @@
+{
+  "semesters": {
+    "Semester 1 2024": {
+      "courses": [
+        { "Code": "FSK20119", "Name": "Cert II Skills for Work" },
+        { "Code": "11225NAT", "Name": "Cert IV Tertiary Prep" }
+      ],
+      "teachers": [
+        { "Name": "Juan", "Surname": "Aburto", "Initials": "JA", "HomeCollege": "Moss Vale", "EmploymentType": "Full-Time", "TotalHours": 20 },
+        { "Name": "Cary", "Surname": "Buecher", "Initials": "CB", "HomeCollege": "Goulburn", "EmploymentType": "Casual", "TotalHours": 8 },
+        { "Name": "Miroslav", "Surname": "Belik", "Initials": "MB", "HomeCollege": "Moss Vale", "EmploymentType": "Full-Time", "TotalHours": 10 },
+        { "Name": "Carlie", "Surname": "Dally", "Initials": "CD", "HomeCollege": "Goulburn", "EmploymentType": "Full-Time", "TotalHours": 20 },
+        { "Name": "Bernadette", "Surname": "Flynn-Whitehall", "Initials": "BF", "HomeCollege": "Moss Vale", "EmploymentType": "Casual", "TotalHours": 4 },
+        { "Name": "Cary", "Surname": "Buecher", "Initials": "CB2", "HomeCollege": "Moss Vale", "EmploymentType": "Casual", "TotalHours": 8 },
+        { "Name": "Christopher", "Surname": "Worland", "Initials": "CW", "HomeCollege": "Goulburn", "EmploymentType": "Full-Time", "TotalHours": 10 },
+        { "Name": "David", "Surname": "Baird", "Initials": "DB", "HomeCollege": "Goulburn", "EmploymentType": "Full-Time", "TotalHours": 20 },
+        { "Name": "David", "Surname": "Cole", "Initials": "DC", "HomeCollege": "Goulburn", "EmploymentType": "Full-Time", "TotalHours": 20 },
+        { "Name": "Georgina", "Surname": "Templeton", "Initials": "GT", "HomeCollege": "Goulburn", "EmploymentType": "Full-Time", "TotalHours": 20 },
+        { "Name": "Ian", "Surname": "Willis", "Initials": "IW", "HomeCollege": "Goulburn", "EmploymentType": "Casual", "TotalHours": 4 },
+        { "Name": "Karen", "Surname": "Gardner", "Initials": "KG", "HomeCollege": "Moss Vale", "EmploymentType": "Full-Time", "TotalHours": 20 },
+        { "Name": "Kerri-Anne", "Surname": "Smith", "Initials": "KS", "HomeCollege": "Moss Vale", "EmploymentType": "Casual", "TotalHours": 4 },
+        { "Name": "Rosalind", "Surname": "Phillips", "Initials": "RP", "HomeCollege": "Queanbeyan", "EmploymentType": "Casual", "TotalHours": 4 },
+        { "Name": "Rosalind", "Surname": "Tuohy", "Initials": "RT", "HomeCollege": "Moss Vale", "EmploymentType": "Full-Time", "TotalHours": 10 },
+        { "Name": "Susan", "Surname": "Neild", "Initials": "SN", "HomeCollege": "Queanbeyan", "EmploymentType": "Casual", "TotalHours": 4 },
+        { "Name": "Anna", "Surname": "Nikonova", "Initials": "AN", "HomeCollege": "Queanbeyan", "EmploymentType": "Full-Time", "TotalHours": 20 }
+      ],
+      "subjects": [
+        { "Subject": "Health TPC", "Color": "#ffa57d", "Units": ["NAT11225026"] },
+        { "Subject": "Maths B TPC", "Color": "#ffa57d", "Units": ["NAT11225020"] },
+        { "Subject": "History TPC", "Color": "#ffa57d", "Units": ["NAT11225017"] },
+        { "Subject": "Film and Media TPC", "Color": "#ffa57d", "Units": ["NAT11225015"] },
+        { "Subject": "English B TPC", "Color": "#ffa57d", "Units": ["NAT11225002"] },
+        { "Subject": "Maths B Calculus TPC", "Color": "#ffa57d", "Units": ["NAT11225021"] },
+        { "Subject": "Compulsory Dig Lit Units PFS", "Color": "#ff4013", "Units": ["NAT11224002", "NAT11041009", "NAT11039015", "FSKDIG003"] },
+        { "Subject": "English A PFS", "Color": "#00c7fc", "Units": ["NAT11224001", "NAT11225001"] },
+        { "Subject": "Human Rights PFS", "Color": "#00c7fc", "Units": ["NAT11224007", "NAT11224008"] }
+      ],
+      "schedule": [],
+      "currentCollege": "Moss Vale"
+    }
+  },
+  "currentSemester": "Semester 1 2024"
+}

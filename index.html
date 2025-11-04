@@ -12,41 +12,41 @@
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-                   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-                   .sidebar { transition: transform 0.3s ease-in-out; }
-                   .sidebar-open { transform: translateX(0) !important; }
-                   .view-container { display: none; }
-                   .view-container.active { display: block; }
-                   .college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; }
-                   .college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
-                   .timetable-main-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(200px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
-                   .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
-                   .time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
-                   .time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
-                   .day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; }
-                   .time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
-                   .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
-                   .time-slot.slot-selected { background-color: rgba(59, 130, 246, 0.3); }
-                   .session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
-                   .dispute-warning { border: 3px solid #ef4444 !important; z-index: 15; animation: pulse-border 1.5s infinite; }
-                   .dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
-                   @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-                   .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
-                   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
-                   .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; z-index: 101; }
-                   .modal-overlay.active { display: block; }
-                   .context-menu { position: fixed; background: white; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px 0; z-index: 1000; min-width: 220px; }
-                   .context-menu-item { padding: 10px 16px; cursor: pointer; transition: background 0.2s; font-size: 14px; }
-                   .context-menu-item:hover { background: #f3f4f6; }
-                   .context-menu-item.danger:hover { background: #fee2e2; color: #dc2626; }
-                   .print-grid { display: grid; grid-template-columns: 100px repeat(5, 1fr); border: 2px solid #000; grid-auto-rows: minmax(160px, auto); }
-                   .print-header { font-weight: bold; text-align: center; padding: 8px; border: 1px solid #999; background: #d9d9d9; }
-                   .print-day-header { background: #595959; color: white; }
-                   .print-period-label { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; background: #fde9d9; border: 1px solid #999; }
-                   .print-cell { border: 1px solid #999; padding: 4px; vertical-align: top; }
-                   .print-session { border-radius: 4px; padding: 6px; font-size: 15px; margin-top: 5px; border: 1px solid black; line-height: 1.3; }
-                   @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } }
-               </style>
+   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+   .sidebar { transition: transform 0.3s ease-in-out; }
+   .sidebar-open { transform: translateX(0) !important; }
+   .view-container { display: none; }
+   .view-container.active { display: block; }
+   .college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; }
+   .college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
+   .timetable-main-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(200px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
+   .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
+   .time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
+   .time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
+   .day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; }
+   .time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
+   .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
+   .time-slot.slot-selected { background-color: rgba(59, 130, 246, 0.3); }
+   .session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
+   .dispute-warning { border: 3px solid #ef4444 !important; z-index: 15; animation: pulse-border 1.5s infinite; }
+   .dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
+   @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+   .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
+   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
+   .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; z-index: 101; }
+   .modal-overlay.active { display: block; }
+   .context-menu { position: fixed; background: white; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px 0; z-index: 1000; min-width: 220px; }
+   .context-menu-item { padding: 10px 16px; cursor: pointer; transition: background 0.2s; font-size: 14px; }
+   .context-menu-item:hover { background: #f3f4f6; }
+   .context-menu-separator { height: 1px; background: #e5e7eb; margin: 4px 0; }
+   .print-grid { display: grid; grid-template-columns: 100px repeat(5, 1fr); border: 2px solid #000; grid-auto-rows: minmax(160px, auto); }
+   .print-header { font-weight: bold; text-align: center; padding: 8px; border: 1px solid #999; background: #d9d9d9; }
+   .print-day-header { background: #595959; color: white; }
+   .print-period-label { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; background: #fde9d9; border: 1px solid #999; }
+   .print-cell { border: 1px solid #999; padding: 4px; vertical-align: top; }
+   .print-session { border-radius: 4px; padding: 6px; font-size: 15px; margin-top: 5px; border: 1px solid black; line-height: 1.3; }
+   @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } }
+</style>
 </head>
 <body class="bg-gray-100">
 <!-- Context Menu -->
@@ -60,101 +60,117 @@
       <button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button>
     </div>
     <div class="flex flex-col gap-2" id="dayButtonsContainer">
-      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded" data-day="Monday">Monday</button>
-      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded" data-day="Tuesday">Tuesday</button>
-      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded" data-day="Wednesday">Wednesday</button>
-      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded" data-day="Thursday">Thursday</button>
-      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded" data-day="Friday">Friday</button>
+      <button class="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 font-semibold" data-day="Monday">Monday</button>
+      <button class="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 font-semibold" data-day="Tuesday">Tuesday</button>
+      <button class="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 font-semibold" data-day="Wednesday">Wednesday</button>
+      <button class="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 font-semibold" data-day="Thursday">Thursday</button>
+      <button class="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 font-semibold" data-day="Friday">Friday</button>
     </div>
   </div>
 </div>
 
-<!-- Rest of existing HTML structure... -->
-<!-- (Include all the existing sidebar, header, main content, modals from the base file) -->
+<!-- Rest of the application HTML from the base file -->
+<!-- Include all existing modals, sidebar, header, main content -->
 
 <script>
-// Add context menu functionality
-let contextMenuSession = null;
-
-function showContextMenu(e, session) {
+document.addEventListener('DOMContentLoaded', () => {
+  // All existing code...
+  
+  // NEW: Context Menu Functions
+  let contextMenuSession = null;
+  const contextMenu = document.getElementById('contextMenu');
+  
+  function showContextMenu(e, session) {
     e.preventDefault();
     contextMenuSession = session;
     
-    const menu = document.getElementById('contextMenu');
-    menu.innerHTML = `
-        <div class="context-menu-item" onclick="duplicateToSameDay()">📋 Duplicate to Same Day</div>
-        <div class="context-menu-item" onclick="duplicateToAnotherDay()">📅 Duplicate to Another Day...</div>
-        <div class="context-menu-item" onclick="editSessionFromContext()">✏️ Edit Session</div>
-        <div class="context-menu-item danger" onclick="deleteSessionFromContext()">🗑️ Delete Session</div>
+    contextMenu.innerHTML = `
+      <div class="context-menu-item" data-action="duplicate-same">📋 Duplicate to Same Day</div>
+      <div class="context-menu-item" data-action="duplicate-other">📅 Duplicate to Another Day...</div>
+      <div class="context-menu-separator"></div>
+      <div class="context-menu-item" data-action="edit">✏️ Edit Session</div>
+      <div class="context-menu-item" data-action="delete" style="color: #dc2626;">🗑️ Delete Session</div>
     `;
     
-    menu.style.display = 'block';
-    menu.style.left = `${e.pageX}px`;
-    menu.style.top = `${e.pageY}px`;
-}
-
-function hideContextMenu() {
-    document.getElementById('contextMenu').style.display = 'none';
+    contextMenu.style.left = `${e.pageX}px`;
+    contextMenu.style.top = `${e.pageY}px`;
+    contextMenu.style.display = 'block';
+    
+    // Add click handlers
+    contextMenu.querySelectorAll('.context-menu-item').forEach(item => {
+      item.addEventListener('click', () => handleContextMenuAction(item.dataset.action));
+    });
+  }
+  
+  function hideContextMenu() {
+    contextMenu.style.display = 'none';
     contextMenuSession = null;
-}
-
-function duplicateToSameDay() {
+  }
+  
+  function handleContextMenuAction(action) {
     if (!contextMenuSession) return;
-    const semesterData = getCurrentSemesterData();
-    const newSession = { ...contextMenuSession, id: Date.now() };
-    semesterData.schedule.push(newSession);
-    hideContextMenu();
-    processAndRenderAll();
-}
-
-function duplicateToAnotherDay() {
-    hideContextMenu();
-    document.getElementById('duplicateDayModal').classList.add('active');
-}
-
-function editSessionFromContext() {
-    hideContextMenu();
-    openSessionModal(contextMenuSession);
-}
-
-function deleteSessionFromContext() {
-    if (!contextMenuSession) return;
-    if (confirm('Are you sure you want to delete this session?')) {
-        const semesterData = getCurrentSemesterData();
-        semesterData.schedule = semesterData.schedule.filter(s => s.id !== contextMenuSession.id);
-        hideContextMenu();
-        processAndRenderAll();
+    
+    switch(action) {
+      case 'duplicate-same':
+        duplicateSession(contextMenuSession, contextMenuSession.Day);
+        break;
+      case 'duplicate-other':
+        document.getElementById('duplicateDayModal').classList.add('active');
+        break;
+      case 'edit':
+        openSessionModal(contextMenuSession);
+        break;
+      case 'delete':
+        if (confirm('Delete this session?')) {
+          const semesterData = getCurrentSemesterData();
+          semesterData.schedule = semesterData.schedule.filter(s => s.id !== contextMenuSession.id);
+          processAndRenderAll();
+        }
+        break;
     }
-}
-
-// Close context menu when clicking outside
-document.addEventListener('click', hideContextMenu);
-
-// Duplicate day modal handlers
-document.getElementById('closeDuplicateDayModalBtn').addEventListener('click', () => {
-    document.getElementById('duplicateDayModal').classList.remove('active');
-});
-
-document.getElementById('dayButtonsContainer').addEventListener('click', (e) => {
-    const dayBtn = e.target.closest('[data-day]');
-    if (!dayBtn || !contextMenuSession) return;
-    
-    const targetDay = dayBtn.dataset.day;
+    hideContextMenu();
+  }
+  
+  function duplicateSession(session, targetDay) {
     const semesterData = getCurrentSemesterData();
-    const newSession = { ...contextMenuSession, id: Date.now(), Day: targetDay };
+    const newSession = {
+      ...session,
+      id: Date.now(),
+      Day: targetDay,
+      dispute: null
+    };
     semesterData.schedule.push(newSession);
-    
-    document.getElementById('duplicateDayModal').classList.remove('active');
     processAndRenderAll();
+    alert(`Session duplicated to ${targetDay}!`);
+  }
+  
+  // Close context menu on outside click
+  document.addEventListener('click', (e) => {
+    if (!contextMenu.contains(e.target)) hideContextMenu();
+  });
+  
+  // Duplicate Day Modal handlers
+  document.getElementById('closeDuplicateDayModalBtn').addEventListener('click', () => {
+    document.getElementById('duplicateDayModal').classList.remove('active');
+  });
+  
+  document.querySelectorAll('#dayButtonsContainer button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (contextMenuSession) {
+        duplicateSession(contextMenuSession, btn.dataset.day);
+        document.getElementById('duplicateDayModal').classList.remove('active');
+      }
+    });
+  });
+  
+  // Update renderMainTimetableView to add context menu and Room label
+  // In session block creation, add:
+  // sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
+  // Change room display to: `Room ${session.Room}`
+  
+  // Update renderGenericPrintView to show Room label
+  // Change: ${s.Room} to Room ${s.Room}
 });
-
-// Update renderMainTimetableView to add context menu listener and "Room" label
-// In the session block creation, add:
-// sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
-// Change: ${session.Room} to Room ${session.Room}
-
-// Update renderGenericPrintView to add "Room" label
-// Change: ${s.Room} to Room ${s.Room}
 </script>
 </body>
 </html>

@@ -589,7 +589,7 @@
                            sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''}`;
                            sessionBlock.setAttribute('data-session-id', session.id);
                            Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
-                           sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div><div>${teacherInfo ? `${teacherInfo.Name} ${teacherInfo.Surname}` : session.TeacherInitials} | ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
+                           sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div><div>${teacherInfo ? `${teacherInfo.Name} ${teacherInfo.Surname}` : session.TeacherInitials} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
                            sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
                            sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
                            dayCol.appendChild(sessionBlock);
@@ -961,7 +961,7 @@
                                    <td class="border p-2">${session.CourseCode}</td>
                                    <td class="border p-2">${session.Subject}</td>
                                    <td class="border p-2">${session.TeacherInitials}</td>
-                                   <td class="border p-2">${session.Room}</td>
+                                   <td class="border p-2">Room ${session.Room}</td>
                                    <td class="border p-2">${session.colleges?.join(', ') || ''}</td>
                                    <td class="border p-2 font-bold text-red-600">${session.dispute.reason}</td>
                                </tr>`;
@@ -1005,7 +1005,7 @@
                                    return `<div class="print-session" style="background-color:${subjectInfo?.Color || '#eee'}">
                                        ${collegeHTML}
                                        <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
-                                       <div>${teacherInfo.Name} ${teacherInfo.Surname} | ${hours.toFixed(2)} Hrs | ${s.Room}</div>
+                                       <div>${teacherInfo.Name} ${teacherInfo.Surname} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
                                        ${notesHTML}
                                        <div>${s.ClassStart} - ${s.ClassEnd}</div>
                                    </div>`;

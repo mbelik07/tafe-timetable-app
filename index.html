@@ -34,6 +34,11 @@
                    .dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
                    @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
                    .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
+                   .context-menu { position: fixed; background: #2d3748; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; min-width: 200px; display: none; }
+                   .context-menu.active { display: block; }
+                   .context-menu-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #4a5568; }
+                   .context-menu-item:last-child { border-bottom: none; }
+                   .context-menu-item:hover { background: #4a5568; }
                    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
                    .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; z-index: 101; }
                    .modal-overlay.active { display: block; }
@@ -96,10 +101,13 @@
 </div>
 </main>
 </div>
+<!-- Context Menu -->
+<div class="context-menu" id="contextMenu"></div>
 <!-- Modals -->
 <div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="modalTitle">Manage</h2><button class="text-3xl font-bold" id="closeModalBtn">×</button></div><div class="space-y-4" id="modalContent"></div></div></div>
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
+<div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.8); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl">
 <h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
@@ -147,6 +155,8 @@
                        const sessionForm = document.getElementById('sessionForm');
                        const managementModal = document.getElementById('managementModal');
                        const semesterModal = document.getElementById('semesterModal');
+                       const contextMenu = document.getElementById('contextMenu');
+                       const duplicateDayModal = document.getElementById('duplicateDayModal');
                        const secondarySelectorsContainer = document.getElementById('secondary-selectors');
                        const viewSelector = document.getElementById('viewSelector');
                        const semesterSelector = document.getElementById('semesterSelector');
@@ -202,6 +212,7 @@
                        document.getElementById('closeModalBtn').addEventListener('click', () => managementModal.classList.remove('active'));
                        document.getElementById('closeSemesterModalBtn').addEventListener('click', () => semesterModal.classList.remove('active'));
                        document.getElementById('closeSessionModalBtn').addEventListener('click', () => document.getElementById('sessionModal').classList.remove('active'));
+                       document.getElementById('closeDuplicateDayModalBtn').addEventListener('click', () => duplicateDayModal.classList.remove('active'));
                        document.getElementById('loadSampleDataBtn').addEventListener('click', () => {
                            const currentData = getCurrentSemesterData();
                            const sampleData = getSampleData();
@@ -220,6 +231,7 @@
                    sessionForm.addEventListener('submit', handleSessionFormSubmit);
                    document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
                    document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
+                   document.addEventListener('click', () => contextMenu.classList.remove('active'));
 
                    // --- CORE PROCESSING & RENDERING ---
                    function processAndRenderAll() {
@@ -579,6 +591,7 @@
                            Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
                            sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div><div>${teacherInfo ? `${teacherInfo.Name} ${teacherInfo.Surname}` : session.TeacherInitials} | ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
                            sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
+                           sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
                            dayCol.appendChild(sessionBlock);
                            makeDraggable(sessionBlock, session, grid);
                            makeResizable(sessionBlock, session);
@@ -594,6 +607,78 @@
                        
                        addSlotSelectionListeners();
                    }
+
+                   function showContextMenu(e, session) {
+                       e.preventDefault();
+                       e.stopPropagation();
+                       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                       let menuHTML = `
+                           <div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})">📋 Duplicate to Same Day</div>
+                           <div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})">📅 Duplicate to Another Day</div>
+                           <div class="context-menu-item" onclick="editSessionFromContext(${session.id})">✏️ Edit Session</div>
+                           <div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})">🗑️ Delete Session</div>
+                       `;
+                       contextMenu.innerHTML = menuHTML;
+                       contextMenu.classList.add('active');
+                       contextMenu.style.left = e.clientX + 'px';
+                       contextMenu.style.top = e.clientY + 'px';
+                   }
+
+                   window.duplicateSessionSameDay = (sessionId) => {
+                       const semesterData = getCurrentSemesterData();
+                       const session = semesterData.schedule.find(s => s.id === sessionId);
+                       if (session) {
+                           const newSession = { ...session, id: Date.now() };
+                           semesterData.schedule.push(newSession);
+                           processAndRenderAll();
+                       }
+                       contextMenu.classList.remove('active');
+                   };
+
+                   window.openDuplicateDayModal = (sessionId) => {
+                       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                       const semesterData = getCurrentSemesterData();
+                       const session = semesterData.schedule.find(s => s.id === sessionId);
+                       if (!session) return;
+
+                       let contentHTML = '<h3 class="text-lg font-bold mb-4">Select a day to duplicate to:</h3><div class="space-y-2">';
+                       days.forEach(day => {
+                           contentHTML += `<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" onclick="duplicateSessionToDay(${sessionId}, '${day}')">${day}</button>`;
+                       });
+                       contentHTML += '</div>';
+                       document.getElementById('duplicateDayContent').innerHTML = contentHTML;
+                       duplicateDayModal.classList.add('active');
+                       contextMenu.classList.remove('active');
+                   };
+
+                   window.duplicateSessionToDay = (sessionId, newDay) => {
+                       const semesterData = getCurrentSemesterData();
+                       const session = semesterData.schedule.find(s => s.id === sessionId);
+                       if (session) {
+                           const newSession = { ...session, id: Date.now(), Day: newDay };
+                           semesterData.schedule.push(newSession);
+                           processAndRenderAll();
+                       }
+                       duplicateDayModal.classList.remove('active');
+                   };
+
+                   window.editSessionFromContext = (sessionId) => {
+                       const semesterData = getCurrentSemesterData();
+                       const session = semesterData.schedule.find(s => s.id === sessionId);
+                       if (session) {
+                           openSessionModal(session);
+                       }
+                       contextMenu.classList.remove('active');
+                   };
+
+                   window.deleteSessionFromContext = (sessionId) => {
+                       if (confirm('Are you sure you want to delete this session?')) {
+                           const semesterData = getCurrentSemesterData();
+                           semesterData.schedule = semesterData.schedule.filter(s => s.id !== sessionId);
+                           processAndRenderAll();
+                       }
+                       contextMenu.classList.remove('active');
+                   };
         
     
 

@@ -50,7 +50,10 @@
                    .print-session { border-radius: 4px; padding: 6px; font-size: 15px; margin-top: 5px; border: 1px solid black; line-height: 1.3; }
                    .session-units { font-size: 11px; color: #555; margin-top: 2px; font-style: italic; }
                    .color-circle { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #999; margin-right: 8px; vertical-align: middle; }
-                   @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } }
+                   .notes-section { margin-top: 2rem; padding: 1.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background-color: #f9fafb; }
+                   .notes-section label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #1f2937; }
+                   .notes-section textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 0.875rem; }
+                   @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .notes-section { page-break-inside: avoid; } }
                </style>
 <script>
                 window.load_data_from_csv = (filename) => {
@@ -199,7 +202,8 @@
                            schedule: [
                                { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
                                { id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
-                           ]
+                           ],
+                           courseNotes: {}
                        });
 
                        // --- EVENT LISTENERS ---
@@ -222,6 +226,7 @@
                            currentData.teachers = sampleData.teachers;
                            currentData.subjects = sampleData.subjects;
                            currentData.schedule = sampleData.schedule;
+                           currentData.courseNotes = sampleData.courseNotes || {};
                            processAndRenderAll();
                            alert(`Sample data loaded into ${db.currentSemester}!`);
                        });
@@ -1051,9 +1056,70 @@
                        : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
             
                    const sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
+                   const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+        
+                   // Initialize courseNotes if it doesn't exist
+                   if (!semesterData.courseNotes) semesterData.courseNotes = {};
+                   const courseNotes = semesterData.courseNotes[courseCode] || '';
         
                    const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentCollege}`;
-                   renderGenericPrintView('course-print-view', title, sessions);
+                   
+                   // Render the timetable grid
+                   let gridHTML = `<div class="print-grid">
+                       <div class="print-header"></div>
+                       ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
+
+                   ['Morning', 'Afternoon', 'Night'].forEach(period => {
+                       gridHTML += `<div class="print-period-label">${period}</div>`;
+                       ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+                           const daySessions = sessions.filter(s => {
+                               const start = timeToMinutes(s.ClassStart);
+                               return s.Day === day && (
+                                   (period === 'Morning' && start < 720) ||
+                                   (period === 'Afternoon' && start >= 720 && start < 1020) || 
+                                   (period === 'Night' && start >= 1020)
+                               );
+                           });
+            
+                           const sessionsHTML = daySessions.map(s => {
+                               const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+                               const teacherInfo = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+                               const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+                               const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+                               const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+                               const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+                
+                               if (!teacherInfo) return '';
+
+                               return `<div class="print-session" style="background-color:${subjectInfo?.Color || '#eee'}">
+                                   ${collegeHTML}
+                                   <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
+                                   ${unitsHTML}
+                                   <div>${teacherInfo.Name} ${teacherInfo.Surname} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
+                                   ${notesHTML}
+                                   <div>${s.ClassStart} - ${s.ClassEnd}</div>
+                               </div>`;
+                           }).join('');
+                           gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
+                       });
+                   });
+                   gridHTML += `</div>`;
+
+                   const notesSection = `
+                       <div class="notes-section">
+                           <label for="course-notes-textarea">Course Notes:</label>
+                           <textarea id="course-notes-textarea" rows="4" placeholder="Add any additional notes for this course...">${courseNotes}</textarea>
+                       </div>
+                   `;
+
+                   container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${notesSection}</div>`;
+
+                   // Add event listener for notes textarea
+                   const notesTextarea = document.getElementById('course-notes-textarea');
+                   notesTextarea.addEventListener('input', (e) => {
+                       semesterData.courseNotes[courseCode] = e.target.value;
+                       saveData();
+                   });
                 }
 
                 function renderTeacherPrintView() {

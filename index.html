@@ -53,7 +53,10 @@
                    .notes-section { margin-top: 2rem; padding: 1.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background-color: #f9fafb; }
                    .notes-section label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #1f2937; }
                    .notes-section textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 0.875rem; }
-                   @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .notes-section { page-break-inside: avoid; } }
+                   .teacher-contact-info { margin-top: 1.5rem; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background-color: #f3f4f6; }
+                   .teacher-contact-info h4 { font-weight: bold; margin-bottom: 0.75rem; color: #1f2937; }
+                   .teacher-contact-info p { margin: 0.25rem 0; font-size: 0.875rem; color: #374151; }
+                   @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .notes-section { page-break-inside: avoid; } .teacher-contact-info { page-break-inside: avoid; } }
                </style>
 <script>
                 window.load_data_from_csv = (filename) => {
@@ -170,23 +173,23 @@
                        const getSampleData = () => ({
                            courses: [{ Code: 'FSK20119', Name: 'Cert II Skills for Work' }, { Code: '11225NAT', Name: 'Cert IV Tertiary Prep' }],
                            teachers: [
-                               { Name: 'Juan', Surname: 'Aburto', Initials: 'JA', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20 },
-                               { Name: 'Cary', Surname: 'Buecher', Initials: 'CB', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 8 },
-                               { Name: 'Miroslav', Surname: 'Belik', Initials: 'MB', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10 },
-                               { Name: 'Carlie', Surname: 'Dally', Initials: 'CD', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
-                               { Name: 'Bernadette', Surname: 'Flynn-Whitehall', Initials: 'BF', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4 },
-                               { Name: 'Cary', Surname: 'Buecher', Initials: 'CB2', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 8 },
-                               { Name: 'Christopher', Surname: 'Worland', Initials: 'CW', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 10 },
-                               { Name: 'David', Surname: 'Baird', Initials: 'DB', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
-                               { Name: 'David', Surname: 'Cole', Initials: 'DC', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
-                               { Name: 'Georgina', Surname: 'Templeton', Initials: 'GT', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20 },
-                               { Name: 'Ian', Surname: 'Willis', Initials: 'IW', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 4 },
-                               { Name: 'Karen', Surname: 'Gardner', Initials: 'KG', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20 },
-                               { Name: 'Kerri-Anne', Surname: 'Smith', Initials: 'KS', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4 },
-                               { Name: 'Rosalind', Surname: 'Phillips', Initials: 'RP', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4 },
-                               { Name: 'Rosalind', Surname: 'Tuohy', Initials: 'RT', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10 },
-                               { Name: 'Susan', Surname: 'Neild', Initials: 'SN', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4 },
-                               { Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20 }
+                               { Name: 'Juan', Surname: 'Aburto', Initials: 'JA', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'juan.aburto@tafe.edu.au' },
+                               { Name: 'Cary', Surname: 'Buecher', Initials: 'CB', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 8, Email: 'cary.buecher@tafe.edu.au' },
+                               { Name: 'Miroslav', Surname: 'Belik', Initials: 'MB', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'miroslav.belik@tafe.edu.au' },
+                               { Name: 'Carlie', Surname: 'Dally', Initials: 'CD', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'carlie.dally@tafe.edu.au' },
+                               { Name: 'Bernadette', Surname: 'Flynn-Whitehall', Initials: 'BF', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4, Email: 'bernadette.flynn@tafe.edu.au' },
+                               { Name: 'Cary', Surname: 'Buecher', Initials: 'CB2', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 8, Email: 'cary.buecher2@tafe.edu.au' },
+                               { Name: 'Christopher', Surname: 'Worland', Initials: 'CW', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'christopher.worland@tafe.edu.au' },
+                               { Name: 'David', Surname: 'Baird', Initials: 'DB', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'david.baird@tafe.edu.au' },
+                               { Name: 'David', Surname: 'Cole', Initials: 'DC', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'david.cole@tafe.edu.au' },
+                               { Name: 'Georgina', Surname: 'Templeton', Initials: 'GT', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'georgina.templeton@tafe.edu.au' },
+                               { Name: 'Ian', Surname: 'Willis', Initials: 'IW', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 4, Email: 'ian.willis@tafe.edu.au' },
+                               { Name: 'Karen', Surname: 'Gardner', Initials: 'KG', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'karen.gardner@tafe.edu.au' },
+                               { Name: 'Kerri-Anne', Surname: 'Smith', Initials: 'KS', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4, Email: 'kerri-anne.smith@tafe.edu.au' },
+                               { Name: 'Rosalind', Surname: 'Phillips', Initials: 'RP', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4, Email: 'rosalind.phillips@tafe.edu.au' },
+                               { Name: 'Rosalind', Surname: 'Tuohy', Initials: 'RT', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'rosalind.tuohy@tafe.edu.au' },
+                               { Name: 'Susan', Surname: 'Neild', Initials: 'SN', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4, Email: 'susan.neild@tafe.edu.au' },
+                               { Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'anna.nikonova@tafe.edu.au' }
                            ],
                            subjects: [
                                { Subject: 'Health TPC', Color: '#ffa57d', Units: ['NAT11225026'] },
@@ -232,7 +235,7 @@
                        });
         
                    document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterModal);
-                   document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'HomeCollege', 'TotalHours']));
+                   document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
                    document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
                    document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'Color', 'Units']));
                    sessionForm.addEventListener('submit', handleSessionFormSubmit);
@@ -371,6 +374,7 @@
                                <div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div>
                                <div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div>
                                <div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div>
+                               <div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div>
                                <div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" class="w-full border p-2 rounded" required>${colleges.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div>
                                <div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div>
                                <div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div>
@@ -433,6 +437,7 @@
                                    Name: formData.get('Name'),
                                    Surname: formData.get('Surname'),
                                    Initials: formData.get('Initials'),
+                                   Email: formData.get('Email'),
                                    HomeCollege: formData.get('HomeCollege'),
                                    EmploymentType: formData.get('EmploymentType'),
                                    TotalHours: parseFloat(formData.get('TotalHours')) || 0,
@@ -1062,6 +1067,19 @@
                        });
                        gridHTML += `</div>`;
 
+                       // Get unique teachers for this course
+                       const courseTeachers = [...new Set(sessions.map(s => s.TeacherInitials))]
+                           .map(initials => semesterData.teachers.find(t => t.Initials === initials))
+                           .filter(t => t)
+                           .sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
+
+                       const teacherContactHTML = courseTeachers.length > 0 ? `
+                           <div class="teacher-contact-info">
+                               <h4>Teacher Contact Information:</h4>
+                               ${courseTeachers.map(t => `<p>${t.Name} ${t.Surname} - ${t.Email} (${t.EmploymentType})</p>`).join('')}
+                           </div>
+                       ` : '';
+
                        const notesSection = `
                            <div class="notes-section">
                                <label for="course-notes-textarea">Course Notes:</label>
@@ -1069,7 +1087,7 @@
                            </div>
                        `;
 
-                       container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${notesSection}</div>`;
+                       container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${teacherContactHTML}${notesSection}</div>`;
 
                        // Add event listener for notes textarea
                        const notesTextarea = document.getElementById('course-notes-textarea');

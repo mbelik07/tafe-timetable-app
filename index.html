@@ -989,16 +989,44 @@
                        container.innerHTML = contentHTML;
                    }
 
-                   function renderGenericPrintView(containerId, title, sessions) {
-                       const container = document.getElementById(containerId);
+                   function renderCoursePrintView() {
+                       const container = document.getElementById('course-print-view');
+                       const selector = document.getElementById('course-selector');
                        const semesterData = getCurrentSemesterData();
+        
+                       if (!selector) {
+                           container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
+                           return;
+                       }
+        
+                       const courseCode = selector.value;
+                       const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
+        
+                       const scheduleToFilter = semesterData.currentCollege === 'Master View'
+                           ? semesterData.schedule
+                           : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+            
+                       const sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
                        const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
         
+                       // Initialize courseNotes if it doesn't exist
+                       if (!semesterData.courseNotes) semesterData.courseNotes = {};
+                       const courseNotes = semesterData.courseNotes[courseCode] || '';
+        
+                       const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentCollege}`;
+                       
+                       // Check if there are any night sessions
+                       const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
+                       
+                       // Render the timetable grid
                        let gridHTML = `<div class="print-grid">
                            <div class="print-header"></div>
                            ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
 
-                       ['Morning', 'Afternoon', 'Night'].forEach(period => {
+                       const periods = ['Morning', 'Afternoon'];
+                       if (hasNightSessions) periods.push('Night');
+
+                       periods.forEach(period => {
                            gridHTML += `<div class="print-period-label">${period}</div>`;
                            ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
                                const daySessions = sessions.filter(s => {
@@ -1009,7 +1037,7 @@
                                        (period === 'Night' && start >= 1020)
                                    );
                                });
-                
+            
                                const sessionsHTML = daySessions.map(s => {
                                    const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
                                    const teacherInfo = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
@@ -1017,8 +1045,8 @@
                                    const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
                                    const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
                                    const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-                    
-                                   if (!teacherInfo) return ''; // Prevent crash if teacher not found
+                
+                                   if (!teacherInfo) return '';
 
                                    return `<div class="print-session" style="background-color:${subjectInfo?.Color || '#eee'}">
                                        ${collegeHTML}
@@ -1034,163 +1062,137 @@
                        });
                        gridHTML += `</div>`;
 
+                       const notesSection = `
+                           <div class="notes-section">
+                               <label for="course-notes-textarea">Course Notes:</label>
+                               <textarea id="course-notes-textarea" rows="4" placeholder="Add any additional notes for this course...">${courseNotes}</textarea>
+                           </div>
+                       `;
+
+                       container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${notesSection}</div>`;
+
+                       // Add event listener for notes textarea
+                       const notesTextarea = document.getElementById('course-notes-textarea');
+                       notesTextarea.addEventListener('input', (e) => {
+                           semesterData.courseNotes[courseCode] = e.target.value;
+                           saveData();
+                       });
+                   }
+
+                   function renderTeacherPrintView() {
+                       const container = document.getElementById('teacher-print-view');
+                       const selector = document.getElementById('teacher-selector');
+                       const semesterData = getCurrentSemesterData();
+
+                       if (!selector) {
+                           container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
+                           return;
+                       }
+
+                       const teacherInitials = selector.value;
+                       const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
+
+                       const scheduleToFilter = semesterData.currentCollege === 'Master View'
+                           ? semesterData.schedule
+                           : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+
+                       const sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials);
+                       const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+        
+                       const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
+                       
+                       // Check if there are any night sessions
+                       const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
+                       
+                       let gridHTML = `<div class="print-grid">
+                           <div class="print-header"></div>
+                           ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
+
+                       const periods = ['Morning', 'Afternoon'];
+                       if (hasNightSessions) periods.push('Night');
+
+                       periods.forEach(period => {
+                           gridHTML += `<div class="print-period-label">${period}</div>`;
+                           ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+                               const daySessions = sessions.filter(s => {
+                                   const start = timeToMinutes(s.ClassStart);
+                                   return s.Day === day && (
+                                       (period === 'Morning' && start < 720) ||
+                                       (period === 'Afternoon' && start >= 720 && start < 1020) || 
+                                       (period === 'Night' && start >= 1020)
+                                   );
+                               });
+            
+                               const sessionsHTML = daySessions.map(s => {
+                                   const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+                                   const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+                                   const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+                                   const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+                                   const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+                    
+                                   return `<div class="print-session" style="background-color:${subjectInfo?.Color || '#eee'}">
+                                       ${collegeHTML}
+                                       <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
+                                       ${unitsHTML}
+                                       <div>${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
+                                       ${notesHTML}
+                                       <div>${s.ClassStart} - ${s.ClassEnd}</div>
+                                   </div>`;
+                               }).join('');
+                               gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
+                           });
+                       });
+                       gridHTML += `</div>`;
+
                        container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div></div>`;
                    }
-        
 
-                function renderCoursePrintView() {
-                   const container = document.getElementById('course-print-view');
-                   const selector = document.getElementById('course-selector');
-                   const semesterData = getCurrentSemesterData();
-        
-                   if (!selector) {
-                       container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
-                       return;
-                   }
-        
-                   const courseCode = selector.value;
-                   const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
-        
-                   const scheduleToFilter = semesterData.currentCollege === 'Master View'
-                       ? semesterData.schedule
-                       : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
-            
-                   const sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
-                   const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
-        
-                   // Initialize courseNotes if it doesn't exist
-                   if (!semesterData.courseNotes) semesterData.courseNotes = {};
-                   const courseNotes = semesterData.courseNotes[courseCode] || '';
-        
-                   const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentCollege}`;
-                   
-                   // Render the timetable grid
-                   let gridHTML = `<div class="print-grid">
-                       <div class="print-header"></div>
-                       ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
+                   function generatePdf() {
+                       const loadingOverlay = document.getElementById('loadingOverlay');
+                       const activeView = document.querySelector('.view-container.active');
+                       const semesterData = getCurrentSemesterData();
 
-                   ['Morning', 'Afternoon', 'Night'].forEach(period => {
-                       gridHTML += `<div class="print-period-label">${period}</div>`;
-                       ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
-                           const daySessions = sessions.filter(s => {
-                               const start = timeToMinutes(s.ClassStart);
-                               return s.Day === day && (
-                                   (period === 'Morning' && start < 720) ||
-                                   (period === 'Afternoon' && start >= 720 && start < 1020) || 
-                                   (period === 'Night' && start >= 1020)
-                               );
-                           });
-            
-                           const sessionsHTML = daySessions.map(s => {
-                               const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
-                               const teacherInfo = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
-                               const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-                               const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
-                               const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
-                               const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-                
-                               if (!teacherInfo) return '';
+                       if (!activeView) {
+                           alert('Could not find an active view to print.');
+                           return;
+                       }
+                       loadingOverlay.style.display = 'flex';
 
-                               return `<div class="print-session" style="background-color:${subjectInfo?.Color || '#eee'}">
-                                   ${collegeHTML}
-                                   <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
-                                   ${unitsHTML}
-                                   <div>${teacherInfo.Name} ${teacherInfo.Surname} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
-                                   ${notesHTML}
-                                   <div>${s.ClassStart} - ${s.ClassEnd}</div>
-                               </div>`;
-                           }).join('');
-                           gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
+                       const selectedViewText = viewSelector.options[viewSelector.selectedIndex].text;
+        
+                       let filename = `${db.currentSemester} - ${semesterData.currentCollege} - ${selectedViewText}.pdf`.replace(/[\s/]/g, '_');
+
+                       if (selectedViewText === 'Course Print' || selectedViewText === 'Teacher Print') {
+                           const secondarySelector = document.getElementById('course-selector') || document.getElementById('teacher-selector');
+                           if (secondarySelector && secondarySelector.options.length > 0) {
+                               const selectedOptionText = secondarySelector.options[secondarySelector.selectedIndex].text;
+                               filename = `${db.currentSemester} - ${selectedOptionText} - ${semesterData.currentCollege}.pdf`.replace(/[\s/]/g, '_');
+                           }
+                       }
+        
+                       const elementToPrint = activeView.firstElementChild || activeView;
+
+                       const opt = {
+                           margin:       [0.5, 0.5, 0.5, 0.5],
+                           filename:     filename,
+                           image:        { type: 'jpeg', quality: 0.98 },
+                           html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: -window.scrollY },
+                           jsPDF:        { unit: 'in', format: 'a3', orientation: 'landscape' }
+                       };
+
+                       html2pdf().from(elementToPrint).set(opt).save().then(() => {
+                           loadingOverlay.style.display = 'none';
+                       }).catch(err => {
+                           console.error("PDF generation failed:", err);
+                           alert("Sorry, there was an error generating the PDF.");
+                           loadingOverlay.style.display = 'none';
                        });
-                   });
-                   gridHTML += `</div>`;
-
-                   const notesSection = `
-                       <div class="notes-section">
-                           <label for="course-notes-textarea">Course Notes:</label>
-                           <textarea id="course-notes-textarea" rows="4" placeholder="Add any additional notes for this course...">${courseNotes}</textarea>
-                       </div>
-                   `;
-
-                   container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${notesSection}</div>`;
-
-                   // Add event listener for notes textarea
-                   const notesTextarea = document.getElementById('course-notes-textarea');
-                   notesTextarea.addEventListener('input', (e) => {
-                       semesterData.courseNotes[courseCode] = e.target.value;
-                       saveData();
-                   });
-                }
-
-                function renderTeacherPrintView() {
-                   const container = document.getElementById('teacher-print-view');
-                   const selector = document.getElementById('teacher-selector');
-                   const semesterData = getCurrentSemesterData();
-
-                   if (!selector) {
-                       container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
-                       return;
                    }
-
-                   const teacherInitials = selector.value;
-                   const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
-
-                   const scheduleToFilter = semesterData.currentCollege === 'Master View'
-                       ? semesterData.schedule
-                       : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
-
-                   const sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials);
-        
-                   const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
-                   renderGenericPrintView('teacher-print-view', title, sessions);
-                }
-
-                function generatePdf() {
-                  const loadingOverlay = document.getElementById('loadingOverlay');
-                  const activeView = document.querySelector('.view-container.active');
-                  const semesterData = getCurrentSemesterData();
-
-                  if (!activeView) {
-                      alert('Could not find an active view to print.');
-                      return;
-                  }
-                  loadingOverlay.style.display = 'flex';
-
-                  const selectedViewText = viewSelector.options[viewSelector.selectedIndex].text;
-        
-                  let filename = `${db.currentSemester} - ${semesterData.currentCollege} - ${selectedViewText}.pdf`.replace(/[\s/]/g, '_');
-
-                  if (selectedViewText === 'Course Print' || selectedViewText === 'Teacher Print') {
-                      const secondarySelector = document.getElementById('course-selector') || document.getElementById('teacher-selector');
-                      if (secondarySelector && secondarySelector.options.length > 0) {
-                          const selectedOptionText = secondarySelector.options[secondarySelector.selectedIndex].text;
-                          filename = `${db.currentSemester} - ${selectedOptionText} - ${semesterData.currentCollege}.pdf`.replace(/[\s/]/g, '_');
-                      }
-                  }
-        
-                  const elementToPrint = activeView.firstElementChild || activeView;
-
-                  const opt = {
-                      margin:       [0.5, 0.5, 0.5, 0.5],
-                      filename:     filename,
-                      image:        { type: 'jpeg', quality: 0.98 },
-                      html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: -window.scrollY },
-                      jsPDF:        { unit: 'in', format: 'a3', orientation: 'landscape' }
-                  };
-
-                  html2pdf().from(elementToPrint).set(opt).save().then(() => {
-                      loadingOverlay.style.display = 'none';
-                  }).catch(err => {
-                      console.error("PDF generation failed:", err);
-                      alert("Sorry, there was an error generating the PDF.");
-                      loadingOverlay.style.display = 'none';
-                  });
-               }
     
-                // --- INITIALIZATION ---
-                loadData();
-                processAndRenderAll();
-            });
+                   // --- INITIALIZATION ---
+                   loadData();
+                   processAndRenderAll();
+               });
             </script>
 </body>
 </html>

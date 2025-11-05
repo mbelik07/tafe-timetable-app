@@ -253,6 +253,14 @@
                    }
 
                    const timeToMinutes = (timeStr) => !timeStr ? 0 : timeStr.split(':').map(Number).reduce((h, m) => h * 60 + m);
+                   const dayOrder = { 'Monday': 0, 'Tuesday': 1, 'Wednesday': 2, 'Thursday': 3, 'Friday': 4 };
+                   const sortSessionsChronologically = (sessions) => {
+                       return [...sessions].sort((a, b) => {
+                           const dayDiff = (dayOrder[a.Day] || 0) - (dayOrder[b.Day] || 0);
+                           if (dayDiff !== 0) return dayDiff;
+                           return timeToMinutes(a.ClassStart) - timeToMinutes(b.ClassStart);
+                       });
+                   };
     
                    function detectDisputes() {
                        const semesterData = getCurrentSemesterData();
@@ -1011,7 +1019,8 @@
                            ? semesterData.schedule
                            : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
             
-                       const sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
+                       let sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
+                       sessions = sortSessionsChronologically(sessions);
                        const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
         
                        // Initialize courseNotes if it doesn't exist
@@ -1114,7 +1123,8 @@
                            ? semesterData.schedule
                            : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
-                       const sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials);
+                       let sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials);
+                       sessions = sortSessionsChronologically(sessions);
                        const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
         
                        const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;

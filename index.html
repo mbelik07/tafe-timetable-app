@@ -114,7 +114,7 @@
 <!-- Modals -->
 <div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="modalTitle">Manage</h2><button class="text-3xl font-bold" id="closeModalBtn">×</button></div><div class="space-y-4" id="modalContent"></div></div></div>
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
-<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
+<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary)</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.8); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl">
@@ -203,8 +203,8 @@
                                { Subject: 'Human Rights PFS', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'] }
                            ],
                            schedule: [
-                               { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
-                               { id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
+                               { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
+                               { id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
                            ],
                            courseNotes: {}
                        });
@@ -280,7 +280,11 @@
                                const timeOverlap = timeToMinutes(s1.ClassStart) < timeToMinutes(s2.ClassEnd) && timeToMinutes(s2.ClassStart) < timeToMinutes(s1.ClassEnd);
                                if (timeOverlap) {
                                    let reason = null;
-                                   if (s1.TeacherInitials === s2.TeacherInitials) reason = `Teacher Conflict: ${s1.TeacherInitials}`;
+                                   const s1Teachers = [s1.TeacherInitials, s1.TeacherInitials2].filter(Boolean);
+                                   const s2Teachers = [s2.TeacherInitials, s2.TeacherInitials2].filter(Boolean);
+                                   const commonTeachers = s1Teachers.filter(t => s2Teachers.includes(t));
+                                   
+                                   if (commonTeachers.length > 0) reason = `Teacher Conflict: ${commonTeachers.join(', ')}`;
                                    else if (s1.Room === s2.Room) reason = `Room Conflict: ${s1.Room}`;
 
                                    if (reason) {
@@ -610,7 +614,11 @@
                            const start = timeToMinutes(session.ClassStart) / 30 - startTime * 2;
                            const height = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 30 * slotHeight;
                            const subjectInfo = semesterData.subjects.find(s => s.Subject === session.Subject);
-                           const teacherInfo = semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
+                           const teacher1Info = semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
+                           const teacher2Info = session.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === session.TeacherInitials2) : null;
+                           const teacherDisplay = teacher2Info 
+                               ? `${teacher1Info?.Name || session.TeacherInitials} & ${teacher2Info.Name}` 
+                               : (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : session.TeacherInitials);
                            const notesHTML = session.notes ? `<div class="text-xs italic text-gray-600 truncate" title="${session.notes}">${session.notes}</div>` : '';
                            const collegeInfo = semesterData.currentCollege === 'Master View' ? `<div class="font-bold text-indigo-600 text-xs">${session.colleges?.join(', ') || ''}</div>` : '';
                            const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div class="session-units">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
@@ -619,7 +627,7 @@
                            sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''}`;
                            sessionBlock.setAttribute('data-session-id', session.id);
                            Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
-                           sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${unitsHTML}<div>${teacherInfo ? `${teacherInfo.Name} ${teacherInfo.Surname}` : session.TeacherInitials} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
+                           sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
                            sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
                            sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
                            dayCol.appendChild(sessionBlock);
@@ -882,9 +890,11 @@
                        const courseSelect = document.getElementById('sessionCourse');
                        const subjectSelect = document.getElementById('sessionSubject');
                        const teacherSelect = document.getElementById('sessionTeacher');
+                       const teacher2Select = document.getElementById('sessionTeacher2');
                        courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
                        subjectSelect.innerHTML = semesterData.subjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
                        teacherSelect.innerHTML = semesterData.teachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
+                       teacher2Select.innerHTML = `<option value="">-- None --</option>` + semesterData.teachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials2 === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
                        
                        // Check college checkboxes
                        const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
@@ -910,6 +920,7 @@
                            CourseCode: document.getElementById('sessionCourse').value,
                            Subject: document.getElementById('sessionSubject').value,
                            TeacherInitials: document.getElementById('sessionTeacher').value,
+                           TeacherInitials2: document.getElementById('sessionTeacher2').value || '',
                            Room: document.getElementById('sessionRoom').value,
                            notes: document.getElementById('sessionNotes').value,
                            colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
@@ -956,7 +967,7 @@
                            tableHTML += `<tr class="border-b hover:bg-gray-100"><td class="border p-2 font-bold">${teacher.Initials}</td><td class="border p-2">${teacher.Name}</td><td class="border p-2">${teacher.Surname}</td>`;
                            let directTeachingHours = 0;
                            semesterData.courses.forEach(course => {
-                               const hours = scheduleToView.filter(s => s.TeacherInitials === teacher.Initials && s.CourseCode === course.Code).reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+                               const hours = scheduleToView.filter(s => (s.TeacherInitials === teacher.Initials || s.TeacherInitials2 === teacher.Initials) && s.CourseCode === course.Code).reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
                                tableHTML += `<td class="border p-2 text-center">${hours ? hours.toFixed(2) : ''}</td>`;
                                directTeachingHours += hours;
                            });
@@ -985,12 +996,13 @@
                            const headers = ['Day', 'Time', 'Course', 'Subject', 'Teacher', 'Room', 'Colleges', 'Reason for Dispute'];
                            contentHTML += `<table class="w-full text-sm border-collapse"><thead><tr class="bg-red-800 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
                            disputedSessions.forEach(session => {
+                               const teachers = [session.TeacherInitials, session.TeacherInitials2].filter(Boolean).join(', ');
                                contentHTML += `<tr class="border-b hover:bg-red-50">
                                    <td class="border p-2">${session.Day}</td>
                                    <td class="border p-2">${session.ClassStart} - ${session.ClassEnd}</td>
                                    <td class="border p-2">${session.CourseCode}</td>
                                    <td class="border p-2">${session.Subject}</td>
-                                   <td class="border p-2">${session.TeacherInitials}</td>
+                                   <td class="border p-2">${teachers}</td>
                                    <td class="border p-2">Room ${session.Room}</td>
                                    <td class="border p-2">${session.colleges?.join(', ') || ''}</td>
                                    <td class="border p-2 font-bold text-red-600">${session.dispute.reason}</td>
@@ -1054,19 +1066,23 @@
             
                                const sessionsHTML = daySessions.map(s => {
                                    const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
-                                   const teacherInfo = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+                                   const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+                                   const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
+                                   const teacherDisplay = teacher2Info 
+                                       ? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}` 
+                                       : (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials);
                                    const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
                                    const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
                                    const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
                                    const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
                 
-                                   if (!teacherInfo) return '';
+                                   if (!teacher1Info) return '';
 
                                    return `<div class="print-session" style="background-color:${subjectInfo?.Color || '#eee'}">
                                        ${collegeHTML}
                                        <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
                                        ${unitsHTML}
-                                       <div>${teacherInfo.Name} ${teacherInfo.Surname} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
+                                       <div>${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
                                        ${notesHTML}
                                        <div>${s.ClassStart} - ${s.ClassEnd}</div>
                                    </div>`;
@@ -1076,8 +1092,13 @@
                        });
                        gridHTML += `</div>`;
 
-                       // Get unique teachers for this course
-                       const courseTeachers = [...new Set(sessions.map(s => s.TeacherInitials))]
+                       // Get unique teachers for this course (both Teacher 1 and Teacher 2)
+                       const uniqueTeacherInitials = new Set();
+                       sessions.forEach(s => {
+                           if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials);
+                           if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2);
+                       });
+                       const courseTeachers = Array.from(uniqueTeacherInitials)
                            .map(initials => semesterData.teachers.find(t => t.Initials === initials))
                            .filter(t => t)
                            .sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
@@ -1123,7 +1144,7 @@
                            ? semesterData.schedule
                            : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
-                       let sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials);
+                       let sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials || s.TeacherInitials2 === teacherInitials);
                        sessions = sortSessionsChronologically(sessions);
                        const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
         
@@ -1153,6 +1174,10 @@
             
                                const sessionsHTML = daySessions.map(s => {
                                    const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+                                   const coTeacher = s.TeacherInitials === teacherInitials 
+                                       ? (s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null)
+                                       : semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+                                   const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
                                    const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
                                    const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
                                    const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
@@ -1162,7 +1187,7 @@
                                        ${collegeHTML}
                                        <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
                                        ${unitsHTML}
-                                       <div>${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
+                                       <div>${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
                                        ${notesHTML}
                                        <div>${s.ClassStart} - ${s.ClassEnd}</div>
                                    </div>`;

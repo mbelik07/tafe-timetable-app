@@ -993,10 +993,19 @@
         
                        titleEl.textContent = `Teaching Program Summary - ${semesterData.currentCollege} (${db.currentSemester})`;
 
+                       // Sort teachers by surname
+                       const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
+                           const surnameA = (a.Surname || '').toLowerCase();
+                           const surnameB = (b.Surname || '').toLowerCase();
+                           if (surnameA < surnameB) return -1;
+                           if (surnameA > surnameB) return 1;
+                           return 0;
+                       });
+
                        const headers = ['Initials', 'Name', 'Surname', ...semesterData.courses.map(c => c.Code), 'Direct Teaching', 'Total Hours', 'Remaining Hours'];
                        let tableHTML = `<table class="w-full text-sm border-collapse"><thead><tr class="bg-blue-900 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
         
-                       semesterData.teachers.forEach(teacher => {
+                       sortedTeachers.forEach(teacher => {
                            tableHTML += `<tr class="border-b hover:bg-gray-100"><td class="border p-2 font-bold">${teacher.Initials}</td><td class="border p-2">${teacher.Name}</td><td class="border p-2">${teacher.Surname}</td>`;
                            let directTeachingHours = 0;
                            semesterData.courses.forEach(course => {

@@ -43,14 +43,14 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
 .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; z-index: 101; }
 .modal-overlay.active { display: block; }
-.print-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(150px, 1fr)); grid-template-rows: auto 1fr; border: 2px solid #000; }
-.print-header { font-weight: bold; text-align: center; padding: 8px; border: 1px solid #999; background: #d9d9d9; grid-row: 1; }
+.print-grid { display: grid; grid-template-columns: 100px repeat(5, 1fr); border: 2px solid #000; grid-auto-rows: minmax(160px, auto); }
+.print-header { font-weight: bold; text-align: center; padding: 8px; border: 1px solid #999; background: #d9d9d9; }
 .print-day-header { background: #595959; color: white; }
-.print-time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
-.print-time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #333; border-top: 1px solid #999; box-sizing: border-box; background: #f0f0f0; }
-.print-day-column { grid-row: 2; position: relative; border-left: 1px solid #999; }
-.print-session-block { position: absolute; border-radius: 2px; padding: 4px; font-size: 11px; line-height: 1.2; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; }
-.print-session-block.compulsory { box-shadow: 0 0 0 3px #ffff00, 0 0 0 4px #ffd700; }
+.print-period-label { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; background: #fde9d9; border: 1px solid #999; }
+.print-cell { border: 1px solid #999; padding: 4px; vertical-align: top; }
+.print-session { border-radius: 4px; padding: 6px; font-size: 15px; margin-top: 5px; border: 1px solid black; line-height: 1.3; }
+.print-session.compulsory { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700; }
+.session-units { font-size: 11px; color: #555; margin-top: 2px; font-style: italic; }
 .color-circle { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #999; margin-right: 8px; vertical-align: middle; }
 .notes-section { margin-top: 2rem; padding: 1.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background-color: #f9fafb; }
 .notes-section label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #1f2937; }
@@ -1105,68 +1105,54 @@ if (!semesterData.courseNotes) semesterData.courseNotes = {};
 const courseNotes = semesterData.courseNotes[courseCode] || '';
 
 const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentCollege}`;
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const startTime = 8, endTime = 22, slotHeight = 30;
-const totalRows = (endTime - startTime) * 2;
 
 const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
+
+let gridHTML = `<div class="print-grid">
+<div class="print-header"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
+
 const periods = ['Morning', 'Afternoon'];
 if (hasNightSessions) periods.push('Night');
 
-let gridHTML = `<div class="print-grid" style="grid-template-columns: 50px repeat(5, minmax(150px, 1fr));">`;
-gridHTML += `<div style="grid-row: 1; grid-column: 1;"></div>`;
-gridHTML += days.map((day, i) => `<div class="print-header print-day-header" style="grid-column: ${i + 2}; grid-row: 1;">${day}</div>`).join('');
-
-let rowIndex = 2;
 periods.forEach(period => {
-const periodStartTime = period === 'Morning' ? 8 : (period === 'Afternoon' ? 12 : 17);
-const periodEndTime = period === 'Morning' ? 12 : (period === 'Afternoon' ? 17 : 22);
-const periodRows = (periodEndTime - periodStartTime) * 2;
-
-gridHTML += `<div class="print-header" style="grid-row: ${rowIndex}; grid-column: 1; display: flex; align-items: center; justify-content: center;">${period}</div>`;
-
-days.forEach((day, dayIndex) => {
+gridHTML += `<div class="print-period-label">${period}</div>`;
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
 const daySessions = sessions.filter(s => {
 const start = timeToMinutes(s.ClassStart);
-const end = timeToMinutes(s.ClassEnd);
-return s.Day === day && start >= periodStartTime * 60 && end <= periodEndTime * 60;
+return s.Day === day && (
+(period === 'Morning' && start < 720) ||
+(period === 'Afternoon' && start >= 720 && start < 1020) || 
+(period === 'Night' && start >= 1020)
+);
 });
 
-let cellHTML = `<div style="grid-row: ${rowIndex}; grid-column: ${dayIndex + 2}; position: relative; border: 1px solid #999; min-height: ${periodRows * slotHeight}px;">`;
-
-daySessions.forEach(session => {
-const subjectInfo = semesterData.subjects.find(sub => sub.Subject === session.Subject);
-const teacher1Info = semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
-const teacher2Info = session.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === session.TeacherInitials2) : null;
+const sessionsHTML = daySessions.map(s => {
+const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
 const teacherDisplay = teacher2Info 
-? `${teacher1Info?.Name || session.TeacherInitials} & ${teacher2Info.Name}` 
-: (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : session.TeacherInitials);
-const hours = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 60;
-const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 10px; color: #4338ca;">${session.colleges?.join(', ') || ''}</div>` : '';
-const notesHTML = session.notes ? `<div style="font-style: italic; font-size: 10px;">${session.notes}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 9px; color: #555; margin-top: 1px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 9px; color: #d32f2f;">COMPULSORY</div>` : '';
+? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}` 
+: (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials);
+const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
 
-const blockHTML = `<div class="print-session-block ${subjectInfo?.Compulsory ? 'compulsory' : ''}" style="background-color: ${subjectInfo?.Color || '#eee'}; top: ${(timeToMinutes(session.ClassStart) - periodStartTime * 60) / 30 * slotHeight}px; height: ${hours / 0.5 * slotHeight}px;">
+if (!teacher1Info) return '';
+
+return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
-<div style="font-weight: bold; font-size: 11px;">${session.CourseCode} - ${session.Subject}</div>
+<div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
 ${unitsHTML}
-${compulsoryBadge}
-<div style="font-size: 10px;">${teacherDisplay} | Room ${session.Room}</div>
+<div>${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
 ${notesHTML}
-<div style="font-size: 9px;">${session.ClassStart} - ${session.ClassEnd}</div>
+<div>${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
-
-cellHTML += blockHTML;
+}).join('');
+gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
 });
-
-cellHTML += `</div>`;
-gridHTML += cellHTML;
 });
-
-rowIndex++;
-});
-
 gridHTML += `</div>`;
 
 const uniqueTeacherInitials = new Set();
@@ -1196,12 +1182,10 @@ const notesSection = `
 container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${teacherContactHTML}${notesSection}</div>`;
 
 const notesTextarea = document.getElementById('course-notes-textarea');
-if (notesTextarea) {
 notesTextarea.addEventListener('input', (e) => {
 semesterData.courseNotes[courseCode] = e.target.value;
 saveData();
 });
-}
 }
 
 function renderTeacherPrintView() {
@@ -1226,66 +1210,51 @@ sessions = sortSessionsChronologically(sessions);
 const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
 
 const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const startTime = 8, endTime = 22, slotHeight = 30;
-const totalRows = (endTime - startTime) * 2;
 
 const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
+
+let gridHTML = `<div class="print-grid">
+<div class="print-header"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
+
 const periods = ['Morning', 'Afternoon'];
 if (hasNightSessions) periods.push('Night');
 
-let gridHTML = `<div class="print-grid" style="grid-template-columns: 50px repeat(5, minmax(150px, 1fr));">`;
-gridHTML += `<div style="grid-row: 1; grid-column: 1;"></div>`;
-gridHTML += days.map((day, i) => `<div class="print-header print-day-header" style="grid-column: ${i + 2}; grid-row: 1;">${day}</div>`).join('');
-
-let rowIndex = 2;
 periods.forEach(period => {
-const periodStartTime = period === 'Morning' ? 8 : (period === 'Afternoon' ? 12 : 17);
-const periodEndTime = period === 'Morning' ? 12 : (period === 'Afternoon' ? 17 : 22);
-const periodRows = (periodEndTime - periodStartTime) * 2;
-
-gridHTML += `<div class="print-header" style="grid-row: ${rowIndex}; grid-column: 1; display: flex; align-items: center; justify-content: center;">${period}</div>`;
-
-days.forEach((day, dayIndex) => {
+gridHTML += `<div class="print-period-label">${period}</div>`;
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
 const daySessions = sessions.filter(s => {
 const start = timeToMinutes(s.ClassStart);
-const end = timeToMinutes(s.ClassEnd);
-return s.Day === day && start >= periodStartTime * 60 && end <= periodEndTime * 60;
+return s.Day === day && (
+(period === 'Morning' && start < 720) ||
+(period === 'Afternoon' && start >= 720 && start < 1020) || 
+(period === 'Night' && start >= 1020)
+);
 });
 
-let cellHTML = `<div style="grid-row: ${rowIndex}; grid-column: ${dayIndex + 2}; position: relative; border: 1px solid #999; min-height: ${periodRows * slotHeight}px;">`;
-
-daySessions.forEach(session => {
-const subjectInfo = semesterData.subjects.find(sub => sub.Subject === session.Subject);
-const coTeacher = session.TeacherInitials === teacherInitials 
-? (session.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === session.TeacherInitials2) : null)
-: semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
+const sessionsHTML = daySessions.map(s => {
+const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+const coTeacher = s.TeacherInitials === teacherInitials 
+? (s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null)
+: semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
 const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
-const hours = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 60;
-const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 10px; color: #4338ca;">${session.colleges?.join(', ') || ''}</div>` : '';
-const notesHTML = session.notes ? `<div style="font-style: italic; font-size: 10px;">${session.notes}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 9px; color: #555; margin-top: 1px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 9px; color: #d32f2f;">COMPULSORY</div>` : '';
+const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
 
-const blockHTML = `<div class="print-session-block ${subjectInfo?.Compulsory ? 'compulsory' : ''}" style="background-color: ${subjectInfo?.Color || '#eee'}; top: ${(timeToMinutes(session.ClassStart) - periodStartTime * 60) / 30 * slotHeight}px; height: ${hours / 0.5 * slotHeight}px;">
+return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
-<div style="font-weight: bold; font-size: 11px;">${session.CourseCode} - ${session.Subject}</div>
+<div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
 ${unitsHTML}
-${compulsoryBadge}
-<div style="font-size: 10px;">${hours.toFixed(2)} Hrs | Room ${session.Room}${coTeacherDisplay}</div>
+<div>${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
 ${notesHTML}
-<div style="font-size: 9px;">${session.ClassStart} - ${session.ClassEnd}</div>
+<div>${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
-
-cellHTML += blockHTML;
+}).join('');
+gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
 });
-
-cellHTML += `</div>`;
-gridHTML += cellHTML;
 });
-
-rowIndex++;
-
 gridHTML += `</div>`;
 
 container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div></div>`;

@@ -32,7 +32,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
 .session-block.compulsory { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700; }
 .dispute-warning { border: 3px solid #ef4444 !important; z-index: 15; animation: pulse-border 1.5s infinite; }
-.dispute-warning::after { content: '\26a0\fe0f DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
+.dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
 @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
 .context-menu { position: fixed; background: #2d3748; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; min-width: 200px; display: none; }
@@ -221,15 +221,15 @@ teachers: [
 { Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'anna.nikonova@tafe.edu.au' }
 ],
 subjects: [
-{ Subject: 'Health TPC', Color: '#ffa57d', Units: ['NAT11225026'], Compulsory: false },
-{ Subject: 'Maths B TPC', Color: '#ffa57d', Units: ['NAT11225020'], Compulsory: false },
-{ Subject: 'History TPC', Color: '#ffa57d', Units: ['NAT11225017'], Compulsory: false },
-{ Subject: 'Film and Media TPC', Color: '#ffa57d', Units: ['NAT11225015'], Compulsory: false },
-{ Subject: 'English B TPC', Color: '#ffa57d', Units: ['NAT11225002'], Compulsory: false },
-{ Subject: 'Maths B Calculus TPC', Color: '#ffa57d', Units: ['NAT11225021'], Compulsory: false },
-{ Subject: 'Compulsory Dig Lit Units PFS', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'], Compulsory: true },
-{ Subject: 'English A PFS', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'], Compulsory: true },
-{ Subject: 'Human Rights PFS', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'], Compulsory: true }
+{ Subject: 'Health TPC', CourseCode: 'FSK20119', Color: '#ffa57d', Units: ['NAT11225026'], Compulsory: false },
+{ Subject: 'Maths B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225020'], Compulsory: false },
+{ Subject: 'History TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225017'], Compulsory: false },
+{ Subject: 'Film and Media TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225015'], Compulsory: false },
+{ Subject: 'English B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225002'], Compulsory: false },
+{ Subject: 'Maths B Calculus TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225021'], Compulsory: false },
+{ Subject: 'Compulsory Dig Lit Units PFS', CourseCode: 'FSK20119', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'], Compulsory: true },
+{ Subject: 'English A PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'], Compulsory: true },
+{ Subject: 'Human Rights PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'], Compulsory: true }
 ],
 schedule: [
 { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
@@ -267,7 +267,7 @@ alert(`Sample data loaded into ${db.currentSemester}!`);
 document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterModal);
 document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
-document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'Color', 'Units', 'Compulsory']));
+document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory']));
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
@@ -401,16 +401,25 @@ if (surnameA < surnameB) return -1;
 if (surnameA > surnameB) return 1;
 return 0;
 });
+} else if (title === 'Subjects') {
+displayData = [...data].sort((a, b) => {
+const courseA = (a.CourseCode || '').toLowerCase();
+const courseB = (b.CourseCode || '').toLowerCase();
+if (courseA !== courseB) return courseA.localeCompare(courseB);
+const subjectA = (a.Subject || '').toLowerCase();
+const subjectB = (b.Subject || '').toLowerCase();
+return subjectA.localeCompare(subjectB);
+});
 }
 
 let contentHTML = `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">`;
 
 if (title === 'Subjects') {
-contentHTML += `<th class="p-2 text-left">Subject</th><th class="p-2 text-left">Color</th><th class="p-2 text-left">Units</th><th class="p-2 text-left">Compulsory</th><th class="p-2">Actions</th></tr></thead><tbody>`;
+contentHTML += `<th class="p-2 text-left">Subject</th><th class="p-2 text-left">Course</th><th class="p-2 text-left">Color</th><th class="p-2 text-left">Units</th><th class="p-2 text-left">Compulsory</th><th class="p-2">Actions</th></tr></thead><tbody>`;
 displayData.forEach((item, index) => {
 const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">No</span>';
 const originalIndex = data.indexOf(item);
-contentHTML += `<tr class="border-b"><td class="p-2"><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td class="p-2">${item.Color}</td><td class="p-2">${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td class="p-2">${compulsoryBadge}</td><td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
+contentHTML += `<tr class="border-b"><td class="p-2"><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td class="p-2 font-semibold">${item.CourseCode}</td><td class="p-2">${item.Color}</td><td class="p-2">${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td class="p-2">${compulsoryBadge}</td><td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
 });
 } else {
 contentHTML += fields.map(f => `<th class="p-2 text-left">${f}</th>`).join('') + `<th class="p-2">Actions</th></tr></thead><tbody>`;
@@ -439,9 +448,11 @@ formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4
 </div>
 </form>`;
 } else if (title === 'Subjects') {
+const semesterData = getCurrentSemesterData();
 formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 border-t pt-4">
 <h3 class="text-lg font-bold col-span-full mb-2">Add / Edit Subject</h3>
 <div><label class="block text-sm font-medium">Subject</label><input type="text" name="Subject" class="w-full border p-2 rounded" required></div>
+<div><label class="block text-sm font-medium">Assign to Course</label><select name="CourseCode" class="w-full border p-2 rounded" required>${semesterData.courses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('')}</select></div>
 <div><label class="block text-sm font-medium">Color</label><input type="color" name="Color" class="w-full border p-2 rounded" required></div>
 <div><label class="block text-sm font-medium">Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" class="w-full border p-2 rounded" required></div>
 <div class="col-span-full"><label class="flex items-center gap-2"><input type="checkbox" name="Compulsory" class="w-4 h-4"> <span class="text-sm font-medium">Mark as Compulsory</span></label></div>
@@ -517,6 +528,7 @@ semesterData.teachers.push(teacherData);
 } else if (title === 'Subjects') {
 const subjectData = {
 Subject: formData.get('Subject'),
+CourseCode: formData.get('CourseCode'),
 Color: formData.get('Color'),
 Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
 Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on'

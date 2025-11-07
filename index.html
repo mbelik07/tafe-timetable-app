@@ -52,14 +52,14 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .print-session.compulsory { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700; }
 .session-units { font-size: 11px; color: #555; margin-top: 2px; font-style: italic; }
 .color-circle { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #999; margin-right: 8px; vertical-align: middle; }
-.bottom-sections-container { display: flex; gap: 1.5rem; margin-top: 1.5rem; }
+.bottom-sections-container { display: flex; gap: 1.5rem; margin-top: 1.5rem; align-items: stretch; }
 .teacher-contact-info { flex: 1; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background-color: #f3f4f6; }
-.teacher-contact-info h4 { font-weight: bold; margin-bottom: 0.75rem; color: #1f2937; font-size: 1.125rem; }
+.teacher-contact-info h4 { font-weight: bold; margin-bottom: 0.75rem; color: #1f2937; font-size: 1rem; }
 .teacher-contact-info p { margin: 0.5rem 0; font-size: 1rem; color: #374151; }
-.notes-section { flex: 1; padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background-color: #f9fafb; }
-.notes-section label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #1f2937; font-size: 1.125rem; }
-.notes-section textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1rem; min-height: 120px; }
-@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
+.notes-section { flex: 1; padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background-color: #f9fafb; display: flex; flex-direction: column; }
+.notes-section label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #1f2937; font-size: 1rem; }
+.notes-section textarea { flex: 1; width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 0.875rem; resize: vertical; }
+@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .notes-section { page-break-inside: avoid; } .teacher-contact-info { page-break-inside: avoid; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
 <body class="bg-gray-100">
@@ -67,7 +67,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
 <div class="p-4 space-y-3 no-print">
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Management</h3>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn">🗓️ Manage Semesters</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn">📋 Manage Semesters</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn">👨‍🏫 Manage Teachers</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn">📚 Manage Courses</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn">🎨 Manage Subjects</button>
@@ -1183,7 +1183,7 @@ const notesSection = `
 </div>
 `;
 
-const bottomSections = teacherContactHTML || notesSection ? `<div class="bottom-sections-container">${teacherContactHTML}${notesSection}</div>` : '';
+const bottomSections = `<div class="bottom-sections-container">${teacherContactHTML}${notesSection}</div>`;
 
 container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
 

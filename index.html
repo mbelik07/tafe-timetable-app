@@ -41,11 +41,8 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .context-menu-item:last-child { border-bottom: none; }
 .context-menu-item:hover { background: #4a5568; }
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
-.modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; z-index: 101; }
+.modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; z-index: 101; }
 .modal-overlay.active { display: block; }
-.course-list-item { padding: 12px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
-.course-list-item:hover { background-color: #f3f4f6; }
-.course-list-item.selected { background-color: #dbeafe; border-color: #3b82f6; font-weight: bold; }
 .print-grid { display: grid; grid-template-columns: 100px repeat(5, 1fr); border: 2px solid #000; grid-auto-rows: minmax(160px, auto); }
 .print-header { font-weight: bold; text-align: center; padding: 8px; border: 1px solid #999; background: #d9d9d9; }
 .print-day-header { background: #595959; color: white; }
@@ -224,15 +221,15 @@ teachers: [
 { Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'anna.nikonova@tafe.edu.au' }
 ],
 subjects: [
-{ Subject: 'Health TPC', Color: '#ffa57d', Units: ['NAT11225026'], Compulsory: false, CourseCode: 'FSK20119' },
-{ Subject: 'Maths B TPC', Color: '#ffa57d', Units: ['NAT11225020'], Compulsory: false, CourseCode: '11225NAT' },
-{ Subject: 'History TPC', Color: '#ffa57d', Units: ['NAT11225017'], Compulsory: false, CourseCode: '11225NAT' },
-{ Subject: 'Film and Media TPC', Color: '#ffa57d', Units: ['NAT11225015'], Compulsory: false, CourseCode: '11225NAT' },
-{ Subject: 'English B TPC', Color: '#ffa57d', Units: ['NAT11225002'], Compulsory: false, CourseCode: '11225NAT' },
-{ Subject: 'Maths B Calculus TPC', Color: '#ffa57d', Units: ['NAT11225021'], Compulsory: false, CourseCode: '11225NAT' },
-{ Subject: 'Compulsory Dig Lit Units PFS', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'], Compulsory: true, CourseCode: 'FSK20119' },
-{ Subject: 'English A PFS', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'], Compulsory: true, CourseCode: '11225NAT' },
-{ Subject: 'Human Rights PFS', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'], Compulsory: false, CourseCode: '11225NAT' }
+{ Subject: 'Health TPC', Color: '#ffa57d', Units: ['NAT11225026'], Compulsory: false },
+{ Subject: 'Maths B TPC', Color: '#ffa57d', Units: ['NAT11225020'], Compulsory: false },
+{ Subject: 'History TPC', Color: '#ffa57d', Units: ['NAT11225017'], Compulsory: false },
+{ Subject: 'Film and Media TPC', Color: '#ffa57d', Units: ['NAT11225015'], Compulsory: false },
+{ Subject: 'English B TPC', Color: '#ffa57d', Units: ['NAT11225002'], Compulsory: false },
+{ Subject: 'Maths B Calculus TPC', Color: '#ffa57d', Units: ['NAT11225021'], Compulsory: false },
+{ Subject: 'Compulsory Dig Lit Units PFS', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'], Compulsory: true },
+{ Subject: 'English A PFS', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'], Compulsory: true },
+{ Subject: 'Human Rights PFS', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'], Compulsory: true }
 ],
 schedule: [
 { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
@@ -270,7 +267,7 @@ alert(`Sample data loaded into ${db.currentSemester}!`);
 document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterModal);
 document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
-document.getElementById('manageSubjectsBtn').addEventListener('click', () => openSubjectsModal());
+document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'Color', 'Units', 'Compulsory']));
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
@@ -392,143 +389,6 @@ processAndRenderAll();
 });
 }
 
-function openSubjectsModal() {
-const semesterData = getCurrentSemesterData();
-const courses = semesterData.courses;
-const subjects = semesterData.subjects;
-
-if (courses.length === 0) {
-alert('Please add courses first before managing subjects.');
-return;
-}
-
-let selectedCourseCode = courses[0].Code;
-
-const renderSubjectsModal = () => {
-const filteredSubjects = subjects.filter(s => s.CourseCode === selectedCourseCode);
-
-let contentHTML = `<div class="grid grid-cols-3 gap-4">`;
-
-contentHTML += `<div class="col-span-1 border-r pr-4">
-<h3 class="text-lg font-bold mb-3">Courses</h3>
-<div class="space-y-2">`;
-
-courses.forEach(course => {
-const subjectCount = subjects.filter(s => s.CourseCode === course.Code).length;
-const isSelected = course.Code === selectedCourseCode;
-contentHTML += `<div class="course-list-item ${isSelected ? 'selected' : ''}" data-course-code="${course.Code}">
-<div class="font-bold">${course.Code}</div>
-<div class="text-sm text-gray-600">${course.Name}</div>
-<div class="text-xs text-gray-500 mt-1">${subjectCount} subject${subjectCount !== 1 ? 's' : ''}</div>
-</div>`;
-});
-
-contentHTML += `</div></div>`;
-
-contentHTML += `<div class="col-span-2">
-<h3 class="text-lg font-bold mb-3">Subjects for ${courses.find(c => c.Code === selectedCourseCode)?.Name || selectedCourseCode}</h3>`;
-
-if (filteredSubjects.length === 0) {
-contentHTML += `<p class="text-center text-gray-500 py-8">No subjects assigned to this course yet.</p>`;
-} else {
-contentHTML += `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">
-<th class="p-2 text-left">Subject</th><th class="p-2 text-left">Color</th><th class="p-2 text-left">Units</th><th class="p-2 text-left">Compulsory</th><th class="p-2">Actions</th></tr></thead><tbody>`;
-
-filteredSubjects.forEach((item) => {
-const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">No</span>';
-const originalIndex = subjects.indexOf(item);
-contentHTML += `<tr class="border-b"><td class="p-2"><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td class="p-2">${item.Color}</td><td class="p-2">${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td class="p-2">${compulsoryBadge}</td><td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
-});
-
-contentHTML += `</tbody></table></div>`;
-}
-
-contentHTML += `</div></div>`;
-
-contentHTML += `<form id="addSubjectForm" class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 border-t pt-4">
-<h3 class="text-lg font-bold col-span-full mb-2">Add / Edit Subject</h3>
-<div><label class="block text-sm font-medium">Subject Name</label><input type="text" name="Subject" class="w-full border p-2 rounded" required></div>
-<div><label class="block text-sm font-medium">Color</label><input type="color" name="Color" class="w-full border p-2 rounded" required></div>
-<div><label class="block text-sm font-medium">Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" class="w-full border p-2 rounded" required></div>
-<div><label class="block text-sm font-medium">Assign to Course</label><select name="CourseCode" class="w-full border p-2 rounded" required>${courses.map(c => `<option value="${c.Code}" ${c.Code === selectedCourseCode ? 'selected' : ''}>${c.Code} - ${c.Name}</option>`).join('')}</select></div>
-<div class="col-span-full"><label class="flex items-center gap-2"><input type="checkbox" name="Compulsory" class="w-4 h-4"> <span class="text-sm font-medium">Mark as Compulsory</span></label></div>
-<input type="hidden" name="editIndex">
-<div class="col-span-full flex items-center gap-4">
-<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Subject</button>
-<button type="button" id="cancelSubjectEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
-</div>
-</form>`;
-
-document.getElementById('modalTitle').textContent = 'Manage Subjects';
-document.getElementById('modalContent').innerHTML = contentHTML;
-managementModal.classList.add('active');
-
-document.querySelectorAll('.course-list-item').forEach(item => {
-item.addEventListener('click', (e) => {
-selectedCourseCode = e.currentTarget.dataset.courseCode;
-renderSubjectsModal();
-});
-});
-
-const form = document.getElementById('addSubjectForm');
-const cancelBtn = document.getElementById('cancelSubjectEditBtn');
-
-cancelBtn.addEventListener('click', () => {
-form.reset();
-form.querySelector('[name="editIndex"]').value = '';
-form.querySelector('button[type="submit"]').textContent = 'Add Subject';
-cancelBtn.classList.add('hidden');
-});
-
-form.addEventListener('submit', (e) => {
-e.preventDefault();
-const formData = new FormData(e.target);
-const editIndex = formData.get('editIndex');
-
-const subjectData = {
-Subject: formData.get('Subject'),
-Color: formData.get('Color'),
-Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
-CourseCode: formData.get('CourseCode'),
-Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on'
-};
-
-if (editIndex) {
-subjects[parseInt(editIndex, 10)] = subjectData;
-} else {
-subjects.push(subjectData);
-}
-
-renderSubjectsModal();
-processAndRenderAll();
-});
-
-document.querySelectorAll('button[data-action]').forEach(btn => btn.addEventListener('click', (e) => {
-const { index, action } = e.currentTarget.dataset;
-
-if (action === 'delete') {
-if (confirm('Are you sure you want to delete this subject? This action cannot be undone.')) {
-subjects.splice(index, 1);
-renderSubjectsModal();
-processAndRenderAll();
-}
-} else if (action === 'edit') {
-const item = subjects[index];
-form.querySelector('[name="Subject"]').value = item.Subject;
-form.querySelector('[name="Color"]').value = item.Color;
-form.querySelector('[name="Units"]').value = Array.isArray(item.Units) ? item.Units.join(', ') : item.Units;
-form.querySelector('[name="CourseCode"]').value = item.CourseCode;
-form.querySelector('[name="Compulsory"]').checked = item.Compulsory;
-form.querySelector('[name="editIndex"]').value = index;
-form.querySelector('button[type="submit"]').textContent = 'Update Subject';
-cancelBtn.classList.remove('hidden');
-}
-}));
-};
-
-renderSubjectsModal();
-}
-
 function openManagementModal(title, data, fields) {
 document.getElementById('modalTitle').textContent = `Manage ${title}`;
 
@@ -545,12 +405,20 @@ return 0;
 
 let contentHTML = `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">`;
 
+if (title === 'Subjects') {
+contentHTML += `<th class="p-2 text-left">Subject</th><th class="p-2 text-left">Color</th><th class="p-2 text-left">Units</th><th class="p-2 text-left">Compulsory</th><th class="p-2">Actions</th></tr></thead><tbody>`;
+displayData.forEach((item, index) => {
+const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">No</span>';
+const originalIndex = data.indexOf(item);
+contentHTML += `<tr class="border-b"><td class="p-2"><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td class="p-2">${item.Color}</td><td class="p-2">${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td class="p-2">${compulsoryBadge}</td><td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
+});
+} else {
 contentHTML += fields.map(f => `<th class="p-2 text-left">${f}</th>`).join('') + `<th class="p-2">Actions</th></tr></thead><tbody>`;
 displayData.forEach((item, index) => {
 const originalIndex = data.indexOf(item);
 contentHTML += `<tr class="border-b">${fields.map(f => `<td class="p-2">${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
 });
-
+}
 contentHTML += `</tbody></table></div>`;
 
 let formHTML = '';
@@ -567,6 +435,19 @@ formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4
 <input type="hidden" name="editIndex">
 <div class="col-span-full flex items-center gap-4">
 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Teacher</button>
+<button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
+</div>
+</form>`;
+} else if (title === 'Subjects') {
+formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 border-t pt-4">
+<h3 class="text-lg font-bold col-span-full mb-2">Add / Edit Subject</h3>
+<div><label class="block text-sm font-medium">Subject</label><input type="text" name="Subject" class="w-full border p-2 rounded" required></div>
+<div><label class="block text-sm font-medium">Color</label><input type="color" name="Color" class="w-full border p-2 rounded" required></div>
+<div><label class="block text-sm font-medium">Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" class="w-full border p-2 rounded" required></div>
+<div class="col-span-full"><label class="flex items-center gap-2"><input type="checkbox" name="Compulsory" class="w-4 h-4"> <span class="text-sm font-medium">Mark as Compulsory</span></label></div>
+<input type="hidden" name="editIndex">
+<div class="col-span-full flex items-center gap-4">
+<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Subject</button>
 <button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
 </div>
 </form>`;
@@ -633,6 +514,18 @@ semesterData.teachers[parseInt(editIndex, 10)] = teacherData;
 } else {
 semesterData.teachers.push(teacherData);
 }
+} else if (title === 'Subjects') {
+const subjectData = {
+Subject: formData.get('Subject'),
+Color: formData.get('Color'),
+Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
+Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on'
+};
+if (editIndex) {
+semesterData.subjects[parseInt(editIndex, 10)] = subjectData;
+} else {
+semesterData.subjects.push(subjectData);
+}
 } else {
 const newItem = {};
 fields.forEach(f => {
@@ -676,9 +569,6 @@ form.querySelector('button[type="submit"]').textContent = `Update ${title.slice(
 cancelBtn.classList.remove('hidden');
 }
 }));
-}
-
-renderSubjectsModal();
 }
 
 const renderers = { 'main-timetable': renderMainTimetableView, 'staff-summary': renderStaffSummaryView, 'dispute-log': renderDisputeLogView, 'course-print': renderCoursePrintView, 'teacher-print': renderTeacherPrintView };

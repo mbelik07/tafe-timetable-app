@@ -74,6 +74,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .course-list-item { padding: 12px; margin-bottom: 8px; background: #f3f4f6; border: 2px solid transparent; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
 .course-list-item:hover { background: #e5e7eb; }
 .course-list-item.active { background: #dbeafe; border-color: #3b82f6; font-weight: bold; }
+.staff-notes-input { max-width: 200px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; }
 @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
@@ -133,7 +134,7 @@ let selectedCourseForSubjects = null;
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
 const colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
-const getNewSemesterData = () => ({ courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale' });
+const getNewSemesterData = () => ({ courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale', staffNotes: {} });
 
 const saveData = () => localStorage.setItem('timetableDataV2', JSON.stringify(db));
 const loadData = () => {
@@ -145,6 +146,9 @@ if (db.semesters[semKey].subjects) {
 db.semesters[semKey].subjects.forEach(subj => {
 if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
 });
+}
+if (!db.semesters[semKey].staffNotes) {
+db.semesters[semKey].staffNotes = {};
 }
 });
 } else {
@@ -193,6 +197,9 @@ if (db.semesters[semKey].subjects) {
 db.semesters[semKey].subjects.forEach(subj => {
 if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
 });
+}
+if (!db.semesters[semKey].staffNotes) {
+db.semesters[semKey].staffNotes = {};
 }
 });
 saveData();
@@ -1154,7 +1161,7 @@ if (surnameA > surnameB) return 1;
 return 0;
 });
 
-const headers = ['Initials', 'Name', 'Surname', ...semesterData.courses.map(c => c.Code), 'Direct Teaching', 'Total Hours', 'Remaining Hours'];
+const headers = ['Initials', 'Name', 'Surname', ...semesterData.courses.map(c => c.Code), 'Direct Teaching', 'Total Hours', 'Remaining Hours', 'Notes'];
 let tableHTML = `<table class="w-full text-sm border-collapse"><thead><tr class="bg-blue-900 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
 
 sortedTeachers.forEach(teacher => {
@@ -1168,12 +1175,23 @@ directTeachingHours += hours;
 const totalHours = teacher.TotalHours || 0;
 const remainingHours = totalHours - directTeachingHours;
 const remainingHoursClass = remainingHours < 0 ? 'text-red-600 font-bold' : '';
+const teacherNote = semesterData.staffNotes[teacher.Initials] || '';
 
 tableHTML += `<td class="border p-2 text-center font-bold bg-cyan-100">${directTeachingHours.toFixed(2)}</td>`;
 tableHTML += `<td class="border p-2 text-center font-bold bg-yellow-100">${totalHours.toFixed(2)}</td>`;
-tableHTML += `<td class="border p-2 text-center font-bold bg-green-100 ${remainingHoursClass}">${remainingHours.toFixed(2)}</td></tr>`;
+tableHTML += `<td class="border p-2 text-center font-bold bg-green-100 ${remainingHoursClass}">${remainingHours.toFixed(2)}</td>`;
+tableHTML += `<td class="border p-2"><input type="text" class="staff-notes-input" data-teacher="${teacher.Initials}" value="${teacherNote}" placeholder="Add notes..."></td></tr>`;
 });
 container.innerHTML = tableHTML + `</tbody></table>`;
+
+// Add event listeners for notes inputs
+container.querySelectorAll('.staff-notes-input').forEach(input => {
+input.addEventListener('change', (e) => {
+const teacherInitials = e.target.dataset.teacher;
+semesterData.staffNotes[teacherInitials] = e.target.value;
+saveData();
+});
+});
 }
 
 function renderDisputeLogView() {

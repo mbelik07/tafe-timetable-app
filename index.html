@@ -43,11 +43,11 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
 .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; z-index: 101; }
 .modal-overlay.active { display: block; }
-.print-grid { display: grid; grid-template-columns: 80px repeat(5, 1fr); border: 2px solid #000; grid-auto-rows: minmax(120px, auto); grid-gap: 0; }
-.print-header { font-weight: bold; text-align: center; border: 1px solid #999; background: #d9d9d9; margin: 0; }
+.print-grid { display: grid; grid-template-columns: 80px repeat(5, 1fr); border: 2px solid #000; grid-auto-rows: minmax(140px, auto); }
+.print-header { font-weight: bold; text-align: center; padding: 8px 4px; border: 1px solid #999; background: #d9d9d9; font-size: 18px; }
 .print-day-header { background: #595959; color: white; }
-.print-period-label { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; background: #fde9d9; border: 1px solid #999; font-size: 12px; margin: 0; }
-.print-cell { border: 1px solid #999; padding: 4px; vertical-align: top; margin: 0; }
+.print-period-label { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; background: #fde9d9; border: 1px solid #999; font-size: 13px; }
+.print-cell { border: 1px solid #999; padding: 4px; vertical-align: top; }
 .print-session { border-radius: 4px; padding: 6px; font-size: 15px; margin-top: 5px; border: 1px solid black; line-height: 1.3; }
 .print-session.compulsory { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700; }
 .session-units { font-size: 11px; color: #555; margin-top: 2px; font-style: italic; }
@@ -1111,14 +1111,14 @@ const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentColleg
 const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
 
 let gridHTML = `<div class="print-grid">
-<div class="print-header" style="height: 20px !important; padding: 2px 4px !important; font-size: 13px !important; line-height: 1.1 !important; margin: 0 !important;"></div>
-${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header" style="height: 20px !important; padding: 2px 4px !important; font-size: 13px !important; line-height: 1.1 !important; margin: 0 !important;">${d}</div>`).join('')}`;
+<div class="print-header"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
 
 const periods = ['Morning', 'Afternoon'];
 if (hasNightSessions) periods.push('Night');
 
 periods.forEach(period => {
-gridHTML += `<div class="print-period-label" style="margin: 0 !important;">${period}</div>`;
+gridHTML += `<div class="print-period-label">${period}</div>`;
 ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
 const daySessions = sessions.filter(s => {
 const start = timeToMinutes(s.ClassStart);
@@ -1154,7 +1154,7 @@ ${notesHTML}
 <div>${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
 }).join('');
-gridHTML += `<div class="print-cell" style="margin: 0 !important;">${sessionsHTML}</div>`;
+gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
 });
 });
 gridHTML += `</div>`;
@@ -1222,14 +1222,14 @@ const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.curre
 const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
 
 let gridHTML = `<div class="print-grid">
-<div class="print-header" style="height: 20px !important; padding: 2px 4px !important; font-size: 13px !important; line-height: 1.1 !important; margin: 0 !important;"></div>
-${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header" style="height: 20px !important; padding: 2px 4px !important; font-size: 13px !important; line-height: 1.1 !important; margin: 0 !important;">${d}</div>`).join('')}`;
+<div class="print-header"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
 
 const periods = ['Morning', 'Afternoon'];
 if (hasNightSessions) periods.push('Night');
 
 periods.forEach(period => {
-gridHTML += `<div class="print-period-label" style="margin: 0 !important;">${period}</div>`;
+gridHTML += `<div class="print-period-label">${period}</div>`;
 ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
 const daySessions = sessions.filter(s => {
 const start = timeToMinutes(s.ClassStart);
@@ -1262,7 +1262,7 @@ ${notesHTML}
 <div>${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
 }).join('');
-gridHTML += `<div class="print-cell" style="margin: 0 !important;">${sessionsHTML}</div>`;
+gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
 });
 });
 gridHTML += `</div>`;

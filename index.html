@@ -31,6 +31,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .time-slot.slot-selected { background-color: rgba(59, 130, 246, 0.3); }
 .session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
 .session-block.compulsory { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700; }
+.session-block.online { box-shadow: 0 0 0 3px #3b82f6; }
+.session-block.blended { box-shadow: 0 0 0 3px #3b82f6; }
+.session-block.compulsory.online { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700, 0 0 0 8px #3b82f6; }
+.session-block.compulsory.blended { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700, 0 0 0 8px #3b82f6; }
 .dispute-warning { border: 3px solid #ef4444 !important; z-index: 15; animation: pulse-border 1.5s infinite; }
 .dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
 @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
@@ -50,6 +54,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .print-cell { border: 1px solid #999; padding: 4px; vertical-align: top; min-height: 140px; }
 .print-session { border-radius: 4px; padding: 6px; font-size: 15px; margin-top: 5px; border: 1px solid black; line-height: 1.3; }
 .print-session.compulsory { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700; }
+.print-session.online { border: 3px solid #3b82f6; }
+.print-session.blended { border: 3px solid #3b82f6; }
+.print-session.compulsory.online { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700, 0 0 0 4px #3b82f6; }
+.print-session.compulsory.blended { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700, 0 0 0 4px #3b82f6; }
 .session-units { font-size: 11px; color: #555; margin-top: 2px; font-style: italic; }
 .color-circle { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #999; margin-right: 8px; vertical-align: middle; }
 .bottom-sections-container { display: flex; gap: 1.5rem; margin-top: 1rem; }
@@ -128,6 +136,13 @@ const loadData = () => {
 const savedData = localStorage.getItem('timetableDataV2');
 if (savedData) {
 db = JSON.parse(savedData);
+Object.keys(db.semesters).forEach(semKey => {
+if (db.semesters[semKey].subjects) {
+db.semesters[semKey].subjects.forEach(subj => {
+if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
+});
+}
+});
 } else {
 db = {
 semesters: { 'Semester 1 2024': getNewSemesterData() },
@@ -169,6 +184,13 @@ throw new Error('Invalid data format. Missing semesters or currentSemester.');
 
 if (confirm('⚠️ This will replace all your current data. Are you sure?')) {
 db = importedData;
+Object.keys(db.semesters).forEach(semKey => {
+if (db.semesters[semKey].subjects) {
+db.semesters[semKey].subjects.forEach(subj => {
+if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
+});
+}
+});
 saveData();
 processAndRenderAll();
 alert('✅ Data imported successfully!');
@@ -227,16 +249,16 @@ teachers: [
 { Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'anna.nikonova@tafe.edu.au' }
 ],
 subjects: [
-{ Subject: 'Health TPC', CourseCode: 'FSK20119', Color: '#ffa57d', Units: ['NAT11225026'], Compulsory: false },
-{ Subject: 'Maths B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225020'], Compulsory: false },
-{ Subject: 'History TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225017'], Compulsory: false },
-{ Subject: 'Film and Media TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225015'], Compulsory: false },
-{ Subject: 'English B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225002'], Compulsory: true },
-{ Subject: 'Maths B Calculus TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225021'], Compulsory: false },
-{ Subject: 'Compulsory Dig Lit Units PFS', CourseCode: 'FSK20119', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'], Compulsory: true },
-{ Subject: 'English A PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'], Compulsory: true },
-{ Subject: 'Human Rights PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'], Compulsory: false },
-{ Subject: 'Study Skills', CourseCode: '11225NAT', Color: '#90ee90', Units: ['NAT11225030'], Compulsory: true }
+{ Subject: 'Health TPC', CourseCode: 'FSK20119', Color: '#ffa57d', Units: ['NAT11225026'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'Maths B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225020'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'History TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225017'], Compulsory: false, DeliveryMode: 'Online' },
+{ Subject: 'Film and Media TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225015'], Compulsory: false, DeliveryMode: 'Blended' },
+{ Subject: 'English B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225002'], Compulsory: true, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'Maths B Calculus TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225021'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'Compulsory Dig Lit Units PFS', CourseCode: 'FSK20119', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'], Compulsory: true, DeliveryMode: 'Blended' },
+{ Subject: 'English A PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'], Compulsory: true, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'Human Rights PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'], Compulsory: false, DeliveryMode: 'Online' },
+{ Subject: 'Study Skills', CourseCode: '11225NAT', Color: '#90ee90', Units: ['NAT11225030'], Compulsory: true, DeliveryMode: 'Face-to-Face' }
 ],
 schedule: [
 { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
@@ -274,7 +296,7 @@ alert(`Sample data loaded into ${db.currentSemester}!`);
 document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterModal);
 document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
-document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory']));
+document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
@@ -432,12 +454,14 @@ contentHTML += `</div></div>`;
 contentHTML += `<div style="flex: 1;">`;
 
 contentHTML += `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">`;
-contentHTML += `<th class="p-2 text-left">Subject</th><th class="p-2 text-left">Color</th><th class="p-2 text-left">Units</th><th class="p-2 text-left">Compulsory</th><th class="p-2">Actions</th></tr></thead><tbody>`;
+contentHTML += `<th class="p-2 text-left">Subject</th><th class="p-2 text-left">Color</th><th class="p-2 text-left">Units</th><th class="p-2 text-left">Compulsory</th><th class="p-2 text-left">Delivery</th><th class="p-2">Actions</th></tr></thead><tbody>`;
 
 sortedSubjects.forEach((item) => {
 const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">No</span>';
+const deliveryMode = item.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">F2F</span>');
 const originalIndex = data.indexOf(item);
-contentHTML += `<tr class="border-b"><td class="p-2"><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td class="p-2">${item.Color}</td><td class="p-2">${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td class="p-2">${compulsoryBadge}</td><td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="subjects" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="subjects" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
+contentHTML += `<tr class="border-b"><td class="p-2"><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td class="p-2">${item.Color}</td><td class="p-2">${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td class="p-2">${compulsoryBadge}</td><td class="p-2">${deliveryBadge}</td><td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="subjects" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="subjects" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
 });
 
 contentHTML += `</tbody></table></div>`;
@@ -447,7 +471,8 @@ const formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 gap-4 border-t
 <div><label class="block text-sm font-medium">Subject</label><input type="text" name="Subject" class="w-full border p-2 rounded" required></div>
 <div><label class="block text-sm font-medium">Color</label><input type="color" name="Color" class="w-full border p-2 rounded" required></div>
 <div class="col-span-full"><label class="block text-sm font-medium">Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" class="w-full border p-2 rounded" required></div>
-<div class="col-span-full"><label class="flex items-center gap-2"><input type="checkbox" name="Compulsory" class="w-4 h-4"> <span class="text-sm font-medium">Mark as Compulsory</span></label></div>
+<div><label class="flex items-center gap-2"><input type="checkbox" name="Compulsory" class="w-4 h-4"> <span class="text-sm font-medium">Mark as Compulsory</span></label></div>
+<div><label class="block text-sm font-medium">Delivery Mode</label><select name="DeliveryMode" class="w-full border p-2 rounded" required><option value="Face-to-Face">Face-to-Face</option><option value="Online">Online</option><option value="Blended">Blended</option></select></div>
 <input type="hidden" name="editIndex">
 <input type="hidden" name="CourseCode" value="${selectedCourseForSubjects}">
 <div class="col-span-full flex items-center gap-4">
@@ -483,7 +508,8 @@ Subject: formData.get('Subject'),
 CourseCode: selectedCourseForSubjects,
 Color: formData.get('Color'),
 Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
-Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on'
+Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on',
+DeliveryMode: formData.get('DeliveryMode') || 'Face-to-Face'
 };
 
 if (editIndex) {
@@ -795,9 +821,11 @@ const notesHTML = session.notes ? `<div class="text-xs italic text-gray-600 trun
 const collegeInfo = semesterData.currentCollege === 'Master View' ? `<div class="font-bold text-indigo-600 text-xs">${session.colleges?.join(', ') || ''}</div>` : '';
 const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div class="session-units">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
 const compulsoryBadge = subjectInfo?.Compulsory ? `<div class="font-bold text-red-600 text-xs">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
 const sessionBlock = document.createElement('div');
-sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''}`;
+sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}`;
 sessionBlock.setAttribute('data-session-id', session.id);
 Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
 sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
@@ -1235,13 +1263,17 @@ const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style=
 const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
 const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
 const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 11px; color: #d32f2f;">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 11px; color: #3b82f6;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
 if (!teacher1Info) return '';
 
-return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''}" style="background-color:${subjectInfo?.Color || '#eee'}">
+return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
 <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
 ${compulsoryBadge}
+${deliveryBadge}
 ${unitsHTML}
 <div>${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
 ${notesHTML}
@@ -1345,11 +1377,15 @@ const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style=
 const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
 const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
 const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 11px; color: #d32f2f;">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 11px; color: #3b82f6;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
-return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''}" style="background-color:${subjectInfo?.Color || '#eee'}">
+return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
 <div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
 ${compulsoryBadge}
+${deliveryBadge}
 ${unitsHTML}
 <div>${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
 ${notesHTML}

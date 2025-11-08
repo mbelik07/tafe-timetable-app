@@ -1111,14 +1111,14 @@ const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentColleg
 const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
 
 let gridHTML = `<div class="print-grid">
-<div class="print-header" style="height: 22px; padding: 3px 4px; font-size: 13px; line-height: 1.1; margin: 0;"></div>
-${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header" style="height: 22px; padding: 3px 4px; font-size: 13px; line-height: 1.1; margin: 0;">${d}</div>`).join('')}`;
+<div class="print-header" style="height: 20px !important; padding: 2px 4px !important; font-size: 13px !important; line-height: 1.1 !important; margin: 0 !important;"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header" style="height: 20px !important; padding: 2px 4px !important; font-size: 13px !important; line-height: 1.1 !important; margin: 0 !important;">${d}</div>`).join('')}`;
 
 const periods = ['Morning', 'Afternoon'];
 if (hasNightSessions) periods.push('Night');
 
 periods.forEach(period => {
-gridHTML += `<div class="print-period-label" style="margin: 0;">${period}</div>`;
+gridHTML += `<div class="print-period-label" style="margin: 0 !important;">${period}</div>`;
 ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
 const daySessions = sessions.filter(s => {
 const start = timeToMinutes(s.ClassStart);
@@ -1154,7 +1154,7 @@ ${notesHTML}
 <div>${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
 }).join('');
-gridHTML += `<div class="print-cell" style="margin: 0;">${sessionsHTML}</div>`;
+gridHTML += `<div class="print-cell" style="margin: 0 !important;">${sessionsHTML}</div>`;
 });
 });
 gridHTML += `</div>`;
@@ -1222,14 +1222,14 @@ const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.curre
 const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
 
 let gridHTML = `<div class="print-grid">
-<div class="print-header" style="height: 22px; padding: 3px 4px; font-size: 13px; line-height: 1.1; margin: 0;"></div>
-${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header" style="height: 22px; padding: 3px 4px; font-size: 13px; line-height: 1.1; margin: 0;">${d}</div>`).join('')}`;
+<div class="print-header" style="height: 20px !important; padding: 2px 4px !important; font-size: 13px !important; line-height: 1.1 !important; margin: 0 !important;"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header" style="height: 20px !important; padding: 2px 4px !important; font-size: 13px !important; line-height: 1.1 !important; margin: 0 !important;">${d}</div>`).join('')}`;
 
 const periods = ['Morning', 'Afternoon'];
 if (hasNightSessions) periods.push('Night');
 
 periods.forEach(period => {
-gridHTML += `<div class="print-period-label" style="margin: 0;">${period}</div>`;
+gridHTML += `<div class="print-period-label" style="margin: 0 !important;">${period}</div>`;
 ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
 const daySessions = sessions.filter(s => {
 const start = timeToMinutes(s.ClassStart);
@@ -1262,7 +1262,7 @@ ${notesHTML}
 <div>${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
 }).join('');
-gridHTML += `<div class="print-cell" style="margin: 0;">${sessionsHTML}</div>`;
+gridHTML += `<div class="print-cell" style="margin: 0 !important;">${sessionsHTML}</div>`;
 });
 });
 gridHTML += `</div>`;

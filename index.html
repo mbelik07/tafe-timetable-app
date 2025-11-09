@@ -368,9 +368,10 @@ document.getElementById('manageTeachersBtn').addEventListener('click', () => ope
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
 document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
 document.getElementById('manageTasksBtn').addEventListener('click', () => {
-alert('Tasks are managed through the Tasks view in the main dropdown menu. Select "Tasks" from the view selector to manage your tasks.');
 sidebarOpen = false;
 sidebar.classList.remove('sidebar-open');
+viewSelector.value = 'tasks';
+handleViewChange();
 });
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);

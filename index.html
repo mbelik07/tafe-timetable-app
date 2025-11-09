@@ -72,50 +72,7 @@
 .course-list-item:hover { background: #e5e7eb; }
 .course-list-item.active { background: #dbeafe; border-color: #3b82f6; font-weight: bold; }
 .staff-notes-input { max-width: 200px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; }
-
-/* Enhanced Task Styles */
-.task-card { padding: 1.25rem; border-left: 5px solid #d1d5db; border-radius: 0.5rem; margin-bottom: 1rem; background: white; border: 1px solid #d1d5db; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.task-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-.task-card.critical { border-left: 5px solid #dc2626; background: #fee2e2; }
-.task-card.high { border-left: 5px solid #f59e0b; background: #fef3c7; }
-.task-card.medium { border-left: 5px solid #3b82f6; background: #dbeafe; }
-.task-card.low { border-left: 5px solid #10b981; background: #ecfdf5; }
-.task-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem; gap: 1rem; }
-.task-title { font-weight: bold; font-size: 1.1rem; color: #1f2937; flex: 1; }
-.task-status-badge { display: inline-block; padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; white-space: nowrap; }
-.task-status-todo { background: #e5e7eb; color: #374151; }
-.task-status-inprogress { background: #fbbf24; color: #78350f; }
-.task-status-done { background: #dcfce7; color: #166534; }
-.task-status-blocked { background: #fee2e2; color: #991b1b; }
-.task-meta { display: flex; gap: 1.5rem; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem; flex-wrap: wrap; }
-.task-meta-item { display: flex; align-items: center; gap: 0.5rem; }
-.task-description { color: #4b5563; margin-bottom: 1rem; line-height: 1.5; }
-.task-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.task-actions button { padding: 0.35rem 0.85rem; font-size: 0.875rem; border-radius: 0.375rem; border: none; cursor: pointer; transition: all 0.2s; font-weight: 500; }
-.task-edit-btn { background: #3b82f6; color: white; }
-.task-edit-btn:hover { background: #2563eb; }
-.task-delete-btn { background: #ef4444; color: white; }
-.task-delete-btn:hover { background: #dc2626; }
-.task-complete-btn { background: #10b981; color: white; }
-.task-complete-btn:hover { background: #059669; }
-.task-filters { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.task-filter-btn { padding: 0.5rem 1rem; border: 2px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
-.task-filter-btn:hover { border-color: #3b82f6; }
-.task-filter-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
-.task-empty-state { text-align: center; padding: 3rem 1rem; color: #6b7280; }
-.task-empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
-.task-type-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: bold; margin-bottom: 0.5rem; }
-.task-type-course { background: #dbeafe; color: #1e40af; }
-.task-type-teacher { background: #fce7f3; color: #831843; }
-.task-type-custom { background: #f3e8ff; color: #6b21a8; }
-
-@media print { 
-  body * { visibility: hidden; } 
-  #print-area, #print-area * { visibility: visible; } 
-  #print-area { position: absolute; left: 0; top: 0; width: 100%; } 
-  .no-print { display: none; } 
-  .bottom-sections-container { page-break-inside: avoid; } 
-}
+@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
 <body class="bg-gray-100">
@@ -141,7 +98,7 @@
 <div class="flex items-center gap-3">
 <button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn">Open Menu</button>
 <select class="border border-gray-300 rounded px-3 py-2 font-bold" id="semesterSelector"></select>
-<select class="border border-gray-300 rounded px-3 py-2" id="viewSelector"><option value="main-timetable">Main Timetable</option><option value="staff-summary">Staff Summary</option><option value="dispute-log">Dispute Log</option><option value="course-print">Course Print</option><option value="teacher-print">Teacher Print</option><option value="tasks">Tasks</option></select>
+<select class="border border-gray-300 rounded px-3 py-2" id="viewSelector"><option value="main-timetable">Main Timetable</option><option value="staff-summary">Staff Summary</option><option value="dispute-log">Dispute Log</option><option value="course-print">Course Print</option><option value="teacher-print">Teacher Print</option></select>
 <div class="flex gap-2" id="secondary-selectors"></div>
 <button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded" id="printBtn">📄 Download PDF</button>
 </div>
@@ -154,7 +111,6 @@
 <div class="view-container" id="dispute-log-view"></div>
 <div class="view-container" id="course-print-view"></div>
 <div class="view-container" id="teacher-print-view"></div>
-<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-6">📋 Task Management & Issues</h2><div class="mb-6 flex gap-3 flex-wrap"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="addTaskBtn">+ Add Custom Task</button><button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="scanIssuesBtn">🔍 Scan for Issues</button></div><div class="task-filters" id="taskFilters"></div><div id="tasks-container"></div></div></div>
 </div>
 </main>
 </div>
@@ -163,7 +119,6 @@
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary)</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
-<div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="critical">Critical</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
 <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.8); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl">
 <h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
@@ -174,12 +129,11 @@
 <script>
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
-let taskFilterStatus = 'all';
 
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
 const colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
-const getNewSemesterData = () => ({ courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale', staffNotes: {}, tasks: [] });
+const getNewSemesterData = () => ({ courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale', staffNotes: {} });
 
 const saveData = () => localStorage.setItem('timetableDataV2', JSON.stringify(db));
 const loadData = () => {
@@ -194,9 +148,6 @@ if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
 }
 if (!db.semesters[semKey].staffNotes) {
 db.semesters[semKey].staffNotes = {};
-}
-if (!db.semesters[semKey].tasks) {
-db.semesters[semKey].tasks = [];
 }
 });
 } else {
@@ -249,9 +200,6 @@ if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
 if (!db.semesters[semKey].staffNotes) {
 db.semesters[semKey].staffNotes = {};
 }
-if (!db.semesters[semKey].tasks) {
-db.semesters[semKey].tasks = [];
-}
 });
 saveData();
 processAndRenderAll();
@@ -285,8 +233,6 @@ const managementModal = document.getElementById('managementModal');
 const semesterModal = document.getElementById('semesterModal');
 const contextMenu = document.getElementById('contextMenu');
 const duplicateDayModal = document.getElementById('duplicateDayModal');
-const taskModal = document.getElementById('taskModal');
-const taskForm = document.getElementById('taskForm');
 const secondarySelectorsContainer = document.getElementById('secondary-selectors');
 const viewSelector = document.getElementById('viewSelector');
 const semesterSelector = document.getElementById('semesterSelector');
@@ -330,8 +276,7 @@ schedule: [
 { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
 { id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
 ],
-courseNotes: {},
-tasks: []
+courseNotes: {}
 });
 
 // Toggle sidebar
@@ -352,12 +297,6 @@ sidebar.classList.remove('sidebar-open');
 document.getElementById('printBtn').addEventListener('click', generatePdf);
 document.getElementById('exportDataBtn').addEventListener('click', exportData);
 document.getElementById('importDataBtn').addEventListener('click', importData);
-document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
-document.getElementById('scanIssuesBtn').addEventListener('click', scanForIssues);
-document.getElementById('closeTaskModalBtn').addEventListener('click', () => taskModal.classList.remove('active'));
-document.getElementById('cancelTaskBtn').addEventListener('click', () => taskModal.classList.remove('active'));
-document.getElementById('deleteTaskBtn').addEventListener('click', deleteTask);
-taskForm.addEventListener('submit', saveTask);
 viewSelector.addEventListener('change', handleViewChange);
 semesterSelector.addEventListener('change', (e) => {
 db.currentSemester = e.target.value;
@@ -375,7 +314,6 @@ currentData.teachers = sampleData.teachers;
 currentData.subjects = sampleData.subjects;
 currentData.schedule = sampleData.schedule;
 currentData.courseNotes = sampleData.courseNotes || {};
-currentData.tasks = sampleData.tasks || [];
 processAndRenderAll();
 alert(`Sample data loaded into ${db.currentSemester}!`);
 });
@@ -505,220 +443,1028 @@ processAndRenderAll();
 });
 }
 
-function scanForIssues() {
+function openManagementModal(title, data, fields) {
+document.getElementById('modalTitle').textContent = `Manage ${title}`;
+
+if (title === 'Subjects') {
 const semesterData = getCurrentSemesterData();
-const newTasks = [];
+if (!selectedCourseForSubjects && semesterData.courses.length > 0) {
+selectedCourseForSubjects = semesterData.courses[0].Code;
+}
 
-// Check for incomplete course units
+const renderSubjectsModal = () => {
+const filteredSubjects = data.filter(s => s.CourseCode === selectedCourseForSubjects);
+const sortedSubjects = [...filteredSubjects].sort((a, b) => {
+const subjectA = (a.Subject || '').toLowerCase();
+const subjectB = (b.Subject || '').toLowerCase();
+return subjectA.localeCompare(subjectB);
+});
+
+let contentHTML = `<div style="display: flex; gap: 1.5rem;">`;
+
+contentHTML += `<div style="flex: 0 0 30%; background: #f9fafb; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
+<h3 class="text-lg font-bold mb-3">Courses</h3>
+<div class="space-y-2">`;
+
 semesterData.courses.forEach(course => {
-const courseSubjects = semesterData.subjects.filter(s => s.CourseCode === course.Code);
-const courseSessions = semesterData.schedule.filter(s => s.CourseCode === course.Code);
-
-if (courseSessions.length === 0) {
-newTasks.push({
-id: Date.now() + Math.random(),
-title: `Missing sessions for ${course.Code}`,
-description: `Course "${course.Name}" has no scheduled sessions yet.`,
-priority: 'high',
-status: 'todo',
-type: 'course_incomplete',
-relatedCourse: course.Code,
-dueDate: ''
+const isActive = course.Code === selectedCourseForSubjects;
+contentHTML += `<div class="course-list-item ${isActive ? 'active' : ''}" data-course-code="${course.Code}">
+<div class="font-bold">${course.Code}</div>
+<div class="text-sm text-gray-600">${course.Name}</div>
+</div>`;
 });
+
+contentHTML += `</div></div>`;
+
+contentHTML += `<div style="flex: 1;">`;
+
+contentHTML += `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">`;
+contentHTML += `<th class="p-2 text-left">Subject</th><th class="p-2 text-left">Color</th><th class="p-2 text-left">Units</th><th class="p-2 text-left">Compulsory</th><th class="p-2 text-left">Delivery</th><th class="p-2">Actions</th></tr></thead><tbody>`;
+
+sortedSubjects.forEach((item) => {
+const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">No</span>';
+const deliveryMode = item.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">F2F</span>');
+const originalIndex = data.indexOf(item);
+contentHTML += `<tr class="border-b"><td class="p-2"><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td class="p-2">${item.Color}</td><td class="p-2">${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td class="p-2">${compulsoryBadge}</td><td class="p-2">${deliveryBadge}</td><td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="subjects" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="subjects" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
+});
+
+contentHTML += `</tbody></table></div>`;
+
+const formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 gap-4 border-t pt-4">
+<h3 class="text-lg font-bold col-span-full mb-2">Add / Edit Subject for ${selectedCourseForSubjects}</h3>
+<div><label class="block text-sm font-medium">Subject</label><input type="text" name="Subject" class="w-full border p-2 rounded" required></div>
+<div><label class="block text-sm font-medium">Color</label><input type="color" name="Color" class="w-full border p-2 rounded" required></div>
+<div class="col-span-full"><label class="block text-sm font-medium">Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" class="w-full border p-2 rounded" required></div>
+<div><label class="flex items-center gap-2"><input type="checkbox" name="Compulsory" class="w-4 h-4"> <span class="text-sm font-medium">Mark as Compulsory</span></label></div>
+<div><label class="block text-sm font-medium">Delivery Mode</label><select name="DeliveryMode" class="w-full border p-2 rounded" required><option value="Face-to-Face">Face-to-Face</option><option value="Online">Online</option><option value="Blended">Blended</option></select></div>
+<input type="hidden" name="editIndex">
+<input type="hidden" name="CourseCode" value="${selectedCourseForSubjects}">
+<div class="col-span-full flex items-center gap-4">
+<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Subject</button>
+<button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
+</div>
+</form>`;
+
+contentHTML += formHTML;
+contentHTML += `</div></div>`;
+
+document.getElementById('modalContent').innerHTML = contentHTML;
+managementModal.classList.add('active');
+
+const form = document.getElementById('addForm');
+const cancelBtn = document.getElementById('cancelEditBtn');
+
+cancelBtn.addEventListener('click', () => {
+form.reset();
+form.querySelector('[name="editIndex"]').value = '';
+form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
+form.querySelector('button[type="submit"]').textContent = 'Add Subject';
+cancelBtn.classList.add('hidden');
+});
+
+form.addEventListener('submit', (e) => {
+e.preventDefault();
+const formData = new FormData(e.target);
+const editIndex = formData.get('editIndex');
+
+const subjectData = {
+Subject: formData.get('Subject'),
+CourseCode: selectedCourseForSubjects,
+Color: formData.get('Color'),
+Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
+Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on',
+DeliveryMode: formData.get('DeliveryMode') || 'Face-to-Face'
+};
+
+if (editIndex) {
+data[parseInt(editIndex, 10)] = subjectData;
+} else {
+data.push(subjectData);
 }
+openManagementModal('Subjects', data, fields);
+processAndRenderAll();
 });
 
-// Check for teachers with incomplete hours
-semesterData.teachers.forEach(teacher => {
-const teacherSessions = semesterData.schedule.filter(s => s.TeacherInitials === teacher.Initials || s.TeacherInitials2 === teacher.Initials);
-const allocatedHours = teacherSessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
-const totalHours = teacher.TotalHours || 0;
-
-if (allocatedHours < totalHours) {
-const remainingHours = totalHours - allocatedHours;
-newTasks.push({
-id: Date.now() + Math.random(),
-title: `Incomplete hours for ${teacher.Name} ${teacher.Surname}`,
-description: `${teacher.Name} ${teacher.Surname} (${teacher.Initials}) has ${remainingHours.toFixed(2)} hours remaining to allocate. (${allocatedHours.toFixed(2)}/${totalHours} hours scheduled)`,
-priority: remainingHours > 5 ? 'critical' : 'high',
-status: 'todo',
-type: 'teacher_incomplete',
-relatedTeacher: teacher.Initials,
-dueDate: ''
+document.querySelectorAll('.course-list-item').forEach(item => {
+item.addEventListener('click', (e) => {
+selectedCourseForSubjects = e.currentTarget.dataset.courseCode;
+renderSubjectsModal();
 });
+});
+
+document.getElementById('modalContent').querySelectorAll('button[data-action]').forEach(btn => btn.addEventListener('click', (e) => {
+const { type, index, action } = e.currentTarget.dataset;
+const dataCollection = getCurrentSemesterData()[type];
+
+if (action === 'delete') {
+if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+dataCollection.splice(index, 1);
+openManagementModal('Subjects', dataCollection, fields);
+processAndRenderAll();
 }
-});
+} else if (action === 'edit') {
+const item = dataCollection[index];
+for (const key in item) {
+const input = form.querySelector(`[name="${key}"]`);
+if (input) {
+if (input.type === 'checkbox') {
+input.checked = item[key];
+} else {
+input.value = Array.isArray(item[key]) ? item[key].join(', ') : item[key];
+}
+}
+}
+form.querySelector('[name="editIndex"]').value = index;
+form.querySelector('button[type="submit"]').textContent = 'Update Subject';
+cancelBtn.classList.remove('hidden');
+}
+}));
+};
 
-if (newTasks.length === 0) {
-alert('✅ No issues found! Your timetable is complete.');
+renderSubjectsModal();
 return;
 }
 
-// Add new tasks
-newTasks.forEach(task => {
-if (!semesterData.tasks.find(t => t.type === task.type && (t.relatedCourse === task.relatedCourse || t.relatedTeacher === task.relatedTeacher))) {
-semesterData.tasks.push(task);
+let displayData = data;
+if (title === 'Teachers') {
+displayData = [...data].sort((a, b) => {
+const surnameA = (a.Surname || '').toLowerCase();
+const surnameB = (b.Surname || '').toLowerCase();
+if (surnameA < surnameB) return -1;
+if (surnameA > surnameB) return 1;
+return 0;
+});
+}
+
+let contentHTML = `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">`;
+contentHTML += fields.map(f => `<th class="p-2 text-left">${f}</th>`).join('') + `<th class="p-2">Actions</th></tr></thead><tbody>`;
+displayData.forEach((item, index) => {
+const originalIndex = data.indexOf(item);
+contentHTML += `<tr class="border-b">${fields.map(f => `<td class="p-2">${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
+});
+contentHTML += `</tbody></table></div>`;
+
+let formHTML = '';
+if (title === 'Teachers') {
+formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 border-t pt-4">
+<h3 class="text-lg font-bold col-span-full mb-2">Add / Edit Teacher</h3>
+<div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div>
+<div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div>
+<div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div>
+<div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div>
+<div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" class="w-full border p-2 rounded" required>${colleges.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div>
+<div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div>
+<div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div>
+<input type="hidden" name="editIndex">
+<div class="col-span-full flex items-center gap-4">
+<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Teacher</button>
+<button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
+</div>
+</form>`;
+} else {
+formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 border-t pt-4">
+<h3 class="text-lg font-bold col-span-full mb-2">Add / Edit ${title.slice(0, -1)}</h3>
+${fields.map(f => `<div><label class="block text-sm font-medium">${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" class="w-full border p-2 rounded" required></div>`).join('')}
+<input type="hidden" name="editIndex">
+<div class="col-span-full flex items-center gap-4">
+<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add ${title.slice(0, -1)}</button>
+<button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
+</div>
+</form>`;
+}
+
+document.getElementById('modalContent').innerHTML = contentHTML + formHTML;
+managementModal.classList.add('active');
+
+const form = document.getElementById('addForm');
+const cancelBtn = document.getElementById('cancelEditBtn');
+
+cancelBtn.addEventListener('click', () => {
+form.reset();
+form.querySelector('[name="editIndex"]').value = '';
+form.querySelector('button[type="submit"]').textContent = `Add ${title.slice(0, -1)}`;
+cancelBtn.classList.add('hidden');
+if (title === 'Teachers') {
+const initialsInput = form.querySelector('input[name="Initials"]');
+initialsInput.value = '';
 }
 });
 
-saveData();
-renderTasksView();
-alert(`✅ Found ${newTasks.length} issue(s) and added them as tasks!`);
-}
-
-function openTaskModal(taskId = null) {
-const semesterData = getCurrentSemesterData();
-const task = taskId ? semesterData.tasks.find(t => t.id === taskId) : null;
-
-document.getElementById('taskModalTitle').textContent = task ? 'Edit Task' : 'Add New Task';
-document.getElementById('taskId').value = task?.id || '';
-document.getElementById('taskTitle').value = task?.title || '';
-document.getElementById('taskDescription').value = task?.description || '';
-document.getElementById('taskPriority').value = task?.priority || 'medium';
-document.getElementById('taskStatus').value = task?.status || 'todo';
-document.getElementById('taskDueDate').value = task?.dueDate || '';
-document.getElementById('deleteTaskBtn').style.display = task ? 'block' : 'none';
-
-taskModal.classList.add('active');
-}
-
-function saveTask(e) {
-e.preventDefault();
-const semesterData = getCurrentSemesterData();
-const taskId = document.getElementById('taskId').value;
-
-const taskData = {
-id: taskId || Date.now(),
-title: document.getElementById('taskTitle').value,
-description: document.getElementById('taskDescription').value,
-priority: document.getElementById('taskPriority').value,
-status: document.getElementById('taskStatus').value,
-dueDate: document.getElementById('taskDueDate').value
+if (title === 'Teachers') {
+const nameInput = form.querySelector('input[name="Name"]');
+const surnameInput = form.querySelector('input[name="Surname"]');
+const initialsInput = form.querySelector('input[name="Initials"]');
+const updateInitials = () => {
+const firstInitial = nameInput.value.trim()?.toUpperCase() || '';
+const secondInitial = surnameInput.value.trim()?.toUpperCase() || '';
+initialsInput.value = `${firstInitial}${secondInitial}`;
 };
+nameInput.addEventListener('input', updateInitials);
+surnameInput.addEventListener('input', updateInitials);
+}
 
-if (taskId) {
-const index = semesterData.tasks.findIndex(t => t.id == taskId);
-if (index !== -1) {
-semesterData.tasks[index] = { ...semesterData.tasks[index], ...taskData };
+form.addEventListener('submit', (e) => {
+e.preventDefault();
+const formData = new FormData(e.target);
+const editIndex = formData.get('editIndex');
+const semesterData = getCurrentSemesterData();
+
+if (title === 'Teachers') {
+const teacherData = {
+Name: formData.get('Name'),
+Surname: formData.get('Surname'),
+Initials: formData.get('Initials'),
+Email: formData.get('Email'),
+HomeCollege: formData.get('HomeCollege'),
+EmploymentType: formData.get('EmploymentType'),
+TotalHours: parseFloat(formData.get('TotalHours')) || 0,
+};
+if (editIndex) {
+semesterData.teachers[parseInt(editIndex, 10)] = teacherData;
+} else {
+semesterData.teachers.push(teacherData);
 }
 } else {
-semesterData.tasks.push(taskData);
+const newItem = {};
+fields.forEach(f => {
+const value = formData.get(f)
+newItem[f] = f === 'Units' ? (value ? value.split(',').map(u => u.trim()).filter(Boolean) : []) : value
+});
+if (editIndex) {
+data[parseInt(editIndex, 10)] = newItem;
+} else {
+data.push(newItem);
+}
+}
+openManagementModal(title, data, fields);
+processAndRenderAll();
+});
+
+document.getElementById('modalContent').querySelectorAll('button[data-action]').forEach(btn => btn.addEventListener('click', (e) => {
+const { type, index, action } = e.currentTarget.dataset;
+const dataCollection = getCurrentSemesterData()[type];
+
+if (action === 'delete') {
+if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+dataCollection.splice(index, 1);
+openManagementModal(title, dataCollection, fields);
+processAndRenderAll();
+}
+} else if (action === 'edit') {
+const item = dataCollection[index];
+for (const key in item) {
+const input = form.querySelector(`[name="${key}"]`);
+if (input) {
+if (input.type === 'checkbox') {
+input.checked = item[key];
+} else {
+input.value = Array.isArray(item[key]) ? item[key].join(', ') : item[key];
+}
+}
+}
+form.querySelector('[name="editIndex"]').value = index;
+form.querySelector('button[type="submit"]').textContent = `Update ${title.slice(0, -1)}`;
+cancelBtn.classList.remove('hidden');
+}
+}));
 }
 
-taskModal.classList.remove('active');
+const renderers = { 'main-timetable': renderMainTimetableView, 'staff-summary': renderStaffSummaryView, 'dispute-log': renderDisputeLogView, 'course-print': renderCoursePrintView, 'teacher-print': renderTeacherPrintView };
+function handleViewChange() {
+const selectedView = viewSelector.value;
+document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
+document.getElementById(`${selectedView}-view`).classList.add('active');
+populateSelectors();
+renderers[selectedView]?.();
+}
+
+function populateSelectors() {
+const selectedView = viewSelector.value;
+const semesterData = getCurrentSemesterData();
+secondarySelectorsContainer.innerHTML = '';
+if (selectedView === 'course-print') {
+if (semesterData.courses.length > 0) {
+let selector = `<select id="course-selector" class="border border-gray-300 rounded px-3 py-2">${semesterData.courses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('')}</select>`;
+secondarySelectorsContainer.innerHTML = selector;
+document.getElementById('course-selector').addEventListener('change', renderCoursePrintView);
+}
+} else if (selectedView === 'teacher-print') {
+if (semesterData.teachers.length > 0) {
+let selector = `<select id="teacher-selector" class="border border-gray-300 rounded px-3 py-2">${semesterData.teachers.map(t => `<option value="${t.Initials}">${t.Name} ${t.Surname}</option>`).join('')}</select>`;
+secondarySelectorsContainer.innerHTML = selector;
+document.getElementById('teacher-selector').addEventListener('change', renderTeacherPrintView);
+}
+}
+}
+
+function arrangeOverlappingSessions(dayCol, sessions) {
+const groups = [];
+sessions.forEach(session => {
+let addedToGroup = false;
+for (let group of groups) {
+const overlaps = group.some(s => {
+const s1Start = timeToMinutes(session.ClassStart);
+const s1End = timeToMinutes(session.ClassEnd);
+const s2Start = timeToMinutes(s.ClassStart);
+const s2End = timeToMinutes(s.ClassEnd);
+return s1Start < s2End && s2Start < s1End;
+});
+if (overlaps) {
+group.push(session);
+addedToGroup = true;
+break;
+}
+}
+if (!addedToGroup) {
+groups.push([session]);
+}
+});
+
+groups.forEach(group => {
+const count = group.length;
+if (count > 1) {
+group.forEach((session, index) => {
+const block = dayCol.querySelector(`[data-session-id="${session.id}"]`);
+if (block) {
+const widthPercent = (100 / count);
+const leftPercent = (100 / count) * index;
+block.style.left = `${leftPercent}%`;
+block.style.right = `${100 - leftPercent - widthPercent}%`;
+block.style.width = 'auto';
+}
+});
+}
+});
+}
+
+function renderMainTimetableView() {
+const grid = document.getElementById('main-timetable-grid');
+const titleEl = document.getElementById('main-timetable-title');
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const startTime = 8, endTime = 22, slotHeight = 30;
+const totalRows = (endTime - startTime) * 2;
+const semesterData = getCurrentSemesterData();
+
+titleEl.textContent = `${semesterData.currentCollege} Timetable - ${db.currentSemester}`;
+
+let gridHTML = `<div style="grid-row: 1; grid-column: 1;"></div>` + days.map((day, i) => `<div class="timetable-header" style="grid-column: ${i + 2};">${day}</div>`).join('');
+gridHTML += `<div class="time-labels">${Array.from({length: totalRows}, (_, i) => `<div class="time-label">${(i % 2 === 0) ? `<strong>${startTime + i/2}:00</strong>` : ''}</div>`).join('')}</div>`;
+gridHTML += days.map((day, i) => {
+let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2}; height: ${totalRows * slotHeight}px">`;
+for (let j = 0; j < totalRows; j++) {
+const time = startTime + j * 0.5;
+const timeString = `${Math.floor(time).toString().padStart(2, '0')}:${((time % 1) * 60).toString().padStart(2, '0')}`;
+dayColHTML += `<div class="time-slot" data-day="${day}" data-time="${timeString}" data-slot-index="${j}"></div>`;
+}
+return dayColHTML + `</div>`;
+}).join('');
+grid.innerHTML = gridHTML;
+
+const scheduleToRender = semesterData.currentCollege === 'Master View'
+? semesterData.schedule
+: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+
+const sessionsByDay = {};
+days.forEach(day => sessionsByDay[day] = []);
+
+scheduleToRender.forEach(session => {
+const dayCol = grid.querySelector(`.day-column[data-day="${session.Day}"]`);
+if (!dayCol) return;
+
+sessionsByDay[session.Day].push(session);
+
+const start = timeToMinutes(session.ClassStart) / 30 - startTime * 2;
+const height = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 30 * slotHeight;
+const subjectInfo = semesterData.subjects.find(s => s.Subject === session.Subject);
+const teacher1Info = semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
+const teacher2Info = session.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === session.TeacherInitials2) : null;
+const teacherDisplay = teacher2Info
+? `${teacher1Info?.Name || session.TeacherInitials} & ${teacher2Info.Name}`
+: (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : session.TeacherInitials);
+const notesHTML = session.notes ? `<div class="text-xs italic text-gray-600 truncate" title="${session.notes}">${session.notes}</div>` : '';
+const collegeInfo = semesterData.currentCollege === 'Master View' ? `<div class="font-bold text-indigo-600 text-xs">${session.colleges?.join(', ') || ''}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div class="session-units">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div class="font-bold text-red-600 text-xs">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
+
+const sessionBlock = document.createElement('div');
+sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}`;
+sessionBlock.setAttribute('data-session-id', session.id);
+Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
+sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
+sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
+sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
+dayCol.appendChild(sessionBlock);
+makeDraggable(sessionBlock, session, grid);
+makeResizable(sessionBlock, session);
+});
+
+days.forEach(day => {
+const dayCol = grid.querySelector(`.day-column[data-day="${day}"]`);
+if (dayCol && sessionsByDay[day].length > 0) {
+arrangeOverlappingSessions(dayCol, sessionsByDay[day]);
+}
+});
+
+addSlotSelectionListeners();
+}
+
+function showContextMenu(e, session) {
+e.preventDefault();
+e.stopPropagation();
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+let menuHTML = `
+<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})">📋 Duplicate to Same Day</div>
+<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})">📅 Duplicate to Another Day</div>
+<div class="context-menu-item" onclick="editSessionFromContext(${session.id})">✏️ Edit Session</div>
+<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})">🗑️ Delete Session</div>
+`;
+contextMenu.innerHTML = menuHTML;
+contextMenu.classList.add('active');
+contextMenu.style.left = e.clientX + 'px';
+contextMenu.style.top = e.clientY + 'px';
+}
+
+window.duplicateSessionSameDay = (sessionId) => {
+const semesterData = getCurrentSemesterData();
+const session = semesterData.schedule.find(s => s.id === sessionId);
+if (session) {
+const newSession = { ...session, id: Date.now() };
+semesterData.schedule.push(newSession);
+processAndRenderAll();
+}
+contextMenu.classList.remove('active');
+};
+
+window.openDuplicateDayModal = (sessionId) => {
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const semesterData = getCurrentSemesterData();
+const session = semesterData.schedule.find(s => s.id === sessionId);
+if (!session) return;
+
+let contentHTML = '<h3 class="text-lg font-bold mb-4">Select a day to duplicate to:</h3><div class="space-y-2">';
+days.forEach(day => {
+contentHTML += `<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" onclick="duplicateSessionToDay(${sessionId}, '${day}')">${day}</button>`;
+});
+contentHTML += '</div>';
+document.getElementById('duplicateDayContent').innerHTML = contentHTML;
+duplicateDayModal.classList.add('active');
+contextMenu.classList.remove('active');
+};
+
+window.duplicateSessionToDay = (sessionId, newDay) => {
+const semesterData = getCurrentSemesterData();
+const session = semesterData.schedule.find(s => s.id === sessionId);
+if (session) {
+const newSession = { ...session, id: Date.now(), Day: newDay };
+semesterData.schedule.push(newSession);
+processAndRenderAll();
+}
+duplicateDayModal.classList.remove('active');
+};
+
+window.editSessionFromContext = (sessionId) => {
+const semesterData = getCurrentSemesterData();
+const session = semesterData.schedule.find(s => s.id === sessionId);
+if (session) {
+openSessionModal(session);
+}
+contextMenu.classList.remove('active');
+};
+
+window.deleteSessionFromContext = (sessionId) => {
+if (confirm('Are you sure you want to delete this session?')) {
+const semesterData = getCurrentSemesterData();
+semesterData.schedule = semesterData.schedule.filter(s => s.id !== sessionId);
+processAndRenderAll();
+}
+contextMenu.classList.remove('active');
+};
+
+function addSlotSelectionListeners() {
+if (getCurrentSemesterData().currentCollege === 'Master View') return;
+let isSelecting = false, startSlot = null, dayOfSelection = null;
+const grid = document.getElementById('main-timetable-grid');
+
+grid.addEventListener('mousedown', (e) => {
+const slot = e.target.closest('.time-slot');
+if (!slot || e.target.closest('.session-block')) return;
+isSelecting = true;
+dayOfSelection = slot.dataset.day;
+startSlot = slot;
+clearSlotSelection();
+slot.classList.add('slot-selected');
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseUp);
+});
+
+function onMouseMove(e) {
+if (!isSelecting) return;
+const slot = e.target.closest('.time-slot');
+if (!slot || slot.dataset.day !== dayOfSelection) return;
+clearSlotSelection();
+const startIndex = parseInt(startSlot.dataset.slotIndex, 10);
+const currentIndex = parseInt(slot.dataset.slotIndex, 10);
+const [minIndex, maxIndex] = [Math.min(startIndex, currentIndex), Math.max(startIndex, currentIndex)];
+const dayColumn = grid.querySelector(`.day-column[data-day="${dayOfSelection}"]`);
+const slotsInDay = dayColumn.querySelectorAll('.time-slot');
+for (let i = minIndex; i <= maxIndex; i++) {
+if (slotsInDay[i]) slotsInDay[i].classList.add('slot-selected');
+}
+}
+
+function onMouseUp() {
+if (!isSelecting) return;
+isSelecting = false;
+document.removeEventListener('mousemove', onMouseMove);
+document.removeEventListener('mouseup', onMouseUp);
+const selected = grid.querySelectorAll('.slot-selected');
+if (selected.length > 0) {
+const day = selected[0].dataset.day, startTime = selected[0].dataset.time;
+const lastSlotIndex = parseInt(selected[selected.length - 1].dataset.slotIndex, 10);
+const endMinutes = (8 * 60) + ((lastSlotIndex + 1) * 30);
+const endTime = `${Math.floor(endMinutes / 60).toString().padStart(2, '0')}:${(endMinutes % 60).toString().padStart(2, '0')}`;
+openSessionModal(null, day, startTime, endTime);
+}
+}
+const clearSlotSelection = () => grid.querySelectorAll('.slot-selected').forEach(s => s.classList.remove('slot-selected'));
+}
+
+function makeDraggable(element, session, grid) {
+let clone, offsetX, offsetY;
+let isDragging = false;
+let startX, startY;
+
+const onMouseDown = (e) => {
+if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
+
+isDragging = false;
+startX = e.clientX;
+startY = e.clientY;
+
+e.stopPropagation();
+
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseUp);
+};
+
+const onMouseMove = (e) => {
+if (!isDragging && (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5)) {
+isDragging = true;
+e.preventDefault();
+
+if (grid) grid.classList.add('dragging');
+
+clone = element.cloneNode(true);
+Object.assign(clone.style, { position: 'absolute', zIndex: '1000', opacity: '0.7', pointerEvents: 'none' });
+document.body.appendChild(clone);
+const rect = element.getBoundingClientRect();
+offsetX = startX - rect.left;
+offsetY = startY - rect.top;
+clone.style.left = `${startX - offsetX}px`;
+clone.style.top = `${startY - offsetY}px`;
+element.style.visibility = 'hidden';
+}
+
+if (isDragging) {
+e.preventDefault();
+clone.style.left = `${e.clientX - offsetX}px`;
+clone.style.top = `${e.clientY - offsetY}px`;
+}
+};
+
+const onMouseUp = (e) => {
+document.removeEventListener('mousemove', onMouseMove);
+document.removeEventListener('mouseup', onMouseUp);
+
+if (isDragging) {
+if (grid) grid.classList.remove('dragging');
+
+clone.style.visibility = 'hidden';
+const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+const timeSlot = dropTarget?.closest('.time-slot');
+
+if (timeSlot) {
+const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
+const startMins = (8 * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
+const endMins = startMins + duration;
+const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
+session.Day = timeSlot.dataset.day;
+session.ClassStart = format(startMins);
+session.ClassEnd = format(endMins);
+}
+document.body.removeChild(clone);
+processAndRenderAll();
+}
+element.style.visibility = 'visible';
+};
+
+element.addEventListener('mousedown', onMouseDown);
+}
+
+function makeResizable(element, session) {
+const handle = element.querySelector('.resize-handle');
+handle.addEventListener('mousedown', (e) => {
+e.stopPropagation();
+const startY = e.clientY, startHeight = element.offsetHeight, slotHeight = 30;
+const onMouseMove = (e) => { element.style.height = `${Math.max(slotHeight, startHeight + (e.clientY - startY))}px`; };
+const onMouseUp = () => {
+document.removeEventListener('mousemove', onMouseMove);
+document.removeEventListener('mouseup', onMouseUp);
+const finalHeight = Math.round(element.offsetHeight / slotHeight) * slotHeight;
+const duration = (finalHeight / slotHeight) * 30;
+const endMins = timeToMinutes(session.ClassStart) + duration;
+session.ClassEnd = `${Math.floor(endMins / 60).toString().padStart(2, '0')}:${(endMins % 60).toString().padStart(2, '0')}`;
+processAndRenderAll();
+};
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseUp);
+});
+}
+
+function openSessionModal(session, day = null, startTime = null, endTime = null) {
+sessionForm.reset();
+const semesterData = getCurrentSemesterData();
+document.getElementById('sessionModalTitle').textContent = session ? 'Edit Session' : 'Add New Session';
+document.getElementById('sessionId').value = session?.id || '';
+document.getElementById('sessionDay').value = session?.Day || day;
+document.getElementById('sessionStartTime').value = session?.ClassStart || startTime;
+document.getElementById('sessionEndTime').value = session?.ClassEnd || endTime || '';
+document.getElementById('sessionRoom').value = session?.Room || '';
+document.getElementById('sessionNotes').value = session?.notes || '';
+document.getElementById('deleteSessionBtn').style.display = session ? 'block' : 'none';
+
+const courseSelect = document.getElementById('sessionCourse');
+const subjectSelect = document.getElementById('sessionSubject');
+const teacherSelect = document.getElementById('sessionTeacher');
+const teacher2Select = document.getElementById('sessionTeacher2');
+courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
+subjectSelect.innerHTML = semesterData.subjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
+
+// Sort teachers alphabetically by surname, then name
+const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
+const surnameA = (a.Surname || '').toLowerCase();
+const surnameB = (b.Surname || '').toLowerCase();
+if (surnameA < surnameB) return -1;
+if (surnameA > surnameB) return 1;
+
+const nameA = (a.Name || '').toLowerCase();
+const nameB = (b.Name || '').toLowerCase();
+if (nameA < nameB) return -1;
+if (nameA > nameB) return 1;
+return 0;
+});
+
+teacherSelect.innerHTML = sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
+teacher2Select.innerHTML = `<option value="">-- None --</option>` + sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials2 === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
+
+const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
+collegeCheckboxes.forEach(cb => {
+cb.checked = session?.colleges?.includes(cb.value) || (!session && cb.value === semesterData.currentCollege);
+});
+
+document.getElementById('sessionModal').classList.add('active');
+}
+
+function handleSessionFormSubmit(e) {
+e.preventDefault();
+const id = document.getElementById('sessionId').value;
+const semesterData = getCurrentSemesterData();
+
+const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges"]:checked')).map(cb => cb.value);
+
+const sessionData = {
+Day: document.getElementById('sessionDay').value,
+ClassStart: document.getElementById('sessionStartTime').value,
+ClassEnd: document.getElementById('sessionEndTime').value,
+CourseCode: document.getElementById('sessionCourse').value,
+Subject: document.getElementById('sessionSubject').value,
+TeacherInitials: document.getElementById('sessionTeacher').value,
+TeacherInitials2: document.getElementById('sessionTeacher2').value || '',
+Room: document.getElementById('sessionRoom').value,
+notes: document.getElementById('sessionNotes').value,
+colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
+dispute: null
+};
+
+if (id) {
+const index = semesterData.schedule.findIndex(s => s.id == id);
+if (index !== -1) {
+semesterData.schedule[index] = { ...semesterData.schedule[index], ...sessionData };
+}
+} else {
+sessionData.id = Date.now();
+semesterData.schedule.push(sessionData);
+}
+document.getElementById('sessionModal').classList.remove('active');
 processAndRenderAll();
 }
 
-function deleteTask() {
-const taskId = document.getElementById('taskId').value;
-if (confirm('Are you sure you want to delete this task?')) {
+function handleDeleteSession() {
+const id = document.getElementById('sessionId').value;
 const semesterData = getCurrentSemesterData();
-semesterData.tasks = semesterData.tasks.filter(t => t.id != taskId);
-taskModal.classList.remove('active');
+semesterData.schedule = semesterData.schedule.filter(s => s.id != id);
+document.getElementById('sessionModal').classList.remove('active');
 processAndRenderAll();
 }
-}
 
-function renderTasksView() {
-const container = document.getElementById('tasks-container');
-const filtersContainer = document.getElementById('taskFilters');
+function renderStaffSummaryView() {
+const container = document.getElementById('staff-summary-table');
+const titleEl = document.getElementById('staff-summary-title');
 const semesterData = getCurrentSemesterData();
-const tasks = semesterData.tasks || [];
+const scheduleToView = semesterData.currentCollege === 'Master View'
+? semesterData.schedule
+: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
-// Render filters
-const statuses = ['all', 'todo', 'inprogress', 'done', 'blocked'];
-let filtersHTML = '';
-statuses.forEach(status => {
-const label = status === 'all' ? 'All' : status === 'inprogress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1);
-filtersHTML += `<button class="task-filter-btn ${taskFilterStatus === status ? 'active' : ''}" data-filter="${status}">${label}</button>`;
-});
-filtersContainer.innerHTML = filtersHTML;
+if (!semesterData.teachers?.length) { container.innerHTML = `<p class="text-center text-gray-500">No teacher data.</p>`; return; }
 
-filtersContainer.querySelectorAll('.task-filter-btn').forEach(btn => {
-btn.addEventListener('click', (e) => {
-taskFilterStatus = e.target.dataset.filter;
-renderTasksView();
-});
+titleEl.textContent = `Teaching Program Summary - ${semesterData.currentCollege} (${db.currentSemester})`;
+
+const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
+const surnameA = (a.Surname || '').toLowerCase();
+const surnameB = (b.Surname || '').toLowerCase();
+if (surnameA < surnameB) return -1;
+if (surnameA > surnameB) return 1;
+return 0;
 });
 
-if (tasks.length === 0) {
-container.innerHTML = `<div class="task-empty-state"><div class="task-empty-state-icon">📭</div><p>No tasks yet. Click "Add Custom Task" or "Scan for Issues" to create one.</p></div>`;
+const headers = ['Initials', 'Name', 'Surname', ...semesterData.courses.map(c => c.Code), 'Direct Teaching', 'Total Hours', 'Remaining Hours', 'Notes'];
+let tableHTML = `<table class="w-full text-sm border-collapse"><thead><tr class="bg-blue-900 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
+
+sortedTeachers.forEach(teacher => {
+tableHTML += `<tr class="border-b hover:bg-gray-100"><td class="border p-2 font-bold">${teacher.Initials}</td><td class="border p-2">${teacher.Name}</td><td class="border p-2">${teacher.Surname}</td>`;
+let directTeachingHours = 0;
+semesterData.courses.forEach(course => {
+const hours = scheduleToView.filter(s => (s.TeacherInitials === teacher.Initials || s.TeacherInitials2 === teacher.Initials) && s.CourseCode === course.Code).reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+tableHTML += `<td class="border p-2 text-center">${hours ? hours.toFixed(2) : ''}</td>`;
+directTeachingHours += hours;
+});
+const totalHours = teacher.TotalHours || 0;
+const remainingHours = totalHours - directTeachingHours;
+const remainingHoursClass = remainingHours < 0 ? 'text-red-600 font-bold' : '';
+const teacherNote = semesterData.staffNotes[teacher.Initials] || '';
+
+tableHTML += `<td class="border p-2 text-center font-bold bg-cyan-100">${directTeachingHours.toFixed(2)}</td>`;
+tableHTML += `<td class="border p-2 text-center font-bold bg-yellow-100">${totalHours.toFixed(2)}</td>`;
+tableHTML += `<td class="border p-2 text-center font-bold bg-green-100 ${remainingHoursClass}">${remainingHours.toFixed(2)}</td>`;
+tableHTML += `<td class="border p-2"><input type="text" class="staff-notes-input" data-teacher="${teacher.Initials}" value="${teacherNote}" placeholder="Add notes..."></td></tr>`;
+});
+container.innerHTML = tableHTML + `</tbody></table>`;
+
+container.querySelectorAll('.staff-notes-input').forEach(input => {
+input.addEventListener('change', (e) => {
+const teacherInitials = e.target.dataset.teacher;
+semesterData.staffNotes[teacherInitials] = e.target.value;
+saveData();
+});
+});
+}
+
+function renderDisputeLogView() {
+const container = document.getElementById('dispute-log-view');
+const semesterData = getCurrentSemesterData();
+const disputedSessions = semesterData.schedule.filter(s => s.dispute);
+
+let contentHTML = `<div class="bg-white p-4 rounded-lg shadow-lg overflow-x-auto">
+<h2 class="text-xl font-bold text-center mb-4">Dispute Log - ${semesterData.currentCollege} (${db.currentSemester})</h2>`;
+
+if (disputedSessions.length === 0) {
+contentHTML += `<p class="text-center text-gray-500">No disputes found in this view.</p>`;
+} else {
+const headers = ['Day', 'Time', 'Course', 'Subject', 'Teacher', 'Room', 'Colleges', 'Reason for Dispute'];
+contentHTML += `<table class="w-full text-sm border-collapse"><thead><tr class="bg-red-800 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
+disputedSessions.forEach(session => {
+const teachers = [session.TeacherInitials, session.TeacherInitials2].filter(Boolean).join(', ');
+contentHTML += `<tr class="border-b hover:bg-red-50">
+<td class="border p-2">${session.Day}</td>
+<td class="border p-2">${session.ClassStart} - ${session.ClassEnd}</td>
+<td class="border p-2">${session.CourseCode}</td>
+<td class="border p-2">${session.Subject}</td>
+<td class="border p-2">${teachers}</td>
+<td class="border p-2">Room ${session.Room}</td>
+<td class="border p-2">${session.colleges?.join(', ') || ''}</td>
+<td class="border p-2 font-bold text-red-600">${session.dispute.reason}</td>
+</tr>`;
+});
+contentHTML += `</tbody></table>`;
+}
+contentHTML += `</div>`;
+container.innerHTML = contentHTML;
+}
+
+function renderCoursePrintView() {
+const container = document.getElementById('course-print-view');
+const selector = document.getElementById('course-selector');
+const semesterData = getCurrentSemesterData();
+
+if (!selector) {
+container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
 return;
 }
 
-const filteredTasks = taskFilterStatus === 'all' ? tasks : tasks.filter(t => t.status === taskFilterStatus);
+const courseCode = selector.value;
+const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
 
-if (filteredTasks.length === 0) {
-container.innerHTML = `<div class="task-empty-state"><div class="task-empty-state-icon">✓</div><p>No ${taskFilterStatus} tasks.</p></div>`;
-return;
-}
+const scheduleToFilter = semesterData.currentCollege === 'Master View'
+? semesterData.schedule
+: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
-let html = '';
-filteredTasks.forEach(task => {
-const statusClass = `task-status-${task.status}`;
-const statusText = task.status === 'inprogress' ? 'In Progress' : (task.status === 'todo' ? 'To Do' : (task.status === 'done' ? 'Done' : 'Blocked'));
-const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';
-const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
-let typeLabel = '📝 Custom';
-let typeBadgeClass = 'task-type-custom';
-if (task.type === 'course_incomplete') {
-typeLabel = '📚 Course Issue';
-typeBadgeClass = 'task-type-course';
-} else if (task.type === 'teacher_incomplete') {
-typeLabel = '👨‍🏫 Teacher Issue';
-typeBadgeClass = 'task-type-teacher';
-}
+let sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
+sessions = sortSessionsChronologically(sessions);
+const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
 
-html += `
-<div class="task-card ${task.priority}">
-<div class="task-header">
-<div style="flex: 1;">
-<div class="task-title">${task.title}</div>
-<div class="task-type-badge ${typeBadgeClass}">${typeLabel}</div>
+if (!semesterData.courseNotes) semesterData.courseNotes = {};
+const courseNotes = semesterData.courseNotes[courseCode] || '';
+
+const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentCollege}`;
+
+const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
+
+let gridHTML = `<div class="print-grid">
+<div class="print-header"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
+
+const periods = ['Morning', 'Afternoon'];
+if (hasNightSessions) periods.push('Night');
+
+periods.forEach(period => {
+gridHTML += `<div class="print-period-label">${period}</div>`;
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+const daySessions = sessions.filter(s => {
+const start = timeToMinutes(s.ClassStart);
+return s.Day === day && (
+(period === 'Morning' && start < 720) ||
+(period === 'Afternoon' && start >= 720 && start < 1020) ||
+(period === 'Night' && start >= 1020)
+);
+});
+
+const sessionsHTML = daySessions.map(s => {
+const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
+const teacherDisplay = teacher2Info
+? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}`
+: (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials);
+const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 11px; color: #d32f2f;">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 11px; color: #3b82f6;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
+
+if (!teacher1Info) return '';
+
+return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+${collegeHTML}
+<div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
+${compulsoryBadge}
+${deliveryBadge}
+${unitsHTML}
+<div>${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
+${notesHTML}
+<div>${s.ClassStart} - ${s.ClassEnd}</div>
+</div>`;
+}).join('');
+gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
+});
+});
+gridHTML += `</div>`;
+
+const uniqueTeacherInitials = new Set();
+sessions.forEach(s => {
+if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials);
+if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2);
+});
+const courseTeachers = Array.from(uniqueTeacherInitials)
+.map(initials => semesterData.teachers.find(t => t.Initials === initials))
+.filter(t => t)
+.sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
+
+const teacherContactHTML = courseTeachers.length > 0 ? `
+<div class="teacher-contact-info">
+<h4>Teacher Contact Information:</h4>
+${courseTeachers.map(t => `<p>${t.Name} ${t.Surname} - ${t.Email}</p>`).join('')}
 </div>
-<span class="task-status-badge ${statusClass}">${statusText}</span>
-</div>
-<div class="task-meta">
-<div class="task-meta-item">🎯 <strong>${priorityLabel}</strong></div>
-<div class="task-meta-item">📅 ${dueDate}</div>
-</div>
-${task.description ? `<div class="task-description">${task.description}</div>` : ''}
-<div class="task-actions">
-<button class="task-edit-btn" onclick="window.editTask(${task.id})">✏️ Edit</button>
-${task.status !== 'done' ? `<button class="task-complete-btn" onclick="window.completeTask(${task.id})">✓ Mark Done</button>` : ''}
-<button class="task-delete-btn" onclick="window.deleteTaskFromList(${task.id})">🗑️ Delete</button>
-</div>
+` : '';
+
+const notesSection = `
+<div class="notes-section">
+<label for="course-notes-textarea">Course Notes:</label>
+<textarea id="course-notes-textarea" rows="4" placeholder="Add any additional notes for this course...">${courseNotes}</textarea>
 </div>
 `;
+
+const hasCompulsory = sessions.some(s => semesterData.subjects.find(sub => sub.Subject === s.Subject)?.Compulsory);
+const hasOnline = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Online'));
+const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Blended'));
+
+let legendHTML = '';
+if (hasCompulsory || hasOnline || hasBlended) {
+legendHTML = `
+<div class="legend-section">
+<h4>Legend:</h4>
+${hasCompulsory ? '<div class="legend-item"><div class="legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
+${hasOnline ? '<div class="legend-item"><div class="legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
+${hasBlended ? '<div class="legend-item"><div class="legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
+</div>
+`;
+}
+
+const bottomSections = `<div class="bottom-sections-container">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
+
+container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
+
+const notesTextarea = document.getElementById('course-notes-textarea');
+if (notesTextarea) {
+notesTextarea.addEventListener('input', (e) => {
+semesterData.courseNotes[courseCode] = e.target.value;
+saveData();
+});
+}
+}
+
+function renderTeacherPrintView() {
+const container = document.getElementById('teacher-print-view');
+const selector = document.getElementById('teacher-selector');
+const semesterData = getCurrentSemesterData();
+
+if (!selector) {
+container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
+return;
+}
+
+const teacherInitials = selector.value;
+const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
+
+const scheduleToFilter = semesterData.currentCollege === 'Master View'
+? semesterData.schedule
+: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+
+let sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials || s.TeacherInitials2 === teacherInitials);
+sessions = sortSessionsChronologically(sessions);
+const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+
+const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
+
+const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
+
+let gridHTML = `<div class="print-grid">
+<div class="print-header"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
+
+const periods = ['Morning', 'Afternoon'];
+if (hasNightSessions) periods.push('Night');
+
+periods.forEach(period => {
+gridHTML += `<div class="print-period-label">${period}</div>`;
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+const daySessions = sessions.filter(s => {
+const start = timeToMinutes(s.ClassStart);
+return s.Day === day && (
+(period === 'Morning' && start < 720) ||
+(period === 'Afternoon' && start >= 720 && start < 1020) ||
+(period === 'Night' && start >= 1020)
+);
 });
 
-container.innerHTML = html;
+const sessionsHTML = daySessions.map(s => {
+const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+const coTeacher = s.TeacherInitials === teacherInitials
+? (s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null)
+: semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
+const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 11px; color: #d32f2f;">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 11px; color: #3b82f6;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
+
+return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+${collegeHTML}
+<div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
+${compulsoryBadge}
+${deliveryBadge}
+${unitsHTML}
+<div>${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
+${notesHTML}
+<div>${s.ClassStart} - ${s.ClassEnd}</div>
+</div>`;
+}).join('');
+gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
+});
+});
+gridHTML += `</div>`;
+
+container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div></div>`;
 }
-
-window.editTask = (taskId) => {
-openTaskModal(taskId);
-};
-
-window.completeTask = (taskId) => {
-const semesterData = getCurrentSemesterData();
-const task = semesterData.tasks.find(t => t.id === taskId);
-if (task) {
-task.status = 'done';
-saveData();
-renderTasksView();
-}
-};
-
-window.deleteTaskFromList = (taskId) => {
-if (confirm('Are you sure you want to delete this task?')) {
-const semesterData = getCurrentSemesterData();
-semesterData.tasks = semesterData.tasks.filter(t => t.id !== taskId);
-processAndRenderAll();
-}
-};
-
-// Rest of the code continues with all the other functions...
-// (Including openManagementModal, renderMainTimetableView, etc.)
 
 function generatePdf() {
 const loadingOverlay = document.getElementById('loadingOverlay');

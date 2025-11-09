@@ -116,7 +116,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 </div>
 <div class="transition-all duration-300" id="mainContent">
 <header class="bg-white shadow-md p-4 flex justify-between items-center no-print">
-<div class="flex items-center gap-4"><img alt="TAFE NSW Logo" src="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762158838/u1103083349_img_120x40_8aa3ecf2_m66f6i.png"/><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
+<div class="flex items-center gap-4"><img alt="TAFE Logo" src="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762673524/ci_1595_1762673524_TAFE_logo_ecudtj.png" style="height: 50px;"/><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
 <div class="flex items-center gap-3">
 <button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn">Open Menu</button>
 <select class="border border-gray-300 rounded px-3 py-2 font-bold" id="semesterSelector"></select>
@@ -151,6 +151,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 </div>
 <script>
 let selectedCourseForSubjects = null;
+let sidebarOpen = false;
 
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
@@ -266,6 +267,9 @@ const taskForm = document.getElementById('taskForm');
 const secondarySelectorsContainer = document.getElementById('secondary-selectors');
 const viewSelector = document.getElementById('viewSelector');
 const semesterSelector = document.getElementById('semesterSelector');
+const sidebar = document.getElementById('sidebar');
+const openSidebarBtn = document.getElementById('openSidebarBtn');
+const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 
 const getSampleData = () => ({
 courses: [{ Code: 'FSK20119', Name: 'Cert II Skills for Work' }, { Code: '11225NAT', Name: 'Cert IV Tertiary Prep' }],
@@ -311,12 +315,26 @@ tasks: [
 ]
 });
 
-document.getElementById('openSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('sidebar-open'));
-document.getElementById('closeSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.remove('sidebar-open'));
+// Toggle sidebar with Open Menu button
+openSidebarBtn.addEventListener('click', () => {
+sidebarOpen = !sidebarOpen;
+if (sidebarOpen) {
+sidebar.classList.add('sidebar-open');
+} else {
+sidebar.classList.remove('sidebar-open');
+}
+});
+
+// Close sidebar with X button
+closeSidebarBtn.addEventListener('click', () => {
+sidebarOpen = false;
+sidebar.classList.remove('sidebar-open');
+});
+
 document.getElementById('printBtn').addEventListener('click', generatePdf);
 document.getElementById('exportDataBtn').addEventListener('click', exportData);
 document.getElementById('importDataBtn').addEventListener('click', importData);
-document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
+document.getElementById('addTaskBtn').addEventListener('click', openTaskModal);
 document.getElementById('closeTaskModalBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('cancelTaskBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('deleteTaskBtn').addEventListener('click', deleteTask);
@@ -552,8 +570,8 @@ const teacher = semesterData.teachers.find(t => t.Initials === task.teacher);
 const course = semesterData.courses.find(c => c.Code === task.course);
 const teacherDisplay = teacher ? `${teacher.Name} ${teacher.Surname}` : 'Unassigned';
 const courseDisplay = course ? `${course.Code}` : 'Unassigned';
-const statusClass = `task-status-${task.status.replace(' ', '')}`;
-const statusText = task.status.charAt(0).toUpperCase() + task.status.slice(1);
+const statusClass = `task-status-${task.status}`;
+const statusText = task.status === 'inprogress' ? 'In Progress' : (task.status === 'todo' ? 'To Do' : (task.status === 'done' ? 'Done' : 'Blocked'));
 const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';
 
 html += `
@@ -1252,6 +1270,7 @@ const teacher2Select = document.getElementById('sessionTeacher2');
 courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
 subjectSelect.innerHTML = semesterData.subjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
 
+// Sort teachers alphabetically by surname, then name
 const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
 const surnameA = (a.Surname || '').toLowerCase();
 const surnameB = (b.Surname || '').toLowerCase();

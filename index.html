@@ -106,6 +106,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn">👨‍🏫 Manage Teachers</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn">📚 Manage Courses</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn">🎨 Manage Subjects</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTasksBtn">📝 Manage Tasks</button>
 <hr class="my-4"/>
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
 <button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="exportDataBtn">💾 Export Data</button>
@@ -149,6 +150,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <p class="text-gray-600">Please wait, this may take a moment.</p>
 </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js/dist/html2pdf.bundle.min.js"></script>
 <script>
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
@@ -365,6 +367,11 @@ document.getElementById('manageSemestersBtn').addEventListener('click', openSeme
 document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
 document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
+document.getElementById('manageTasksBtn').addEventListener('click', () => {
+alert('Tasks are managed through the Tasks view in the main dropdown menu. Select "Tasks" from the view selector to manage your tasks.');
+sidebarOpen = false;
+sidebar.classList.remove('sidebar-open');
+});
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });

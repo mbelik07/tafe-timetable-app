@@ -94,6 +94,14 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .task-edit-btn:hover { background: #2563eb; }
 .task-delete-btn { background: #ef4444; color: white; }
 .task-delete-btn:hover { background: #dc2626; }
+.dropdown-menu { position: relative; display: inline-block; }
+.dropdown-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.dropdown-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.dropdown-content { position: absolute; background: white; min-width: 250px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 0.375rem; z-index: 1; top: 100%; left: 0; margin-top: 0.5rem; display: none; border: 2px solid #667eea; }
+.dropdown-content.show { display: block; }
+.dropdown-item { color: #1f2937; padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #e5e7eb; transition: all 0.2s; }
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item:hover { background: #f3f4f6; color: #667eea; font-weight: 500; }
 @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
@@ -106,7 +114,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn">👨‍🏫 Manage Teachers</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn">📚 Manage Courses</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn">🎨 Manage Subjects</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTasksBtn">📝 Manage Tasks</button>
 <hr class="my-4"/>
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
 <button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="exportDataBtn">💾 Export Data</button>
@@ -120,9 +127,15 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="flex items-center gap-4"><img alt="TAFE Logo" src="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762673524/ci_1595_1762673524_TAFE_logo_ecudtj.png" style="height: 50px;"/><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
 <div class="flex items-center gap-3">
 <button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn">Open Menu</button>
-<select class="border border-gray-300 rounded px-3 py-2 font-bold" id="semesterSelector"></select>
-<select class="border border-gray-300 rounded px-3 py-2" id="viewSelector"><option value="main-timetable">Main Timetable</option><option value="staff-summary">Staff Summary</option><option value="dispute-log">Dispute Log</option><option value="course-print">Course Print</option><option value="teacher-print">Teacher Print</option><option value="tasks">Tasks</option></select>
-<div class="flex gap-2" id="secondary-selectors"></div>
+<div class="dropdown-menu">
+<button class="dropdown-btn" id="semesterDropdownBtn">📅 Semester <span>▼</span></button>
+<div class="dropdown-content" id="semesterDropdown"></div>
+</div>
+<div class="dropdown-menu">
+<button class="dropdown-btn" id="viewDropdownBtn">👁️ View <span>▼</span></button>
+<div class="dropdown-content" id="viewDropdown"></div>
+</div>
+<div id="secondary-selectors"></div>
 <button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded" id="printBtn">📄 Download PDF</button>
 </div>
 </header>
@@ -267,8 +280,6 @@ const duplicateDayModal = document.getElementById('duplicateDayModal');
 const taskModal = document.getElementById('taskModal');
 const taskForm = document.getElementById('taskForm');
 const secondarySelectorsContainer = document.getElementById('secondary-selectors');
-const viewSelector = document.getElementById('viewSelector');
-const semesterSelector = document.getElementById('semesterSelector');
 const sidebar = document.getElementById('sidebar');
 const openSidebarBtn = document.getElementById('openSidebarBtn');
 const closeSidebarBtn = document.getElementById('closeSidebarBtn');
@@ -341,11 +352,6 @@ document.getElementById('closeTaskModalBtn').addEventListener('click', () => tas
 document.getElementById('cancelTaskBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('deleteTaskBtn').addEventListener('click', deleteTask);
 taskForm.addEventListener('submit', saveTask);
-viewSelector.addEventListener('change', handleViewChange);
-semesterSelector.addEventListener('change', (e) => {
-db.currentSemester = e.target.value;
-processAndRenderAll();
-});
 document.getElementById('closeModalBtn').addEventListener('click', () => managementModal.classList.remove('active'));
 document.getElementById('closeSemesterModalBtn').addEventListener('click', () => semesterModal.classList.remove('active'));
 document.getElementById('closeSessionModalBtn').addEventListener('click', () => document.getElementById('sessionModal').classList.remove('active'));
@@ -367,20 +373,38 @@ document.getElementById('manageSemestersBtn').addEventListener('click', openSeme
 document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
 document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
-document.getElementById('manageTasksBtn').addEventListener('click', () => {
-sidebarOpen = false;
-sidebar.classList.remove('sidebar-open');
-viewSelector.value = 'tasks';
-handleViewChange();
-});
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
 document.addEventListener('click', () => contextMenu.classList.remove('active'));
 
+// Dropdown menu functionality
+const semesterDropdownBtn = document.getElementById('semesterDropdownBtn');
+const semesterDropdown = document.getElementById('semesterDropdown');
+const viewDropdownBtn = document.getElementById('viewDropdownBtn');
+const viewDropdown = document.getElementById('viewDropdown');
+
+semesterDropdownBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+semesterDropdown.classList.toggle('show');
+viewDropdown.classList.remove('show');
+});
+
+viewDropdownBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+viewDropdown.classList.toggle('show');
+semesterDropdown.classList.remove('show');
+});
+
+document.addEventListener('click', () => {
+semesterDropdown.classList.remove('show');
+viewDropdown.classList.remove('show');
+});
+
 function processAndRenderAll() {
 detectDisputes();
-renderSemesterSelector();
+renderSemesterDropdown();
+renderViewDropdown();
 renderCollegeTabs();
 handleViewChange();
 saveData();
@@ -429,9 +453,49 @@ s2.dispute = { reason: reason, conflictingSessionId: s1.id };
 }
 }
 
-function renderSemesterSelector() {
-semesterSelector.innerHTML = Object.keys(db.semesters).map(name => `<option value="${name}" ${db.currentSemester === name ? 'selected' : ''}>${name}</option>`).join('');
+function renderSemesterDropdown() {
+const semesterNames = Object.keys(db.semesters);
+let html = '';
+semesterNames.forEach(name => {
+html += `<div class="dropdown-item ${db.currentSemester === name ? 'font-bold text-purple-600' : ''}" onclick="changeSemester('${name}')">${name}</div>`;
+});
+semesterDropdown.innerHTML = html;
 }
+
+function renderViewDropdown() {
+const views = [
+{ value: 'main-timetable', label: '📊 Main Timetable' },
+{ value: 'staff-summary', label: '👥 Staff Summary' },
+{ value: 'dispute-log', label: '⚠️ Dispute Log' },
+{ value: 'course-print', label: '📚 Course Print' },
+{ value: 'teacher-print', label: '👨‍🏫 Teacher Print' },
+{ value: 'tasks', label: '📋 Tasks' }
+];
+
+let html = '';
+views.forEach(view => {
+html += `<div class="dropdown-item" onclick="changeView('${view.value}')">${view.label}</div>`;
+});
+viewDropdown.innerHTML = html;
+}
+
+window.changeSemester = (semesterName) => {
+db.currentSemester = semesterName;
+processAndRenderAll();
+semesterDropdown.classList.remove('show');
+};
+
+window.changeView = (viewName) => {
+const viewSelector = document.getElementById('viewSelector');
+if (!viewSelector) {
+// Create a hidden element to track the current view
+window.currentView = viewName;
+} else {
+viewSelector.value = viewName;
+}
+handleViewChange(viewName);
+viewDropdown.classList.remove('show');
+};
 
 function renderCollegeTabs() {
 const currentData = getCurrentSemesterData();
@@ -906,32 +970,47 @@ cancelBtn.classList.remove('hidden');
 }
 
 const renderers = { 'main-timetable': renderMainTimetableView, 'staff-summary': renderStaffSummaryView, 'dispute-log': renderDisputeLogView, 'course-print': renderCoursePrintView, 'teacher-print': renderTeacherPrintView, 'tasks': renderTasksView };
-function handleViewChange() {
-const selectedView = viewSelector.value;
+function handleViewChange(viewName) {
+const selectedView = viewName || window.currentView || 'main-timetable';
 document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
 document.getElementById(`${selectedView}-view`).classList.add('active');
-populateSelectors();
+populateSelectors(selectedView);
 renderers[selectedView]?.();
 }
 
-function populateSelectors() {
-const selectedView = viewSelector.value;
+function populateSelectors(selectedView) {
 const semesterData = getCurrentSemesterData();
 secondarySelectorsContainer.innerHTML = '';
 if (selectedView === 'course-print') {
 if (semesterData.courses.length > 0) {
-let selector = `<select id="course-selector" class="border border-gray-300 rounded px-3 py-2">${semesterData.courses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('')}</select>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn">📚 Course <span>▼</span></button><div class="dropdown-content" id="courseDropdown">${semesterData.courses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
-document.getElementById('course-selector').addEventListener('change', renderCoursePrintView);
+document.getElementById('courseDropdownBtn').addEventListener('click', (e) => {
+e.stopPropagation();
+document.getElementById('courseDropdown').classList.toggle('show');
+});
 }
 } else if (selectedView === 'teacher-print') {
 if (semesterData.teachers.length > 0) {
-let selector = `<select id="teacher-selector" class="border border-gray-300 rounded px-3 py-2">${semesterData.teachers.map(t => `<option value="${t.Initials}">${t.Name} ${t.Surname}</option>`).join('')}</select>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn">👨‍🏫 Teacher <span>▼</span></button><div class="dropdown-content" id="teacherDropdown">${semesterData.teachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
-document.getElementById('teacher-selector').addEventListener('change', renderTeacherPrintView);
+document.getElementById('teacherDropdownBtn').addEventListener('click', (e) => {
+e.stopPropagation();
+document.getElementById('teacherDropdown').classList.toggle('show');
+});
 }
 }
 }
+
+window.selectCourse = (courseCode) => {
+renderCoursePrintView(courseCode);
+document.getElementById('courseDropdown').classList.remove('show');
+};
+
+window.selectTeacher = (teacherInitials) => {
+renderTeacherPrintView(teacherInitials);
+document.getElementById('teacherDropdown').classList.remove('show');
+};
 
 function arrangeOverlappingSessions(dayCol, sessions) {
 const groups = [];
@@ -1429,17 +1508,19 @@ contentHTML += `</div>`;
 container.innerHTML = contentHTML;
 }
 
-function renderCoursePrintView() {
+function renderCoursePrintView(courseCode) {
 const container = document.getElementById('course-print-view');
-const selector = document.getElementById('course-selector');
 const semesterData = getCurrentSemesterData();
 
-if (!selector) {
+if (!courseCode && semesterData.courses.length > 0) {
+courseCode = semesterData.courses[0].Code;
+}
+
+if (!courseCode) {
 container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
 return;
 }
 
-const courseCode = selector.value;
 const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
 
 const scheduleToFilter = semesterData.currentCollege === 'Master View'
@@ -1563,17 +1644,19 @@ saveData();
 }
 }
 
-function renderTeacherPrintView() {
+function renderTeacherPrintView(teacherInitials) {
 const container = document.getElementById('teacher-print-view');
-const selector = document.getElementById('teacher-selector');
 const semesterData = getCurrentSemesterData();
 
-if (!selector) {
+if (!teacherInitials && semesterData.teachers.length > 0) {
+teacherInitials = semesterData.teachers[0].Initials;
+}
+
+if (!teacherInitials) {
 container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
 return;
 }
 
-const teacherInitials = selector.value;
 const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
 
 const scheduleToFilter = semesterData.currentCollege === 'Master View'
@@ -1652,17 +1735,17 @@ return;
 }
 loadingOverlay.style.display = 'flex';
 
-const selectedViewText = viewSelector.options[viewSelector.selectedIndex].text;
+const currentView = window.currentView || 'main-timetable';
+const viewLabels = {
+'main-timetable': 'Main Timetable',
+'staff-summary': 'Staff Summary',
+'dispute-log': 'Dispute Log',
+'course-print': 'Course Print',
+'teacher-print': 'Teacher Print',
+'tasks': 'Tasks'
+};
 
-let filename = `${db.currentSemester} - ${semesterData.currentCollege} - ${selectedViewText}.pdf`.replace(/[\s/]/g, '_');
-
-if (selectedViewText === 'Course Print' || selectedViewText === 'Teacher Print') {
-const secondarySelector = document.getElementById('course-selector') || document.getElementById('teacher-selector');
-if (secondarySelector && secondarySelector.options.length > 0) {
-const selectedOptionText = secondarySelector.options[secondarySelector.selectedIndex].text;
-filename = `${db.currentSemester} - ${selectedOptionText} - ${semesterData.currentCollege}.pdf`.replace(/[\s/]/g, '_');
-}
-}
+let filename = `${db.currentSemester} - ${semesterData.currentCollege} - ${viewLabels[currentView]}.pdf`.replace(/[\s/]/g, '_');
 
 const elementToPrint = activeView.firstElementChild || activeView;
 

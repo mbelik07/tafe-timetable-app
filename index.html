@@ -311,12 +311,12 @@ tasks: [
 ]
 });
 
-document.getElementById('openSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.add('sidebar-open'));
+document.getElementById('openSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('sidebar-open'));
 document.getElementById('closeSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.remove('sidebar-open'));
 document.getElementById('printBtn').addEventListener('click', generatePdf);
 document.getElementById('exportDataBtn').addEventListener('click', exportData);
 document.getElementById('importDataBtn').addEventListener('click', importData);
-document.getElementById('addTaskBtn').addEventListener('click', openTaskModal);
+document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
 document.getElementById('closeTaskModalBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('cancelTaskBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('deleteTaskBtn').addEventListener('click', deleteTask);
@@ -552,8 +552,8 @@ const teacher = semesterData.teachers.find(t => t.Initials === task.teacher);
 const course = semesterData.courses.find(c => c.Code === task.course);
 const teacherDisplay = teacher ? `${teacher.Name} ${teacher.Surname}` : 'Unassigned';
 const courseDisplay = course ? `${course.Code}` : 'Unassigned';
-const statusClass = `task-status-${task.status}`;
-const statusText = task.status === 'inprogress' ? 'In Progress' : (task.status === 'todo' ? 'To Do' : (task.status === 'done' ? 'Done' : 'Blocked'));
+const statusClass = `task-status-${task.status.replace(' ', '')}`;
+const statusText = task.status.charAt(0).toUpperCase() + task.status.slice(1);
 const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';
 
 html += `
@@ -1252,7 +1252,6 @@ const teacher2Select = document.getElementById('sessionTeacher2');
 courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
 subjectSelect.innerHTML = semesterData.subjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
 
-// Sort teachers alphabetically by surname, then name
 const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
 const surnameA = (a.Surname || '').toLowerCase();
 const surnameB = (b.Surname || '').toLowerCase();

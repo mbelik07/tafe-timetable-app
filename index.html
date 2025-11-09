@@ -75,19 +75,18 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .course-list-item:hover { background: #e5e7eb; }
 .course-list-item.active { background: #dbeafe; border-color: #3b82f6; font-weight: bold; }
 .staff-notes-input { max-width: 200px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; }
-.task-card { padding: 1rem; border-left: 4px solid #d1d5db; border-radius: 0.5rem; margin-bottom: 1rem; background: white; border: 1px solid #d1d5db; }
-.task-card.critical { border-left: 4px solid #dc2626; background: #fee2e2; }
-.task-card.high { border-left: 4px solid #f59e0b; background: #fef3c7; }
-.task-card.medium { border-left: 4px solid #3b82f6; background: #dbeafe; }
+.task-card { padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; margin-bottom: 1rem; background: white; }
+.task-card.high { border-left: 4px solid #dc2626; background: #fee2e2; }
+.task-card.medium { border-left: 4px solid #f59e0b; background: #fef3c7; }
 .task-card.low { border-left: 4px solid #10b981; background: #ecfdf5; }
 .task-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; }
 .task-title { font-weight: bold; font-size: 1.1rem; color: #1f2937; }
 .task-status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
 .task-status-todo { background: #e5e7eb; color: #374151; }
-.task-status-inprogress { background: #fbbf24; color: #78350f; }
+.task-status-inprogress { background: #dbeafe; color: #1e40af; }
 .task-status-done { background: #dcfce7; color: #166534; }
 .task-status-blocked { background: #fee2e2; color: #991b1b; }
-.task-meta { display: flex; gap: 1rem; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; flex-wrap: wrap; }
+.task-meta { display: flex; gap: 1rem; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; }
 .task-description { color: #4b5563; margin-bottom: 0.75rem; }
 .task-actions { display: flex; gap: 0.5rem; }
 .task-actions button { padding: 0.25rem 0.75rem; font-size: 0.875rem; border-radius: 0.375rem; border: none; cursor: pointer; }
@@ -95,11 +94,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .task-edit-btn:hover { background: #2563eb; }
 .task-delete-btn { background: #ef4444; color: white; }
 .task-delete-btn:hover { background: #dc2626; }
-.task-complete-btn { background: #10b981; color: white; }
-.task-complete-btn:hover { background: #059669; }
-.task-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.task-filter-btn { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background: white; cursor: pointer; font-size: 0.875rem; }
-.task-filter-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
 @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
@@ -108,7 +102,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
 <div class="p-4 space-y-3 no-print">
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Management</h3>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn">📋 Manage Semesters</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn">🗓️ Manage Semesters</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn">👨‍🏫 Manage Teachers</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn">📚 Manage Courses</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn">🎨 Manage Subjects</button>
@@ -139,7 +133,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="view-container" id="dispute-log-view"></div>
 <div class="view-container" id="course-print-view"></div>
 <div class="view-container" id="teacher-print-view"></div>
-<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-4">📋 Task Management & Issues</h2><div class="mb-4"><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="addTaskBtn">+ Add Custom Task</button><button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2" id="scanIssuesBtn">🔍 Scan for Issues</button></div><div class="task-filters" id="taskFilters"></div><div id="tasks-container"></div></div></div>
+<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-6">📋 Task Management</h2><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn">+ Add New Task</button><div id="tasks-container"></div></div></div>
 </div>
 </main>
 </div>
@@ -148,7 +142,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary)</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
-<div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="critical">Critical</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
+<div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
 <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.8); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl">
 <h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
@@ -158,7 +152,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <script>
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
-let taskFilterStatus = 'all';
 
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
@@ -316,7 +309,10 @@ schedule: [
 { id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
 ],
 courseNotes: {},
-tasks: []
+tasks: [
+{ id: 1, title: 'Prepare materials for FSK20119', description: 'Photocopy worksheets and prepare online resources.', teacher: 'JA', course: 'FSK20119', priority: 'high', status: 'todo', dueDate: '2024-08-01' },
+{ id: 2, title: 'Mark mid-term exams', description: '', teacher: 'MB', course: '11225NAT', priority: 'medium', status: 'inprogress', dueDate: '2024-08-15' },
+]
 });
 
 // Toggle sidebar with Open Menu button
@@ -338,8 +334,7 @@ sidebar.classList.remove('sidebar-open');
 document.getElementById('printBtn').addEventListener('click', generatePdf);
 document.getElementById('exportDataBtn').addEventListener('click', exportData);
 document.getElementById('importDataBtn').addEventListener('click', importData);
-document.getElementById('addTaskBtn').addEventListener('click', () => openTaskModal());
-document.getElementById('scanIssuesBtn').addEventListener('click', scanForIssues);
+document.getElementById('addTaskBtn').addEventListener('click', openTaskModal);
 document.getElementById('closeTaskModalBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('cancelTaskBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('deleteTaskBtn').addEventListener('click', deleteTask);
@@ -491,67 +486,6 @@ processAndRenderAll();
 });
 }
 
-function scanForIssues() {
-const semesterData = getCurrentSemesterData();
-const newTasks = [];
-
-// Check for incomplete course units
-semesterData.courses.forEach(course => {
-const courseSubjects = semesterData.subjects.filter(s => s.CourseCode === course.Code);
-const courseSessions = semesterData.schedule.filter(s => s.CourseCode === course.Code);
-
-if (courseSessions.length === 0) {
-newTasks.push({
-id: Date.now() + Math.random(),
-title: `Missing sessions for ${course.Code}`,
-description: `Course "${course.Name}" has no scheduled sessions yet.`,
-priority: 'high',
-status: 'todo',
-type: 'course_incomplete',
-relatedCourse: course.Code,
-dueDate: ''
-});
-}
-});
-
-// Check for teachers with incomplete hours
-semesterData.teachers.forEach(teacher => {
-const teacherSessions = semesterData.schedule.filter(s => s.TeacherInitials === teacher.Initials || s.TeacherInitials2 === teacher.Initials);
-const allocatedHours = teacherSessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
-const totalHours = teacher.TotalHours || 0;
-
-if (allocatedHours < totalHours) {
-const remainingHours = totalHours - allocatedHours;
-newTasks.push({
-id: Date.now() + Math.random(),
-title: `Incomplete hours for ${teacher.Name} ${teacher.Surname}`,
-description: `${teacher.Name} ${teacher.Surname} (${teacher.Initials}) has ${remainingHours.toFixed(2)} hours remaining to allocate. (${allocatedHours.toFixed(2)}/${totalHours} hours scheduled)`,
-priority: remainingHours > 5 ? 'critical' : 'high',
-status: 'todo',
-type: 'teacher_incomplete',
-relatedTeacher: teacher.Initials,
-dueDate: ''
-});
-}
-});
-
-if (newTasks.length === 0) {
-alert('✅ No issues found! Your timetable is complete.');
-return;
-}
-
-// Add new tasks
-newTasks.forEach(task => {
-if (!semesterData.tasks.find(t => t.type === task.type && (t.relatedCourse === task.relatedCourse || t.relatedTeacher === task.relatedTeacher))) {
-semesterData.tasks.push(task);
-}
-});
-
-saveData();
-renderTasksView();
-alert(`✅ Found ${newTasks.length} issue(s) and added them as tasks!`);
-}
-
 function openTaskModal(taskId = null) {
 const semesterData = getCurrentSemesterData();
 const task = taskId ? semesterData.tasks.find(t => t.id === taskId) : null;
@@ -560,10 +494,23 @@ document.getElementById('taskModalTitle').textContent = task ? 'Edit Task' : 'Ad
 document.getElementById('taskId').value = task?.id || '';
 document.getElementById('taskTitle').value = task?.title || '';
 document.getElementById('taskDescription').value = task?.description || '';
+document.getElementById('taskTeacher').value = task?.teacher || '';
+document.getElementById('taskCourse').value = task?.course || '';
 document.getElementById('taskPriority').value = task?.priority || 'medium';
 document.getElementById('taskStatus').value = task?.status || 'todo';
 document.getElementById('taskDueDate').value = task?.dueDate || '';
 document.getElementById('deleteTaskBtn').style.display = task ? 'block' : 'none';
+
+const teacherSelect = document.getElementById('taskTeacher');
+const courseSelect = document.getElementById('taskCourse');
+
+teacherSelect.innerHTML = '<option value="">-- None --</option>' + semesterData.teachers.map(t => `<option value="${t.Initials}">${t.Name} ${t.Surname}</option>`).join('');
+courseSelect.innerHTML = '<option value="">-- None --</option>' + semesterData.courses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('');
+
+if (task) {
+teacherSelect.value = task.teacher || '';
+courseSelect.value = task.course || '';
+}
 
 taskModal.classList.add('active');
 }
@@ -577,6 +524,8 @@ const taskData = {
 id: taskId || Date.now(),
 title: document.getElementById('taskTitle').value,
 description: document.getElementById('taskDescription').value,
+teacher: document.getElementById('taskTeacher').value,
+course: document.getElementById('taskCourse').value,
 priority: document.getElementById('taskPriority').value,
 status: document.getElementById('taskStatus').value,
 dueDate: document.getElementById('taskDueDate').value
@@ -585,7 +534,7 @@ dueDate: document.getElementById('taskDueDate').value
 if (taskId) {
 const index = semesterData.tasks.findIndex(t => t.id == taskId);
 if (index !== -1) {
-semesterData.tasks[index] = { ...semesterData.tasks[index], ...taskData };
+semesterData.tasks[index] = taskData;
 }
 } else {
 semesterData.tasks.push(taskData);
@@ -607,63 +556,39 @@ processAndRenderAll();
 
 function renderTasksView() {
 const container = document.getElementById('tasks-container');
-const filtersContainer = document.getElementById('taskFilters');
 const semesterData = getCurrentSemesterData();
 const tasks = semesterData.tasks || [];
 
-// Render filters
-const statuses = ['all', 'todo', 'inprogress', 'done', 'blocked'];
-let filtersHTML = '';
-statuses.forEach(status => {
-const label = status === 'all' ? 'All' : status === 'inprogress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1);
-filtersHTML += `<button class="task-filter-btn ${taskFilterStatus === status ? 'active' : ''}" data-filter="${status}">${label}</button>`;
-});
-filtersContainer.innerHTML = filtersHTML;
-
-filtersContainer.querySelectorAll('.task-filter-btn').forEach(btn => {
-btn.addEventListener('click', (e) => {
-taskFilterStatus = e.target.dataset.filter;
-renderTasksView();
-});
-});
-
 if (tasks.length === 0) {
-container.innerHTML = '<p class="text-center text-gray-500 py-8">No tasks yet. Click "Add Custom Task" or "Scan for Issues" to create one.</p>';
-return;
-}
-
-const filteredTasks = taskFilterStatus === 'all' ? tasks : tasks.filter(t => t.status === taskFilterStatus);
-
-if (filteredTasks.length === 0) {
-container.innerHTML = `<p class="text-center text-gray-500 py-8">No ${taskFilterStatus} tasks.</p>`;
+container.innerHTML = '<p class="text-center text-gray-500 py-8">No tasks yet. Click "Add New Task" to create one.</p>';
 return;
 }
 
 let html = '';
-filteredTasks.forEach(task => {
+tasks.forEach(task => {
+const teacher = semesterData.teachers.find(t => t.Initials === task.teacher);
+const course = semesterData.courses.find(c => c.Code === task.course);
+const teacherDisplay = teacher ? `${teacher.Name} ${teacher.Surname}` : 'Unassigned';
+const courseDisplay = course ? `${course.Code}` : 'Unassigned';
 const statusClass = `task-status-${task.status}`;
 const statusText = task.status === 'inprogress' ? 'In Progress' : (task.status === 'todo' ? 'To Do' : (task.status === 'done' ? 'Done' : 'Blocked'));
 const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';
-const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
-const typeLabel = task.type ? (task.type === 'course_incomplete' ? '📚 Course Issue' : '👨‍🏫 Teacher Issue') : '📝 Custom';
 
 html += `
 <div class="task-card ${task.priority}">
 <div class="task-header">
-<div>
 <div class="task-title">${task.title}</div>
-<div class="text-xs text-gray-500 mt-1">${typeLabel}</div>
-</div>
 <span class="task-status-badge ${statusClass}">${statusText}</span>
 </div>
 <div class="task-meta">
-<span>🎯 ${priorityLabel}</span>
+<span>👤 ${teacherDisplay}</span>
+<span>📚 ${courseDisplay}</span>
 <span>📅 ${dueDate}</span>
+<span>🎯 ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
 </div>
 ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
 <div class="task-actions">
 <button class="task-edit-btn" onclick="window.editTask(${task.id})">Edit</button>
-${task.status !== 'done' ? `<button class="task-complete-btn" onclick="window.completeTask(${task.id})">✓ Mark Done</button>` : ''}
 <button class="task-delete-btn" onclick="window.deleteTaskFromList(${task.id})">Delete</button>
 </div>
 </div>
@@ -675,16 +600,6 @@ container.innerHTML = html;
 
 window.editTask = (taskId) => {
 openTaskModal(taskId);
-};
-
-window.completeTask = (taskId) => {
-const semesterData = getCurrentSemesterData();
-const task = semesterData.tasks.find(t => t.id === taskId);
-if (task) {
-task.status = 'done';
-saveData();
-renderTasksView();
-}
 };
 
 window.deleteTaskFromList = (taskId) => {

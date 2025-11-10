@@ -23,8 +23,8 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
 .time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
 .time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
-.day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; display: flex; }
-.day-column-content { flex: 1; position: relative; }
+.day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; }
+.day-column-content { position: relative; }
 .time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
 .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
 .dragging .time-slot:hover { background-color: transparent !important; }
@@ -1116,7 +1116,7 @@ let gridHTML = `<div style="grid-row: 1; grid-column: 1;"></div>` + days.map((da
 gridHTML += `<div class="time-labels">${Array.from({length: totalRows}, (_, i) => `<div class="time-label">${(i % 2 === 0) ? `<strong>${startTime + i/2}:00</strong>` : ''}</div>`).join('')}</div>`;
 gridHTML += days.map((day, i) => {
 let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2}; height: ${totalRows * slotHeight}px;">`;
-dayColHTML += `<div class="day-column-content" style="position: relative; height: 100%;">`;
+dayColHTML += `<div class="day-column-content" style="height: 100%;">`;
 for (let j = 0; j < totalRows; j++) {
 const time = startTime + j * 0.5;
 const timeString = `${Math.floor(time).toString().padStart(2, '0')}:${((time % 1) * 60).toString().padStart(2, '0')}`;

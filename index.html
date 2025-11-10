@@ -29,7 +29,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .dragging .time-slot:hover { background-color: transparent !important; }
 .dragging .time-slot { cursor: default !important; }
 .time-slot.slot-selected { background-color: rgba(59, 130, 246, 0.3); }
-.session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
+.session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; transition: none; }
 .session-block.compulsory { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700; }
 .session-block.online { box-shadow: 0 0 0 3px #3b82f6; }
 .session-block.blended { box-shadow: 0 0 0 3px #3b82f6; }
@@ -106,6 +106,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .college-checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500; }
 .college-checkbox-label input { cursor: pointer; width: 18px; height: 18px; }
 .unassigned-badge { display: inline-block; background: #fbbf24; color: #78350f; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
+.drag-clone { position: fixed; pointer-events: none; z-index: 10000; opacity: 0.8; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
 @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
@@ -1300,6 +1301,7 @@ function makeDraggable(element, session, grid) {
 let clone, offsetX, offsetY;
 let isDragging = false;
 let startX, startY;
+let lastX, lastY;
 
 const onMouseDown = (e) => {
 if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
@@ -1307,11 +1309,13 @@ if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
 isDragging = false;
 startX = e.clientX;
 startY = e.clientY;
+lastX = startX;
+lastY = startY;
 
 e.stopPropagation();
 
-document.addEventListener('mousemove', onMouseMove);
-document.addEventListener('mouseup', onMouseUp);
+document.addEventListener('mousemove', onMouseMove, true);
+document.addEventListener('mouseup', onMouseUp, true);
 };
 
 const onMouseMove = (e) => {
@@ -1322,7 +1326,8 @@ e.preventDefault();
 if (grid) grid.classList.add('dragging');
 
 clone = element.cloneNode(true);
-Object.assign(clone.style, { position: 'absolute', zIndex: '1000', opacity: '0.7', pointerEvents: 'none' });
+clone.classList.add('drag-clone');
+Object.assign(clone.style, { position: 'fixed', zIndex: '10000', opacity: '0.8', pointerEvents: 'none' });
 document.body.appendChild(clone);
 const rect = element.getBoundingClientRect();
 offsetX = startX - rect.left;
@@ -1334,20 +1339,22 @@ element.style.visibility = 'hidden';
 
 if (isDragging) {
 e.preventDefault();
-clone.style.left = `${e.clientX - offsetX}px`;
-clone.style.top = `${e.clientY - offsetY}px`;
+lastX = e.clientX;
+lastY = e.clientY;
+clone.style.left = `${lastX - offsetX}px`;
+clone.style.top = `${lastY - offsetY}px`;
 }
 };
 
 const onMouseUp = (e) => {
-document.removeEventListener('mousemove', onMouseMove);
-document.removeEventListener('mouseup', onMouseUp);
+document.removeEventListener('mousemove', onMouseMove, true);
+document.removeEventListener('mouseup', onMouseUp, true);
 
 if (isDragging) {
 if (grid) grid.classList.remove('dragging');
 
 clone.style.visibility = 'hidden';
-const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+const dropTarget = document.elementFromPoint(lastX, lastY);
 const timeSlot = dropTarget?.closest('.time-slot');
 
 if (timeSlot) {
@@ -1359,7 +1366,9 @@ session.Day = timeSlot.dataset.day;
 session.ClassStart = format(startMins);
 session.ClassEnd = format(endMins);
 }
+if (clone && clone.parentNode) {
 document.body.removeChild(clone);
+}
 processAndRenderAll(); 
 }
 element.style.visibility = 'visible';

@@ -23,7 +23,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
 .time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
 .time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
-.day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; }
+.day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; display: flex; }
+.day-column-content { flex: 1; position: relative; }
+.day-column-gap { width: 75px; background-color: #f0f0f0; border-left: 2px dashed #d1d5db; position: relative; }
+.day-column-gap:hover { background-color: #e8e8e8; }
 .time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
 .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
 .dragging .time-slot:hover { background-color: transparent !important; }
@@ -107,10 +110,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .college-checkbox-label input { cursor: pointer; width: 18px; height: 18px; }
 .unassigned-badge { display: inline-block; background: #fbbf24; color: #78350f; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
 .drag-clone { position: fixed; pointer-events: none; z-index: 10000; opacity: 0.8; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-.buffer-zone { position: absolute; right: 0; top: 0; width: 100px; background-color: rgba(209, 213, 219, 0.3); border-left: 2px dashed #9ca3af; z-index: 5; display: none; }
-.buffer-zone.active { display: block; }
-.buffer-zone.hover { background-color: rgba(209, 213, 219, 0.6); border-left: 2px solid #6b7280; }
-@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
+@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } .day-column-gap { display: none; } }
 </style>
 </head>
 <body class="bg-gray-100">
@@ -175,7 +175,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <script>
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
-let isDraggingSession = false;
 
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
@@ -1118,14 +1117,17 @@ titleEl.textContent = `${semesterData.currentCollege} Timetable - ${db.currentSe
 let gridHTML = `<div style="grid-row: 1; grid-column: 1;"></div>` + days.map((day, i) => `<div class="timetable-header" style="grid-column: ${i + 2};">${day}</div>`).join('');
 gridHTML += `<div class="time-labels">${Array.from({length: totalRows}, (_, i) => `<div class="time-label">${(i % 2 === 0) ? `<strong>${startTime + i/2}:00</strong>` : ''}</div>`).join('')}</div>`;
 gridHTML += days.map((day, i) => {
-let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2}; height: ${totalRows * slotHeight}px; position: relative;">`;
+let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2}; height: ${totalRows * slotHeight}px;">`;
+dayColHTML += `<div class="day-column-content" style="position: relative; height: 100%;">`;
 for (let j = 0; j < totalRows; j++) {
 const time = startTime + j * 0.5;
 const timeString = `${Math.floor(time).toString().padStart(2, '0')}:${((time % 1) * 60).toString().padStart(2, '0')}`;
 dayColHTML += `<div class="time-slot" data-day="${day}" data-time="${timeString}" data-slot-index="${j}"></div>`;
 }
-dayColHTML += `<div class="buffer-zone" style="height: ${totalRows * slotHeight}px;"></div>`;
-return dayColHTML + `</div>`;
+dayColHTML += `</div>`;
+dayColHTML += `<div class="day-column-gap" style="height: 100%;"></div>`;
+dayColHTML += `</div>`;
+return dayColHTML;
 }).join('');
 grid.innerHTML = gridHTML;
 
@@ -1142,6 +1144,7 @@ if (!dayCol) return;
 
 sessionsByDay[session.Day].push(session);
 
+const dayColContent = dayCol.querySelector('.day-column-content');
 const start = timeToMinutes(session.ClassStart) / 30 - startTime * 2;
 const height = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 30 * slotHeight;
 const subjectInfo = semesterData.subjects.find(s => s.Subject === session.Subject);
@@ -1162,11 +1165,11 @@ const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === '
 const sessionBlock = document.createElement('div');
 sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}`;
 sessionBlock.setAttribute('data-session-id', session.id);
-Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
+Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '77px' });
 sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
 sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
 sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
-dayCol.appendChild(sessionBlock);
+dayColContent.appendChild(sessionBlock);
 makeDraggable(sessionBlock, session, grid);
 makeResizable(sessionBlock, session);
 });
@@ -1174,7 +1177,7 @@ makeResizable(sessionBlock, session);
 days.forEach(day => {
 const dayCol = grid.querySelector(`.day-column[data-day="${day}"]`);
 if (dayCol && sessionsByDay[day].length > 0) {
-arrangeOverlappingSessions(dayCol, sessionsByDay[day]);
+arrangeOverlappingSessions(dayCol.querySelector('.day-column-content'), sessionsByDay[day]);
 }
 });
 
@@ -1312,17 +1315,12 @@ const onMouseDown = (e) => {
 if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
 
 isDragging = false;
-isDraggingSession = true;
 startX = e.clientX;
 startY = e.clientY;
 lastX = startX;
 lastY = startY;
 
 e.stopPropagation();
-
-// Show buffer zones when dragging starts
-const bufferZones = grid.querySelectorAll('.buffer-zone');
-bufferZones.forEach(zone => zone.classList.add('active'));
 
 document.addEventListener('mousemove', onMouseMove, true);
 document.addEventListener('mouseup', onMouseUp, true);
@@ -1353,18 +1351,6 @@ lastX = e.clientX;
 lastY = e.clientY;
 clone.style.left = `${lastX - offsetX}px`;
 clone.style.top = `${lastY - offsetY}px`;
-
-// Update buffer zone hover state
-const bufferZones = grid.querySelectorAll('.buffer-zone');
-bufferZones.forEach(zone => {
-const rect = zone.getBoundingClientRect();
-const isHovering = lastX >= rect.left && lastX <= rect.right && lastY >= rect.top && lastY <= rect.bottom;
-if (isHovering) {
-zone.classList.add('hover');
-} else {
-zone.classList.remove('hover');
-}
-});
 }
 };
 
@@ -1372,22 +1358,13 @@ const onMouseUp = (e) => {
 document.removeEventListener('mousemove', onMouseMove, true);
 document.removeEventListener('mouseup', onMouseUp, true);
 
-// Hide buffer zones when dragging ends
-const bufferZones = grid.querySelectorAll('.buffer-zone');
-bufferZones.forEach(zone => {
-zone.classList.remove('active');
-zone.classList.remove('hover');
-});
-
-isDraggingSession = false;
-
 if (isDragging) {
 if (grid) grid.classList.remove('dragging');
 
 clone.style.visibility = 'hidden';
 const dropTarget = document.elementFromPoint(lastX, lastY);
 const timeSlot = dropTarget?.closest('.time-slot');
-const bufferZone = dropTarget?.closest('.buffer-zone');
+const gapZone = dropTarget?.closest('.day-column-gap');
 
 if (timeSlot) {
 const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
@@ -1397,13 +1374,13 @@ const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60
 session.Day = timeSlot.dataset.day;
 session.ClassStart = format(startMins);
 session.ClassEnd = format(endMins);
-} else if (bufferZone) {
-// Drop in buffer zone - place at end of day
-const dayCol = bufferZone.closest('.day-column');
+} else if (gapZone) {
+// Drop in gap zone - place at end of day
+const dayCol = gapZone.closest('.day-column');
 const day = dayCol.dataset.day;
 const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
-const endMinutes = (22 * 60) - duration; // 22:00 is the end time
-const startMinutes = Math.max(endMinutes, 8 * 60); // Don't go before 8:00
+const endMinutes = (22 * 60) - duration;
+const startMinutes = Math.max(endMinutes, 8 * 60);
 const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
 session.Day = day;
 session.ClassStart = format(startMinutes);

@@ -102,6 +102,9 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .dropdown-item { color: #1f2937; padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #e5e7eb; transition: all 0.2s; }
 .dropdown-item:last-child { border-bottom: none; }
 .dropdown-item:hover { background: #f3f4f6; color: #667eea; font-weight: 500; }
+.college-checkboxes { display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap; }
+.college-checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500; }
+.college-checkbox-label input { cursor: pointer; width: 18px; height: 18px; }
 @media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
@@ -156,7 +159,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary)</label><select class="w-full border p-2 rounded" id="sessionTeacher" required=""></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
-<div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">College</label><select id="taskCollege" class="w-full border p-2 rounded"><option value="">-- All Colleges --</option></select></div><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
+<div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
 <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.8); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl">
 <h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
@@ -323,8 +326,8 @@ schedule: [
 ],
 courseNotes: {},
 tasks: [
-{ id: 1, title: 'Prepare materials for FSK20119', description: 'Photocopy worksheets and prepare online resources.', teacher: 'JA', course: 'FSK20119', college: 'Moss Vale', priority: 'high', status: 'todo', dueDate: '2024-08-01' },
-{ id: 2, title: 'Mark mid-term exams', description: '', teacher: 'MB', course: '11225NAT', college: 'Moss Vale', priority: 'medium', status: 'inprogress', dueDate: '2024-08-15' },
+{ id: 1, title: 'Prepare materials for FSK20119', description: 'Photocopy worksheets and prepare online resources.', teacher: 'JA', course: 'FSK20119', colleges: ['Moss Vale'], priority: 'high', status: 'todo', dueDate: '2024-08-01' },
+{ id: 2, title: 'Mark mid-term exams', description: '', teacher: 'MB', course: '11225NAT', colleges: ['Moss Vale'], priority: 'medium', status: 'inprogress', dueDate: '2024-08-15' },
 ]
 });
 
@@ -567,7 +570,6 @@ document.getElementById('taskTitle').value = task?.title || '';
 document.getElementById('taskDescription').value = task?.description || '';
 document.getElementById('taskTeacher').value = task?.teacher || '';
 document.getElementById('taskCourse').value = task?.course || '';
-document.getElementById('taskCollege').value = task?.college || '';
 document.getElementById('taskPriority').value = task?.priority || 'medium';
 document.getElementById('taskStatus').value = task?.status || 'todo';
 document.getElementById('taskDueDate').value = task?.dueDate || '';
@@ -575,7 +577,7 @@ document.getElementById('deleteTaskBtn').style.display = task ? 'block' : 'none'
 
 const teacherSelect = document.getElementById('taskTeacher');
 const courseSelect = document.getElementById('taskCourse');
-const collegeSelect = document.getElementById('taskCollege');
+const collegeCheckboxesContainer = document.getElementById('taskCollegeCheckboxes');
 
 const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
 const surnameA = (a.Surname || '').toLowerCase();
@@ -591,12 +593,18 @@ const sortedColleges = [...colleges].sort();
 
 teacherSelect.innerHTML = '<option value="">-- None --</option>' + sortedTeachers.map(t => `<option value="${t.Initials}">${t.Name} ${t.Surname}</option>`).join('');
 courseSelect.innerHTML = '<option value="">-- None --</option>' + sortedCourses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('');
-collegeSelect.innerHTML = '<option value="">-- All Colleges --</option>' + sortedColleges.map(col => `<option value="${col}">${col}</option>`).join('');
+
+// Create college checkboxes
+let collegeCheckboxesHTML = '';
+sortedColleges.forEach(col => {
+const isChecked = task?.colleges?.includes(col) ? 'checked' : '';
+collegeCheckboxesHTML += `<label class="college-checkbox-label"><input type="checkbox" name="taskCollege" value="${col}" ${isChecked}> ${col}</label>`;
+});
+collegeCheckboxesContainer.innerHTML = collegeCheckboxesHTML;
 
 if (task) {
 teacherSelect.value = task.teacher || '';
 courseSelect.value = task.course || '';
-collegeSelect.value = task.college || '';
 }
 
 taskModal.classList.add('active');
@@ -607,13 +615,15 @@ e.preventDefault();
 const semesterData = getCurrentSemesterData();
 const taskId = document.getElementById('taskId').value;
 
+const selectedColleges = Array.from(document.querySelectorAll('input[name="taskCollege"]:checked')).map(cb => cb.value);
+
 const taskData = {
 id: taskId || Date.now(),
 title: document.getElementById('taskTitle').value,
 description: document.getElementById('taskDescription').value,
 teacher: document.getElementById('taskTeacher').value,
 course: document.getElementById('taskCourse').value,
-college: document.getElementById('taskCollege').value,
+colleges: selectedColleges.length > 0 ? selectedColleges : [],
 priority: document.getElementById('taskPriority').value,
 status: document.getElementById('taskStatus').value,
 dueDate: document.getElementById('taskDueDate').value
@@ -658,7 +668,7 @@ const teacher = semesterData.teachers.find(t => t.Initials === task.teacher);
 const course = semesterData.courses.find(c => c.Code === task.course);
 const teacherDisplay = teacher ? `${teacher.Name} ${teacher.Surname}` : 'Unassigned';
 const courseDisplay = course ? `${course.Code}` : 'Unassigned';
-const collegeDisplay = task.college || 'All Colleges';
+const collegeDisplay = task.colleges && task.colleges.length > 0 ? task.colleges.join(', ') : 'All Colleges';
 const statusClass = `task-status-${task.status}`;
 const statusText = task.status === 'inprogress' ? 'In Progress' : (task.status === 'todo' ? 'To Do' : (task.status === 'done' ? 'Done' : 'Blocked'));
 const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';

@@ -25,9 +25,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
 .day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; display: flex; }
 .day-column-content { flex: 1; position: relative; }
-.day-column-gap { width: 100px; background-color: #e8e8e8; border-left: 3px solid #9ca3af; position: relative; cursor: pointer; transition: background-color 0.2s; }
-.day-column-gap:hover { background-color: #d0d0d0; }
-.day-column-gap.drag-over { background-color: #a8d5ff; border-left: 3px solid #3b82f6; }
 .time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
 .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
 .dragging .time-slot:hover { background-color: transparent !important; }
@@ -111,7 +108,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .college-checkbox-label input { cursor: pointer; width: 18px; height: 18px; }
 .unassigned-badge { display: inline-block; background: #fbbf24; color: #78350f; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
 .drag-clone { position: fixed; pointer-events: none; z-index: 10000; opacity: 0.8; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } .day-column-gap { display: none; } }
+@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
 <body class="bg-gray-100">
@@ -176,7 +173,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <script>
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
-let currentDraggedSession = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
@@ -1127,7 +1123,6 @@ const timeString = `${Math.floor(time).toString().padStart(2, '0')}:${((time % 1
 dayColHTML += `<div class="time-slot" data-day="${day}" data-time="${timeString}" data-slot-index="${j}"></div>`;
 }
 dayColHTML += `</div>`;
-dayColHTML += `<div class="day-column-gap" style="height: 100%;"></div>`;
 dayColHTML += `</div>`;
 return dayColHTML;
 }).join('');
@@ -1167,7 +1162,7 @@ const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === '
 const sessionBlock = document.createElement('div');
 sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}`;
 sessionBlock.setAttribute('data-session-id', session.id);
-Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '102px' });
+Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
 sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
 sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
 sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
@@ -1321,7 +1316,6 @@ startX = e.clientX;
 startY = e.clientY;
 lastX = startX;
 lastY = startY;
-currentDraggedSession = session;
 
 e.stopPropagation();
 
@@ -1354,18 +1348,6 @@ lastX = e.clientX;
 lastY = e.clientY;
 clone.style.left = `${lastX - offsetX}px`;
 clone.style.top = `${lastY - offsetY}px`;
-
-// Update gap zone hover state
-const allGaps = grid.querySelectorAll('.day-column-gap');
-allGaps.forEach(gap => {
-const rect = gap.getBoundingClientRect();
-const isHovering = lastX >= rect.left && lastX <= rect.right && lastY >= rect.top && lastY <= rect.bottom;
-if (isHovering) {
-gap.classList.add('drag-over');
-} else {
-gap.classList.remove('drag-over');
-}
-});
 }
 };
 
@@ -1379,7 +1361,6 @@ if (grid) grid.classList.remove('dragging');
 clone.style.visibility = 'hidden';
 const dropTarget = document.elementFromPoint(lastX, lastY);
 const timeSlot = dropTarget?.closest('.time-slot');
-const gapZone = dropTarget?.closest('.day-column-gap');
 
 if (timeSlot) {
 const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
@@ -1389,25 +1370,10 @@ const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60
 session.Day = timeSlot.dataset.day;
 session.ClassStart = format(startMins);
 session.ClassEnd = format(endMins);
-} else if (gapZone) {
-// Drop in gap zone - place at end of day
-const dayCol = gapZone.closest('.day-column');
-const day = dayCol.dataset.day;
-const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
-const endMinutes = (22 * 60) - duration;
-const startMinutes = Math.max(endMinutes, 8 * 60);
-const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
-session.Day = day;
-session.ClassStart = format(startMinutes);
-session.ClassEnd = format(startMinutes + duration);
 }
 if (clone && clone.parentNode) {
 document.body.removeChild(clone);
 }
-
-// Remove all drag-over states
-grid.querySelectorAll('.day-column-gap').forEach(gap => gap.classList.remove('drag-over'));
-currentDraggedSession = null;
 processAndRenderAll(); 
 }
 element.style.visibility = 'visible';

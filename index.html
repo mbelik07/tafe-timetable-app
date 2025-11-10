@@ -25,8 +25,9 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
 .day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; display: flex; }
 .day-column-content { flex: 1; position: relative; }
-.day-column-gap { width: 75px; background-color: #f0f0f0; border-left: 2px dashed #d1d5db; position: relative; }
-.day-column-gap:hover { background-color: #e8e8e8; }
+.day-column-gap { width: 100px; background-color: #e8e8e8; border-left: 3px solid #9ca3af; position: relative; cursor: pointer; transition: background-color 0.2s; }
+.day-column-gap:hover { background-color: #d0d0d0; }
+.day-column-gap.drag-over { background-color: #a8d5ff; border-left: 3px solid #3b82f6; }
 .time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
 .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
 .dragging .time-slot:hover { background-color: transparent !important; }
@@ -175,6 +176,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <script>
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
+let currentDraggedSession = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
@@ -1165,7 +1167,7 @@ const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === '
 const sessionBlock = document.createElement('div');
 sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}`;
 sessionBlock.setAttribute('data-session-id', session.id);
-Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '77px' });
+Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '102px' });
 sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
 sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
 sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
@@ -1319,6 +1321,7 @@ startX = e.clientX;
 startY = e.clientY;
 lastX = startX;
 lastY = startY;
+currentDraggedSession = session;
 
 e.stopPropagation();
 
@@ -1351,6 +1354,18 @@ lastX = e.clientX;
 lastY = e.clientY;
 clone.style.left = `${lastX - offsetX}px`;
 clone.style.top = `${lastY - offsetY}px`;
+
+// Update gap zone hover state
+const allGaps = grid.querySelectorAll('.day-column-gap');
+allGaps.forEach(gap => {
+const rect = gap.getBoundingClientRect();
+const isHovering = lastX >= rect.left && lastX <= rect.right && lastY >= rect.top && lastY <= rect.bottom;
+if (isHovering) {
+gap.classList.add('drag-over');
+} else {
+gap.classList.remove('drag-over');
+}
+});
 }
 };
 
@@ -1389,6 +1404,10 @@ session.ClassEnd = format(startMinutes + duration);
 if (clone && clone.parentNode) {
 document.body.removeChild(clone);
 }
+
+// Remove all drag-over states
+grid.querySelectorAll('.day-column-gap').forEach(gap => gap.classList.remove('drag-over'));
+currentDraggedSession = null;
 processAndRenderAll(); 
 }
 element.style.visibility = 'visible';

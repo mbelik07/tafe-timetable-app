@@ -150,7 +150,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="view-container" id="dispute-log-view"></div>
 <div class="view-container" id="course-print-view"></div>
 <div class="view-container" id="teacher-print-view"></div>
-<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-6">📋 Task Management</h2><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn">+ Add New Task</button><div id="tasks-container"></div></div></div>
+<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2">📋 Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn">+ Add New Task</button><div id="tasks-container"></div></div></div>
 </div>
 </main>
 </div>
@@ -196,7 +196,7 @@ db.semesters[semKey].tasks = [];
 });
 } else {
 db = {
-semesters: { 'Semester 1 2024': getNewSemesterData() },
+semesters: { 'Semester 1 2024': getNewSemesterData(), 'Semester 2 2024': getNewSemesterData() },
 currentSemester: 'Semester 1 2024'
 };
 }
@@ -654,8 +654,11 @@ processAndRenderAll();
 
 function renderTasksView() {
 const container = document.getElementById('tasks-container');
+const semesterLabel = document.getElementById('tasksSemesterLabel');
 const semesterData = getCurrentSemesterData();
 const tasks = semesterData.tasks || [];
+
+semesterLabel.textContent = db.currentSemester;
 
 if (tasks.length === 0) {
 container.innerHTML = '<p class="text-center text-gray-500 py-8">No tasks yet. Click "Add New Task" to create one.</p>';

@@ -21,6 +21,8 @@
   font-size: 13px;
   margin-left: 8px;
   margin-right: 8px;
+  position: relative;
+  z-index: 10000;
 }
 #${MODE_TOGGLE_ID} .mode-checkbox {
   width: 42px;
@@ -33,6 +35,7 @@
   vertical-align: middle;
   border: none;
   padding: 0;
+  z-index: 10001;
 }
 #${MODE_TOGGLE_ID} .mode-checkbox .knob {
   width: 18px;
@@ -58,6 +61,7 @@
   min-width: 140px;
   font-weight: 600;
   color: #1a202c;
+  z-index: 10001;
 }
 
 /* Download button custom class */

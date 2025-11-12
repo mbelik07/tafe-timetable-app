@@ -1,5 +1,6 @@
 // timetable-download-mode.js
 // Adds single Download PDF button with dropdown for Draft/Final options
+// Matches styling of Semester and View buttons
 
 (function () {
   const STORAGE_KEY = 'timetable_download_mode_v1';
@@ -8,53 +9,55 @@
   const BUTTONS_CONTAINER_ID = 'downloadModeButtonsContainer';
   const WATERMARK_ID = 'timetableDraftWatermark';
 
-  // CSS
+  // CSS - matches Semester/View button styling
   const css = `
 /* Container for download button */
 #${BUTTONS_CONTAINER_ID} {
   display: inline-block !important;
-  margin-left: 8px !important;
   position: relative !important;
 }
 
-/* Main Download PDF Button */
+/* Main Download PDF Button - matches Semester/View styling */
 #${DOWNLOAD_BTN_ID} {
-  background: #4299e1 !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: #fff !important;
   border: none !important;
-  padding: 8px 14px !important;
+  padding: 8px 16px !important;
   border-radius: 6px !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 600 !important;
   cursor: pointer !important;
-  transition: background 0.2s ease !important;
+  transition: all 0.2s ease !important;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 8px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
 #${DOWNLOAD_BTN_ID}:hover {
-  background: #3182ce !important;
+  background: linear-gradient(135deg, #5568d3 0%, #6a3a8f 100%) !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+  transform: translateY(-1px) !important;
 }
 
 #${DOWNLOAD_BTN_ID}:active {
-  background: #2c5aa0 !important;
+  transform: translateY(0) !important;
 }
 
-/* Dropdown menu */
+/* Dropdown menu - matches existing menu styling */
 #${DOWNLOAD_MENU_ID} {
   position: absolute !important;
   top: 100% !important;
-  left: 0 !important;
+  right: 0 !important;
   background: #fff !important;
-  border: 1px solid #cbd5e0 !important;
-  border-radius: 6px !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-  min-width: 220px !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+  min-width: 240px !important;
   z-index: 1001 !important;
   display: none !important;
-  margin-top: 4px !important;
+  margin-top: 8px !important;
   overflow: hidden !important;
 }
 
@@ -63,28 +66,29 @@
 }
 
 .download-menu-item {
-  padding: 12px 14px !important;
+  padding: 14px 16px !important;
   cursor: pointer !important;
   border: none !important;
   background: none !important;
   width: 100% !important;
   text-align: left !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 500 !important;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
-  transition: background 0.15s ease !important;
+  transition: all 0.15s ease !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
+  gap: 12px !important;
+  border-left: 4px solid transparent !important;
 }
 
 .download-menu-item:hover {
-  background: #f7fafc !important;
+  background: #f8f9fa !important;
 }
 
 .download-menu-item.draft {
   color: #c05621 !important;
-  border-left: 4px solid #f6ad55 !important;
+  border-left-color: #f6ad55 !important;
 }
 
 .download-menu-item.draft:hover {
@@ -93,7 +97,7 @@
 
 .download-menu-item.final {
   color: #22543d !important;
-  border-left: 4px solid #48bb78 !important;
+  border-left-color: #48bb78 !important;
 }
 
 .download-menu-item.final:hover {
@@ -101,7 +105,8 @@
 }
 
 .menu-item-icon {
-  font-size: 16px !important;
+  font-size: 18px !important;
+  min-width: 24px !important;
 }
 
 .menu-item-text {
@@ -109,9 +114,10 @@
 }
 
 .menu-item-label {
-  font-size: 11px !important;
-  opacity: 0.7 !important;
+  font-size: 12px !important;
+  opacity: 0.65 !important;
   margin-top: 2px !important;
+  font-weight: 400 !important;
 }
 
 /* Watermark - visible on screen and in print/PDF */
@@ -236,6 +242,8 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   }
 
   function downloadPdf(mode) {
+    console.log('Downloading PDF in', mode, 'mode');
+    
     // Set watermark mode
     if (mode === 'draft') {
       document.body.classList.add('timetable-mode-draft');
@@ -245,15 +253,22 @@ body.timetable-mode-draft #${WATERMARK_ID} {
 
     // Try to find and trigger original download button
     const originalBtn = findOriginalDownloadButton();
+    console.log('Original button found:', originalBtn);
+    
     if (originalBtn) {
       // Adjust filename if it's an anchor with download attribute
       try {
         if (originalBtn.tagName.toLowerCase() === 'a' && originalBtn.hasAttribute('download')) {
           const cur = originalBtn.getAttribute('download') || '';
-          originalBtn.setAttribute('download', adjustedFilename(cur || undefined, mode));
+          const newFilename = adjustedFilename(cur || undefined, mode);
+          console.log('Setting download filename to:', newFilename);
+          originalBtn.setAttribute('download', newFilename);
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error('Error adjusting filename:', e);
+      }
 
+      console.log('Clicking original button');
       // Trigger click
       originalBtn.click();
 
@@ -262,7 +277,9 @@ body.timetable-mode-draft #${WATERMARK_ID} {
         if (mode === 'final') {
           document.body.classList.remove('timetable-mode-draft');
         }
-      }, 500);
+      }, 1000);
+    } else {
+      console.warn('Could not find original download button');
     }
 
     // Close menu
@@ -288,7 +305,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     const btn = document.createElement('button');
     btn.id = DOWNLOAD_BTN_ID;
     btn.type = 'button';
-    btn.innerHTML = '📄 Download PDF <span style="font-size: 10px;">▼</span>';
+    btn.innerHTML = '📥 Download PDF <span style="font-size: 12px; margin-left: 4px;">▼</span>';
     btn.setAttribute('title', 'Download PDF as Draft or Final');
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -309,7 +326,11 @@ body.timetable-mode-draft #${WATERMARK_ID} {
         <div class="menu-item-label">with watermark</div>
       </div>
     `;
-    draftOption.addEventListener('click', () => downloadPdf('draft'));
+    draftOption.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      downloadPdf('draft');
+    });
 
     // Final option
     const finalOption = document.createElement('button');
@@ -321,7 +342,11 @@ body.timetable-mode-draft #${WATERMARK_ID} {
         <div class="menu-item-label">no watermark</div>
       </div>
     `;
-    finalOption.addEventListener('click', () => downloadPdf('final'));
+    finalOption.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      downloadPdf('final');
+    });
 
     menu.appendChild(draftOption);
     menu.appendChild(finalOption);
@@ -334,7 +359,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
       if (!container.contains(e.target)) {
         closeMenu();
       }
-    });
+    }, true);
 
     return container;
   }
@@ -343,7 +368,10 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     if (document.getElementById(BUTTONS_CONTAINER_ID)) return true;
 
     const originalBtn = findOriginalDownloadButton();
-    if (!originalBtn) return false;
+    if (!originalBtn) {
+      console.warn('Could not find original download button to insert next to');
+      return false;
+    }
 
     const buttonContainer = createDownloadButton();
 
@@ -354,7 +382,9 @@ body.timetable-mode-draft #${WATERMARK_ID} {
         originalBtn.style.display = 'none';
         return true;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('Error inserting button:', e);
+    }
 
     return false;
   }
@@ -372,6 +402,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   }
 
   function init() {
+    console.log('Initializing timetable download mode');
     ensureWatermark();
     insertButton();
     startHeaderObserver();

@@ -1,6 +1,6 @@
 // timetable-download-mode.js
 // Adds Draft/Final mode UI with watermark for Draft PDFs
-// Persists mode per-semester and ensures watermark appears in PDF exports
+// Uses FIXED positioning to stay visible above all content
 
 (function () {
   const STORAGE_KEY = 'timetable_download_mode_v1';
@@ -10,58 +10,68 @@
   const MODE_BUTTON_CLASS = 'timetable-download-mode-btn';
   const POLL_INTERVAL_MS = 800;
 
-  // CSS with very high z-index to stay on top
+  // CSS with FIXED positioning to stay on top
   const css = `
-/* Mode toggle styles - VERY HIGH Z-INDEX */
+/* Mode toggle - FIXED POSITION in top-right corner */
 #${MODE_TOGGLE_ID} {
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  font-size: 13px;
-  margin-left: 8px;
-  margin-right: 8px;
-  position: relative;
-  z-index: 999999 !important;
+  position: fixed !important;
+  top: 12px !important;
+  right: 120px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
+  font-size: 13px !important;
+  z-index: 999999999 !important;
+  background: white !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
 }
+
 #${MODE_TOGGLE_ID} .mode-checkbox {
-  width: 42px;
-  height: 24px;
-  background: #e2e8f0;
-  border-radius: 999px;
-  position: relative;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  border: none;
-  padding: 0;
-  z-index: 999999 !important;
+  width: 42px !important;
+  height: 24px !important;
+  background: #e2e8f0 !important;
+  border-radius: 999px !important;
+  position: relative !important;
+  cursor: pointer !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  border: none !important;
+  padding: 0 !important;
+  z-index: 999999999 !important;
 }
+
 #${MODE_TOGGLE_ID} .mode-checkbox .knob {
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border-radius: 50%;
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-  transition: transform 0.18s ease, left 0.18s ease;
+  width: 18px !important;
+  height: 18px !important;
+  background: #fff !important;
+  border-radius: 50% !important;
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
+  transition: transform 0.18s ease, left 0.18s ease !important;
 }
+
 #${MODE_TOGGLE_ID}[data-mode="draft"] .mode-checkbox {
-  background: #f6ad55;
+  background: #f6ad55 !important;
 }
+
 #${MODE_TOGGLE_ID}[data-mode="draft"] .mode-checkbox .knob {
-  transform: translateX(18px);
+  transform: translateX(18px) !important;
 }
+
 #${MODE_TOGGLE_ID}[data-mode="final"] .mode-checkbox {
-  background: #68d391;
+  background: #68d391 !important;
 }
+
 #${MODE_TOGGLE_ID} .mode-text {
-  min-width: 140px;
-  font-weight: 600;
-  color: #1a202c;
-  z-index: 999999 !important;
+  min-width: 140px !important;
+  font-weight: 600 !important;
+  color: #1a202c !important;
+  z-index: 999999999 !important;
 }
 
 /* Download button custom class */
@@ -70,6 +80,7 @@
   color: #fff !important;
   border-color: transparent !important;
 }
+
 .${MODE_BUTTON_CLASS}.final {
   background: #48bb78 !important;
   color: #fff !important;
@@ -78,21 +89,22 @@
 
 /* Watermark - visible on screen and in print/PDF */
 #${WATERMARK_ID} {
-  pointer-events: none;
-  user-select: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%) rotate(-45deg);
-  font-size: 120px;
-  font-weight: 900;
-  color: rgba(180,180,180,0.14);
-  z-index: 99998;
-  white-space: nowrap;
-  display: none;
-  font-family: Arial, sans-serif;
-  letter-spacing: 2px;
+  pointer-events: none !important;
+  user-select: none !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%,-50%) rotate(-45deg) !important;
+  font-size: 120px !important;
+  font-weight: 900 !important;
+  color: rgba(180,180,180,0.14) !important;
+  z-index: 99998 !important;
+  white-space: nowrap !important;
+  display: none !important;
+  font-family: Arial, sans-serif !important;
+  letter-spacing: 2px !important;
 }
+
 body.timetable-mode-draft #${WATERMARK_ID} {
   display: block !important;
 }
@@ -100,14 +112,14 @@ body.timetable-mode-draft #${WATERMARK_ID} {
 @media print {
   #${WATERMARK_ID} {
     display: block !important;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%) rotate(-45deg);
-    color: rgba(160,160,160,0.16);
-    font-size: 140px;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%,-50%) rotate(-45deg) !important;
+    color: rgba(160,160,160,0.16) !important;
+    font-size: 140px !important;
     z-index: 99998 !important;
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
   }
 }
 `;
@@ -162,26 +174,6 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     const states = readStates();
     states[sem] = mode;
     writeStates(states);
-  }
-
-  const HEADER_SELECTORS = [
-    '.header-controls .flex.items-center.gap-3',
-    '.header-controls',
-    'header',
-    '.app-header',
-    '.topbar',
-    '.navbar',
-    '.controls',
-    '.toolbar',
-    '[role="banner"]'
-  ];
-
-  function findHeaderContainer() {
-    for (const sel of HEADER_SELECTORS) {
-      const el = document.querySelector(sel);
-      if (el) return el;
-    }
-    return document.body;
   }
 
   function createToggleElement() {
@@ -286,8 +278,6 @@ body.timetable-mode-draft #${WATERMARK_ID} {
         el.setAttribute('title', `${el.getAttribute('title') || ''} [Mode: ${mode}]`.trim());
       } catch (e) {}
     });
-
-    tryPlaceToggleNearDownloadButton();
   }
 
   function adjustedFilename(originalFilename, mode) {
@@ -301,25 +291,6 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     name = name.replace(/(_DRAFT_|_FINAL_)/i, '');
     name = name.replace(/\.pdf$/i, `${addition}.pdf`);
     return name;
-  }
-
-  function tryPlaceToggleNearDownloadButton() {
-    const toggle = document.getElementById(MODE_TOGGLE_ID);
-    const buttons = findDownloadButtons();
-    if (!toggle) return;
-    if (buttons.length > 0) {
-      const btn = buttons[0];
-      try {
-        if (btn.parentNode) {
-          btn.parentNode.insertBefore(toggle, btn.nextSibling);
-          return;
-        }
-      } catch (e) {}
-    }
-    const header = findHeaderContainer();
-    if (header && !header.contains(toggle)) {
-      header.appendChild(toggle);
-    }
   }
 
   function setMode(mode, opts = { persist: true }) {
@@ -342,9 +313,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   function insertToggle() {
     if (document.getElementById(MODE_TOGGLE_ID)) return true;
     const toggle = createToggleElement();
-    const header = findHeaderContainer();
-    if (!header) return false;
-    header.appendChild(toggle);
+    document.body.appendChild(toggle);
     const saved = loadModeForSemester();
     setMode(saved, { persist: false });
     return true;
@@ -443,7 +412,6 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     interceptDownloads();
     const m = loadModeForSemester();
     setMode(m, { persist: false });
-    tryPlaceToggleNearDownloadButton();
   }
 
   if (document.readyState === 'loading') {

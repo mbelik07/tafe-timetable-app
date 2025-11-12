@@ -86,25 +86,15 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   display: block !important;
 }
 
-/* Ensure timetable sessions appear above dropdown menus */
-.timetable-grid,
-.timetable-container,
-[class*="timetable"],
-[class*="session"],
-[class*="event"],
-.grid,
-main {
-  position: relative !important;
-  z-index: 10 !important;
-}
-
-/* Ensure dropdown menus stay accessible but below content */
+/* Ensure dropdown menus appear ABOVE session boxes */
 [role="menu"],
 [role="listbox"],
 .dropdown,
 [class*="dropdown"],
-[class*="menu"] {
-  z-index: 5 !important;
+[class*="menu"],
+[class*="popover"],
+[class*="popup"] {
+  z-index: 1000 !important;
 }
 
 @media print {

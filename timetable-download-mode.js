@@ -1,90 +1,67 @@
 // timetable-download-mode.js
-// Adds Draft/Final mode UI with watermark for Draft PDFs
-// Uses FIXED positioning to stay visible above all content
+// Adds Draft and Final download buttons with watermark for Draft PDFs
+// Two separate buttons instead of toggle for cleaner UX
 
 (function () {
   const STORAGE_KEY = 'timetable_download_mode_v1';
-  const MODE_TOGGLE_ID = 'timetableModeToggle';
-  const MODE_LABEL_ID = 'timetableModeLabel';
+  const DRAFT_BTN_ID = 'downloadPdfDraftBtn';
+  const FINAL_BTN_ID = 'downloadPdfFinalBtn';
+  const BUTTONS_CONTAINER_ID = 'downloadModeButtonsContainer';
   const WATERMARK_ID = 'timetableDraftWatermark';
-  const MODE_BUTTON_CLASS = 'timetable-download-mode-btn';
   const POLL_INTERVAL_MS = 800;
 
-  // CSS with FIXED positioning to stay on top
+  // CSS
   const css = `
-/* Mode toggle - FIXED POSITION in top-right corner */
-#${MODE_TOGGLE_ID} {
-  position: fixed !important;
-  top: 12px !important;
-  right: 120px !important;
+/* Container for both download buttons */
+#${BUTTONS_CONTAINER_ID} {
   display: inline-flex !important;
+  gap: 8px !important;
   align-items: center !important;
-  gap: 10px !important;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
-  font-size: 13px !important;
-  z-index: 999999999 !important;
-  background: white !important;
-  padding: 6px 12px !important;
-  border-radius: 6px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+  margin-left: 8px !important;
 }
 
-#${MODE_TOGGLE_ID} .mode-checkbox {
-  width: 42px !important;
-  height: 24px !important;
-  background: #e2e8f0 !important;
-  border-radius: 999px !important;
-  position: relative !important;
-  cursor: pointer !important;
-  display: inline-block !important;
-  vertical-align: middle !important;
-  border: none !important;
-  padding: 0 !important;
-  z-index: 999999999 !important;
-}
-
-#${MODE_TOGGLE_ID} .mode-checkbox .knob {
-  width: 18px !important;
-  height: 18px !important;
-  background: #fff !important;
-  border-radius: 50% !important;
-  position: absolute !important;
-  top: 3px !important;
-  left: 3px !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
-  transition: transform 0.18s ease, left 0.18s ease !important;
-}
-
-#${MODE_TOGGLE_ID}[data-mode="draft"] .mode-checkbox {
-  background: #f6ad55 !important;
-}
-
-#${MODE_TOGGLE_ID}[data-mode="draft"] .mode-checkbox .knob {
-  transform: translateX(18px) !important;
-}
-
-#${MODE_TOGGLE_ID}[data-mode="final"] .mode-checkbox {
-  background: #68d391 !important;
-}
-
-#${MODE_TOGGLE_ID} .mode-text {
-  min-width: 140px !important;
-  font-weight: 600 !important;
-  color: #1a202c !important;
-  z-index: 999999999 !important;
-}
-
-/* Download button custom class */
-.${MODE_BUTTON_CLASS}.draft {
+/* Draft Download Button */
+#${DRAFT_BTN_ID} {
   background: #f6ad55 !important;
   color: #fff !important;
-  border-color: transparent !important;
+  border: none !important;
+  padding: 8px 14px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
 }
 
-.${MODE_BUTTON_CLASS}.final {
+#${DRAFT_BTN_ID}:hover {
+  background: #ed8936 !important;
+}
+
+#${DRAFT_BTN_ID}:active {
+  background: #dd6b20 !important;
+}
+
+/* Final Download Button */
+#${FINAL_BTN_ID} {
   background: #48bb78 !important;
   color: #fff !important;
-  border-color: transparent !important;
+  border: none !important;
+  padding: 8px 14px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
+}
+
+#${FINAL_BTN_ID}:hover {
+  background: #38a169 !important;
+}
+
+#${FINAL_BTN_ID}:active {
+  background: #2f855a !important;
 }
 
 /* Watermark - visible on screen and in print/PDF */
@@ -164,122 +141,6 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     return wm;
   }
 
-  function loadModeForSemester() {
-    const sem = getCurrentSemester();
-    const states = readStates();
-    return states[sem] === 'draft' ? 'draft' : 'final';
-  }
-  function saveModeForSemester(mode) {
-    const sem = getCurrentSemester();
-    const states = readStates();
-    states[sem] = mode;
-    writeStates(states);
-  }
-
-  function createToggleElement() {
-    const container = document.createElement('div');
-    container.id = MODE_TOGGLE_ID;
-    container.setAttribute('role', 'group');
-    container.setAttribute('aria-label', 'Timetable download mode');
-
-    const checkboxWrap = document.createElement('button');
-    checkboxWrap.className = 'mode-checkbox';
-    checkboxWrap.type = 'button';
-    checkboxWrap.setAttribute('aria-pressed', 'false');
-    checkboxWrap.setAttribute('title', 'Toggle Draft / Final mode');
-
-    const knob = document.createElement('span');
-    knob.className = 'knob';
-    checkboxWrap.appendChild(knob);
-
-    const text = document.createElement('div');
-    text.className = 'mode-text';
-    text.id = MODE_LABEL_ID;
-    text.textContent = '';
-
-    checkboxWrap.addEventListener('click', () => {
-      const cur = container.getAttribute('data-mode') === 'draft' ? 'draft' : 'final';
-      const next = cur === 'draft' ? 'final' : 'draft';
-      setMode(next, { persist: true });
-    });
-
-    container.appendChild(checkboxWrap);
-    container.appendChild(text);
-
-    return container;
-  }
-
-  function findDownloadButtons() {
-    const candidates = new Set();
-
-    const selectors = [
-      'button[id*="download"]',
-      'button[id*="pdf"]',
-      'a[id*="download"]',
-      'a[id*="pdf"]',
-      'button[data-action*="download"]',
-      'button[data-action*="pdf"]',
-      'a[data-action*="download"]',
-      'a[data-action*="pdf"]',
-      'button[data-testid*="download"]',
-      'a[data-testid*="download"]'
-    ];
-    selectors.forEach(s => document.querySelectorAll(s).forEach(el => candidates.add(el)));
-
-    const textRegex = /\b(download|export|save).*pdf|\bpdf.*(download|export|save)/i;
-    document.querySelectorAll('button, a, input[type="button"], input[type="submit"]').forEach(el => {
-      const txt = (el.textContent || el.value || '').trim();
-      if (textRegex.test(txt)) candidates.add(el);
-    });
-
-    document.querySelectorAll('[aria-label]').forEach(el => {
-      const al = el.getAttribute('aria-label') || '';
-      if (/\bdownload.*pdf|\bpdf.*download/i.test(al)) candidates.add(el);
-    });
-
-    return Array.from(candidates);
-  }
-
-  function updateDownloadButtons(mode) {
-    const buttons = findDownloadButtons();
-    const label = mode === 'draft' ? '📄 Download PDF (Draft)' : '📄 Download PDF (Final)';
-    buttons.forEach(el => {
-      el.classList.add(MODE_BUTTON_CLASS);
-      el.classList.remove(mode === 'draft' ? 'final' : 'draft');
-      el.classList.add(mode === 'draft' ? 'draft' : 'final');
-
-      try {
-        if (el.tagName && el.tagName.toLowerCase() === 'a' && el.hasAttribute('download')) {
-          const cur = el.getAttribute('download') || '';
-          el.setAttribute('download', adjustedFilename(cur || undefined, mode));
-        }
-      } catch (e) {}
-
-      const txt = (el.textContent || el.value || '').trim();
-      if (txt && /pdf/i.test(txt)) {
-        const onlyText = el.children.length === 0;
-        if (onlyText) {
-          if (el.tagName.toLowerCase() === 'input') el.value = label;
-          else el.textContent = label;
-        } else {
-          let sub = el.querySelector('.timetable-mode-inline-label');
-          if (!sub) {
-            sub = document.createElement('span');
-            sub.className = 'timetable-mode-inline-label';
-            sub.style.marginLeft = '8px';
-            sub.style.fontWeight = '700';
-            sub.style.fontSize = '13px';
-            el.appendChild(sub);
-          }
-          sub.textContent = mode === 'draft' ? '(Draft)' : '(Final)';
-        }
-      }
-      try {
-        el.setAttribute('title', `${el.getAttribute('title') || ''} [Mode: ${mode}]`.trim());
-      } catch (e) {}
-    });
-  }
-
   function adjustedFilename(originalFilename, mode) {
     const sem = getCurrentSemester() || 'semester';
     const addition = mode === 'draft' ? '_DRAFT_' : '_FINAL_';
@@ -293,30 +154,114 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     return name;
   }
 
-  function setMode(mode, opts = { persist: true }) {
-    mode = mode === 'draft' ? 'draft' : 'final';
-    const container = document.getElementById(MODE_TOGGLE_ID);
-    if (container) container.setAttribute('data-mode', mode);
-    const labelEl = document.getElementById(MODE_LABEL_ID);
-    if (labelEl) labelEl.textContent = mode === 'draft' ? 'Draft (watermark shown)' : 'Final (no watermark)';
+  function findOriginalDownloadButton() {
+    const candidates = [];
+
+    const selectors = [
+      'button[id*="download"]',
+      'button[id*="pdf"]',
+      'a[id*="download"]',
+      'a[id*="pdf"]',
+      'button[data-action*="download"]',
+      'button[data-action*="pdf"]',
+      'a[data-action*="download"]',
+      'a[data-action*="pdf"]',
+      'button[data-testid*="download"]',
+      'a[data-testid*="download"]'
+    ];
+    selectors.forEach(s => document.querySelectorAll(s).forEach(el => candidates.push(el)));
+
+    const textRegex = /\b(download|export|save).*pdf|\bpdf.*(download|export|save)/i;
+    document.querySelectorAll('button, a, input[type="button"], input[type="submit"]').forEach(el => {
+      const txt = (el.textContent || el.value || '').trim();
+      if (textRegex.test(txt)) candidates.push(el);
+    });
+
+    document.querySelectorAll('[aria-label]').forEach(el => {
+      const al = el.getAttribute('aria-label') || '';
+      if (/\bdownload.*pdf|\bpdf.*download/i.test(al)) candidates.push(el);
+    });
+
+    return candidates.length > 0 ? candidates[0] : null;
+  }
+
+  function createDownloadButtons() {
+    const container = document.createElement('div');
+    container.id = BUTTONS_CONTAINER_ID;
+
+    const draftBtn = document.createElement('button');
+    draftBtn.id = DRAFT_BTN_ID;
+    draftBtn.type = 'button';
+    draftBtn.textContent = '📄 Download PDF (Draft)';
+    draftBtn.setAttribute('title', 'Download as Draft with watermark');
+    draftBtn.addEventListener('click', () => {
+      downloadPdf('draft');
+    });
+
+    const finalBtn = document.createElement('button');
+    finalBtn.id = FINAL_BTN_ID;
+    finalBtn.type = 'button';
+    finalBtn.textContent = '📄 Download PDF (Final)';
+    finalBtn.setAttribute('title', 'Download as Final without watermark');
+    finalBtn.addEventListener('click', () => {
+      downloadPdf('final');
+    });
+
+    container.appendChild(draftBtn);
+    container.appendChild(finalBtn);
+
+    return container;
+  }
+
+  function downloadPdf(mode) {
+    // Set watermark mode
     if (mode === 'draft') {
       document.body.classList.add('timetable-mode-draft');
     } else {
       document.body.classList.remove('timetable-mode-draft');
     }
-    ensureWatermark();
-    updateDownloadButtons(mode);
-    if (opts.persist) saveModeForSemester(mode);
-    window._timetableDownloadMode = mode;
+
+    // Try to find and trigger original download button
+    const originalBtn = findOriginalDownloadButton();
+    if (originalBtn) {
+      // Adjust filename if it's an anchor with download attribute
+      try {
+        if (originalBtn.tagName.toLowerCase() === 'a' && originalBtn.hasAttribute('download')) {
+          const cur = originalBtn.getAttribute('download') || '';
+          originalBtn.setAttribute('download', adjustedFilename(cur || undefined, mode));
+        }
+      } catch (e) {}
+
+      // Trigger click
+      originalBtn.click();
+
+      // Small delay before removing watermark if final
+      setTimeout(() => {
+        if (mode === 'final') {
+          document.body.classList.remove('timetable-mode-draft');
+        }
+      }, 500);
+    }
   }
 
-  function insertToggle() {
-    if (document.getElementById(MODE_TOGGLE_ID)) return true;
-    const toggle = createToggleElement();
-    document.body.appendChild(toggle);
-    const saved = loadModeForSemester();
-    setMode(saved, { persist: false });
-    return true;
+  function insertButtons() {
+    if (document.getElementById(BUTTONS_CONTAINER_ID)) return true;
+
+    const originalBtn = findOriginalDownloadButton();
+    if (!originalBtn) return false;
+
+    const buttonsContainer = createDownloadButtons();
+
+    try {
+      if (originalBtn.parentNode) {
+        originalBtn.parentNode.insertBefore(buttonsContainer, originalBtn.nextSibling);
+        // Hide original button
+        originalBtn.style.display = 'none';
+        return true;
+      }
+    } catch (e) {}
+
+    return false;
   }
 
   let observer = null;
@@ -324,94 +269,17 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     if (observer) return;
     const target = document.documentElement || document.body;
     observer = new MutationObserver(() => {
-      if (!document.getElementById(MODE_TOGGLE_ID)) {
-        insertToggle();
+      if (!document.getElementById(BUTTONS_CONTAINER_ID)) {
+        insertButtons();
       }
     });
     observer.observe(target, { childList: true, subtree: true });
   }
 
-  let lastSemester = getCurrentSemester();
-  function startSemesterPoll() {
-    setInterval(() => {
-      const cur = getCurrentSemester();
-      if (cur !== lastSemester) {
-        lastSemester = cur;
-        const saved = loadModeForSemester();
-        setMode(saved, { persist: false });
-      }
-    }, POLL_INTERVAL_MS);
-  }
-
-  function interceptDownloads() {
-    document.addEventListener('click', function (ev) {
-      try {
-        const mode = window._timetableDownloadMode || loadModeForSemester();
-        const path = ev.composedPath ? ev.composedPath() : (ev.path || []);
-        if ((!path || path.length === 0) && ev.target) path.push(ev.target);
-
-        for (const node of path) {
-          if (!node || !node.getAttribute) continue;
-          if (node.tagName && node.tagName.toLowerCase() === 'a' && node.hasAttribute('download')) {
-            const cur = node.getAttribute('download') || undefined;
-            node.setAttribute('download', adjustedFilename(cur, mode));
-          }
-        }
-      } catch (e) {}
-    }, true);
-
-    try {
-      if (typeof window.saveAs === 'function') {
-        const origSaveAs = window.saveAs;
-        window.saveAs = function (blob, filename, disableAutoBOM) {
-          try {
-            const mode = window._timetableDownloadMode || loadModeForSemester();
-            filename = adjustedFilename(filename, mode);
-          } catch (e) {}
-          return origSaveAs.call(this, blob, filename, disableAutoBOM);
-        };
-      }
-    } catch (e) {}
-
-    try {
-      if (window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.prototype && !window.jspdf.jsPDF.prototype._timetableWrappedSave) {
-        const proto = window.jspdf.jsPDF.prototype;
-        const orig = proto.save;
-        proto.save = function (filename, options) {
-          try {
-            const mode = window._timetableDownloadMode || loadModeForSemester();
-            filename = adjustedFilename(filename, mode);
-          } catch (e) {}
-          return orig.call(this, filename, options);
-        };
-        proto._timetableWrappedSave = true;
-      } else if (typeof window.jsPDF === 'function' && window.jsPDF.prototype && !window.jsPDF.prototype._timetableWrappedSave) {
-        const proto = window.jsPDF.prototype;
-        const orig = proto.save;
-        proto.save = function (filename, options) {
-          try {
-            const mode = window._timetableDownloadMode || loadModeForSemester();
-            filename = adjustedFilename(filename, mode);
-          } catch (e) {}
-          return orig.call(this, filename, options);
-        };
-        proto._timetableWrappedSave = true;
-      }
-    } catch (e) {}
-
-    window._getTimetableDownloadFilename = function (preferredName) {
-      return adjustedFilename(preferredName, window._timetableDownloadMode || loadModeForSemester());
-    };
-  }
-
   function init() {
     ensureWatermark();
-    insertToggle();
+    insertButtons();
     startHeaderObserver();
-    startSemesterPoll();
-    interceptDownloads();
-    const m = loadModeForSemester();
-    setMode(m, { persist: false });
   }
 
   if (document.readyState === 'loading') {
@@ -421,8 +289,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   }
 
   window._timetableDownloadModeAPI = {
-    setMode: (m, persist = true) => setMode(m === 'draft' ? 'draft' : 'final', { persist }),
-    getMode: () => window._timetableDownloadMode || loadModeForSemester(),
+    downloadPdf,
     adjustedFilename,
     getCurrentSemester
   };

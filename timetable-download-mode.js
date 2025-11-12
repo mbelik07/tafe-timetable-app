@@ -1,14 +1,14 @@
 // timetable-download-mode.js
-// Adds Draft and Final download buttons with watermark for Draft PDFs
-// Two separate buttons instead of toggle for cleaner UX
+// Adds Draft and Final download buttons with dropdown menus and watermark for Draft PDFs
 
 (function () {
   const STORAGE_KEY = 'timetable_download_mode_v1';
   const DRAFT_BTN_ID = 'downloadPdfDraftBtn';
   const FINAL_BTN_ID = 'downloadPdfFinalBtn';
+  const DRAFT_MENU_ID = 'downloadPdfDraftMenu';
+  const FINAL_MENU_ID = 'downloadPdfFinalMenu';
   const BUTTONS_CONTAINER_ID = 'downloadModeButtonsContainer';
   const WATERMARK_ID = 'timetableDraftWatermark';
-  const POLL_INTERVAL_MS = 800;
 
   // CSS
   const css = `
@@ -18,6 +18,13 @@
   gap: 8px !important;
   align-items: center !important;
   margin-left: 8px !important;
+  position: relative !important;
+}
+
+/* Button wrapper for positioning */
+.download-btn-wrapper {
+  position: relative !important;
+  display: inline-block !important;
 }
 
 /* Draft Download Button */
@@ -32,6 +39,9 @@
   cursor: pointer !important;
   transition: background 0.2s ease !important;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
 }
 
 #${DRAFT_BTN_ID}:hover {
@@ -54,6 +64,9 @@
   cursor: pointer !important;
   transition: background 0.2s ease !important;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
 }
 
 #${FINAL_BTN_ID}:hover {
@@ -62,6 +75,56 @@
 
 #${FINAL_BTN_ID}:active {
   background: #2f855a !important;
+}
+
+/* Dropdown menus */
+.download-menu {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  background: #fff !important;
+  border: 1px solid #cbd5e0 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  min-width: 200px !important;
+  z-index: 1001 !important;
+  display: none !important;
+  margin-top: 4px !important;
+}
+
+.download-menu.open {
+  display: block !important;
+}
+
+.download-menu-item {
+  padding: 10px 14px !important;
+  cursor: pointer !important;
+  border: none !important;
+  background: none !important;
+  width: 100% !important;
+  text-align: left !important;
+  font-size: 13px !important;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
+  color: #1a202c !important;
+  transition: background 0.15s ease !important;
+}
+
+.download-menu-item:hover {
+  background: #f7fafc !important;
+}
+
+.download-menu-item:first-child {
+  border-radius: 5px 5px 0 0 !important;
+}
+
+.download-menu-item:last-child {
+  border-radius: 0 0 5px 5px !important;
+}
+
+.download-menu-item-divider {
+  height: 1px !important;
+  background: #e2e8f0 !important;
+  margin: 4px 0 !important;
 }
 
 /* Watermark - visible on screen and in print/PDF */
@@ -116,17 +179,6 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   styleEl.setAttribute('data-name', 'timetable-download-mode-styles');
   styleEl.appendChild(document.createTextNode(css));
   document.head.appendChild(styleEl);
-
-  function safeJSONParse(s, fallback) {
-    try { return JSON.parse(s); } catch (e) { return fallback; }
-  }
-
-  function readStates() {
-    return safeJSONParse(localStorage.getItem(STORAGE_KEY) || '{}', {});
-  }
-  function writeStates(states) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(states)); } catch (e) {}
-  }
 
   function getCurrentSemester() {
     try {
@@ -196,34 +248,6 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     return candidates.length > 0 ? candidates[0] : null;
   }
 
-  function createDownloadButtons() {
-    const container = document.createElement('div');
-    container.id = BUTTONS_CONTAINER_ID;
-
-    const draftBtn = document.createElement('button');
-    draftBtn.id = DRAFT_BTN_ID;
-    draftBtn.type = 'button';
-    draftBtn.textContent = '📄 Download PDF (Draft)';
-    draftBtn.setAttribute('title', 'Download as Draft with watermark');
-    draftBtn.addEventListener('click', () => {
-      downloadPdf('draft');
-    });
-
-    const finalBtn = document.createElement('button');
-    finalBtn.id = FINAL_BTN_ID;
-    finalBtn.type = 'button';
-    finalBtn.textContent = '📄 Download PDF (Final)';
-    finalBtn.setAttribute('title', 'Download as Final without watermark');
-    finalBtn.addEventListener('click', () => {
-      downloadPdf('final');
-    });
-
-    container.appendChild(draftBtn);
-    container.appendChild(finalBtn);
-
-    return container;
-  }
-
   function downloadPdf(mode) {
     // Set watermark mode
     if (mode === 'draft') {
@@ -253,6 +277,110 @@ body.timetable-mode-draft #${WATERMARK_ID} {
         }
       }, 500);
     }
+
+    // Close menus
+    closeAllMenus();
+  }
+
+  function closeAllMenus() {
+    const menus = document.querySelectorAll('.download-menu');
+    menus.forEach(menu => menu.classList.remove('open'));
+  }
+
+  function toggleMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    if (menu) {
+      // Close other menus
+      document.querySelectorAll('.download-menu').forEach(m => {
+        if (m.id !== menuId) m.classList.remove('open');
+      });
+      menu.classList.toggle('open');
+    }
+  }
+
+  function createDownloadButtons() {
+    const container = document.createElement('div');
+    container.id = BUTTONS_CONTAINER_ID;
+
+    // Draft button wrapper
+    const draftWrapper = document.createElement('div');
+    draftWrapper.className = 'download-btn-wrapper';
+
+    const draftBtn = document.createElement('button');
+    draftBtn.id = DRAFT_BTN_ID;
+    draftBtn.type = 'button';
+    draftBtn.innerHTML = '📄 Download PDF (Draft) <span style="font-size: 10px;">▼</span>';
+    draftBtn.setAttribute('title', 'Download as Draft with watermark');
+    draftBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu(DRAFT_MENU_ID);
+    });
+
+    const draftMenu = document.createElement('div');
+    draftMenu.id = DRAFT_MENU_ID;
+    draftMenu.className = 'download-menu';
+
+    const draftOption1 = document.createElement('button');
+    draftOption1.className = 'download-menu-item';
+    draftOption1.textContent = 'Download as Draft (with watermark)';
+    draftOption1.addEventListener('click', () => downloadPdf('draft'));
+
+    const draftOption2 = document.createElement('button');
+    draftOption2.className = 'download-menu-item';
+    draftOption2.textContent = 'Download as Final (no watermark)';
+    draftOption2.addEventListener('click', () => downloadPdf('final'));
+
+    draftMenu.appendChild(draftOption1);
+    draftMenu.appendChild(draftOption2);
+
+    draftWrapper.appendChild(draftBtn);
+    draftWrapper.appendChild(draftMenu);
+
+    // Final button wrapper
+    const finalWrapper = document.createElement('div');
+    finalWrapper.className = 'download-btn-wrapper';
+
+    const finalBtn = document.createElement('button');
+    finalBtn.id = FINAL_BTN_ID;
+    finalBtn.type = 'button';
+    finalBtn.innerHTML = '📄 Download PDF (Final) <span style="font-size: 10px;">▼</span>';
+    finalBtn.setAttribute('title', 'Download as Final without watermark');
+    finalBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu(FINAL_MENU_ID);
+    });
+
+    const finalMenu = document.createElement('div');
+    finalMenu.id = FINAL_MENU_ID;
+    finalMenu.className = 'download-menu';
+
+    const finalOption1 = document.createElement('button');
+    finalOption1.className = 'download-menu-item';
+    finalOption1.textContent = 'Download as Final (no watermark)';
+    finalOption1.addEventListener('click', () => downloadPdf('final'));
+
+    const finalOption2 = document.createElement('button');
+    finalOption2.className = 'download-menu-item';
+    finalOption2.textContent = 'Download as Draft (with watermark)';
+    finalOption2.addEventListener('click', () => downloadPdf('draft'));
+
+    finalMenu.appendChild(finalOption1);
+    finalMenu.appendChild(finalOption2);
+
+    finalWrapper.appendChild(finalBtn);
+    finalWrapper.appendChild(finalMenu);
+
+    container.appendChild(draftWrapper);
+    container.appendChild(finalWrapper);
+
+    // Close menus when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!container.contains(e.target)) {
+        closeAllMenus();
+      }
+    });
+
+    return container;
   }
 
   function insertButtons() {

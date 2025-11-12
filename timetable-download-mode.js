@@ -1,6 +1,6 @@
 // timetable-download-mode.js
-// Adds Draft/Final mode UI, watermark for Draft, updates Download PDF button text/colors,
-// persists mode per-semester, and best-effort filename adjustments for downloads.
+// Adds Draft/Final mode UI with watermark for Draft PDFs
+// Persists mode per-semester and ensures watermark appears in PDF exports
 
 (function () {
   const STORAGE_KEY = 'timetable_download_mode_v1';
@@ -10,9 +10,9 @@
   const MODE_BUTTON_CLASS = 'timetable-download-mode-btn';
   const POLL_INTERVAL_MS = 800;
 
-  // CSS
+  // CSS with very high z-index to stay on top
   const css = `
-/* Mode toggle styles */
+/* Mode toggle styles - VERY HIGH Z-INDEX */
 #${MODE_TOGGLE_ID} {
   display:inline-flex;
   align-items:center;
@@ -22,7 +22,7 @@
   margin-left: 8px;
   margin-right: 8px;
   position: relative;
-  z-index: 10000;
+  z-index: 999999 !important;
 }
 #${MODE_TOGGLE_ID} .mode-checkbox {
   width: 42px;
@@ -35,7 +35,7 @@
   vertical-align: middle;
   border: none;
   padding: 0;
-  z-index: 10001;
+  z-index: 999999 !important;
 }
 #${MODE_TOGGLE_ID} .mode-checkbox .knob {
   width: 18px;
@@ -61,7 +61,7 @@
   min-width: 140px;
   font-weight: 600;
   color: #1a202c;
-  z-index: 10001;
+  z-index: 999999 !important;
 }
 
 /* Download button custom class */
@@ -76,7 +76,7 @@
   border-color: transparent !important;
 }
 
-/* Watermark */
+/* Watermark - visible on screen and in print/PDF */
 #${WATERMARK_ID} {
   pointer-events: none;
   user-select: none;
@@ -87,24 +87,27 @@
   font-size: 120px;
   font-weight: 900;
   color: rgba(180,180,180,0.14);
-  z-index: 99999;
+  z-index: 99998;
   white-space: nowrap;
   display: none;
+  font-family: Arial, sans-serif;
+  letter-spacing: 2px;
 }
 body.timetable-mode-draft #${WATERMARK_ID} {
-  display: block;
+  display: block !important;
 }
 
 @media print {
   #${WATERMARK_ID} {
     display: block !important;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%) rotate(-45deg);
     color: rgba(160,160,160,0.16);
     font-size: 140px;
-    z-index: 999999 !important;
+    z-index: 99998 !important;
+    page-break-inside: avoid;
   }
 }
 `;

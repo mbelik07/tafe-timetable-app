@@ -213,6 +213,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   function findOriginalDownloadButton() {
     const candidates = [];
 
+    // Try multiple selector strategies
     const selectors = [
       'button[id*="download"]',
       'button[id*="pdf"]',
@@ -223,67 +224,96 @@ body.timetable-mode-draft #${WATERMARK_ID} {
       'a[data-action*="download"]',
       'a[data-action*="pdf"]',
       'button[data-testid*="download"]',
-      'a[data-testid*="download"]'
+      'a[data-testid*="download"]',
+      'button[onclick*="download"]',
+      'button[onclick*="pdf"]'
     ];
-    selectors.forEach(s => document.querySelectorAll(s).forEach(el => candidates.push(el)));
+    selectors.forEach(s => {
+      try {
+        document.querySelectorAll(s).forEach(el => {
+          if (el.id !== DOWNLOAD_BTN_ID) candidates.push(el);
+        });
+      } catch (e) {}
+    });
 
+    // Text-based search
     const textRegex = /\b(download|export|save).*pdf|\bpdf.*(download|export|save)/i;
     document.querySelectorAll('button, a, input[type="button"], input[type="submit"]').forEach(el => {
       const txt = (el.textContent || el.value || '').trim();
-      if (textRegex.test(txt)) candidates.push(el);
+      if (textRegex.test(txt) && el.id !== DOWNLOAD_BTN_ID) candidates.push(el);
     });
 
+    // Aria-label search
     document.querySelectorAll('[aria-label]').forEach(el => {
       const al = el.getAttribute('aria-label') || '';
-      if (/\bdownload.*pdf|\bpdf.*download/i.test(al)) candidates.push(el);
+      if (/\bdownload.*pdf|\bpdf.*download/i.test(al) && el.id !== DOWNLOAD_BTN_ID) candidates.push(el);
     });
 
-    return candidates.length > 0 ? candidates[0] : null;
+    // Remove duplicates
+    const unique = Array.from(new Set(candidates));
+    console.log('Found download buttons:', unique.length, unique);
+    return unique.length > 0 ? unique[0] : null;
   }
 
   function downloadPdf(mode) {
-    console.log('Downloading PDF in', mode, 'mode');
+    console.log('=== Starting PDF download in', mode, 'mode ===');
     
     // Set watermark mode
     if (mode === 'draft') {
       document.body.classList.add('timetable-mode-draft');
+      console.log('Added draft watermark class');
     } else {
       document.body.classList.remove('timetable-mode-draft');
+      console.log('Removed draft watermark class');
     }
 
-    // Try to find and trigger original download button
-    const originalBtn = findOriginalDownloadButton();
-    console.log('Original button found:', originalBtn);
-    
-    if (originalBtn) {
-      // Adjust filename if it's an anchor with download attribute
-      try {
-        if (originalBtn.tagName.toLowerCase() === 'a' && originalBtn.hasAttribute('download')) {
-          const cur = originalBtn.getAttribute('download') || '';
-          const newFilename = adjustedFilename(cur || undefined, mode);
-          console.log('Setting download filename to:', newFilename);
-          originalBtn.setAttribute('download', newFilename);
+    // Give a moment for watermark to render
+    setTimeout(() => {
+      // Try to find and trigger original download button
+      const originalBtn = findOriginalDownloadButton();
+      console.log('Original button found:', originalBtn);
+      
+      if (originalBtn) {
+        // Adjust filename if it's an anchor with download attribute
+        try {
+          if (originalBtn.tagName.toLowerCase() === 'a' && originalBtn.hasAttribute('download')) {
+            const cur = originalBtn.getAttribute('download') || '';
+            const newFilename = adjustedFilename(cur || undefined, mode);
+            console.log('Setting download filename to:', newFilename);
+            originalBtn.setAttribute('download', newFilename);
+          }
+        } catch (e) {
+          console.error('Error adjusting filename:', e);
         }
-      } catch (e) {
-        console.error('Error adjusting filename:', e);
+
+        console.log('Clicking original button:', originalBtn.tagName, originalBtn.id, originalBtn.className);
+        // Trigger click with multiple methods to ensure it works
+        originalBtn.click();
+        
+        // Also try dispatchEvent as backup
+        try {
+          originalBtn.dispatchEvent(new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+          }));
+        } catch (e) {}
+
+        // Small delay before removing watermark if final
+        setTimeout(() => {
+          if (mode === 'final') {
+            document.body.classList.remove('timetable-mode-draft');
+            console.log('Removed draft watermark class after download');
+          }
+        }, 1000);
+      } else {
+        console.warn('Could not find original download button');
+        alert('Download button not found. Please try using the original Download PDF button.');
       }
 
-      console.log('Clicking original button');
-      // Trigger click
-      originalBtn.click();
-
-      // Small delay before removing watermark if final
-      setTimeout(() => {
-        if (mode === 'final') {
-          document.body.classList.remove('timetable-mode-draft');
-        }
-      }, 1000);
-    } else {
-      console.warn('Could not find original download button');
-    }
-
-    // Close menu
-    closeMenu();
+      // Close menu
+      closeMenu();
+    }, 100);
   }
 
   function closeMenu() {
@@ -380,6 +410,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
         originalBtn.parentNode.insertBefore(buttonContainer, originalBtn.nextSibling);
         // Hide original button
         originalBtn.style.display = 'none';
+        console.log('Successfully inserted new download button');
         return true;
       }
     } catch (e) {
@@ -402,7 +433,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   }
 
   function init() {
-    console.log('Initializing timetable download mode');
+    console.log('=== Initializing timetable download mode ===');
     ensureWatermark();
     insertButton();
     startHeaderObserver();
@@ -417,6 +448,7 @@ body.timetable-mode-draft #${WATERMARK_ID} {
   window._timetableDownloadModeAPI = {
     downloadPdf,
     adjustedFilename,
-    getCurrentSemester
+    getCurrentSemester,
+    findOriginalDownloadButton
   };
 })();

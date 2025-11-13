@@ -85,7 +85,7 @@
       
       // Method 2: Look for html2pdf
       if (typeof window.html2pdf === 'function') {
-        const element = document.body; // or specific timetable element
+        const element = document.body;
         window.html2pdf(element);
         return;
       }

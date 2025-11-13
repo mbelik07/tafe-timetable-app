@@ -1,8 +1,8 @@
 // timetable-download-mode.js
-// Simple Download PDF button - no draft/watermark functionality
+// Direct PDF download - no dialogs, no popups
 
 (function () {
-  console.log('Simple Download PDF button initialized');
+  console.log('Direct PDF download initialized');
 
   function findDownloadButton() {
     // Look for existing Download PDF button
@@ -15,12 +15,12 @@
     return null;
   }
 
-  function createSimpleDownloadButton() {
+  function createDirectDownloadButton() {
     // Check if button already exists
-    if (document.getElementById('simpleDownloadBtn')) return;
+    if (document.getElementById('directDownloadBtn')) return;
 
     const btn = document.createElement('button');
-    btn.id = 'simpleDownloadBtn';
+    btn.id = 'directDownloadBtn';
     btn.innerHTML = '📥 Download PDF';
     btn.style.cssText = `
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -50,57 +50,99 @@
     const originalBtn = findDownloadButton();
     if (originalBtn && originalBtn.parentNode) {
       originalBtn.parentNode.insertBefore(btn, originalBtn.nextSibling);
-      console.log('✓ Simple Download PDF button added');
+      console.log('✓ Direct Download PDF button added');
     } else {
       // If no original button found, add to top of page
       const header = document.querySelector('header, .header, nav, .navbar, .top-bar') || document.body;
       header.appendChild(btn);
-      console.log('✓ Simple Download PDF button added to header');
+      console.log('✓ Direct Download PDF button added to header');
     }
 
-    // Add click handler
-    btn.addEventListener('click', handleDownload);
+    // Add click handler - DIRECT download, no dialogs
+    btn.addEventListener('click', handleDirectDownload);
   }
 
-  function handleDownload(e) {
+  function handleDirectDownload(e) {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('Download PDF clicked');
+    console.log('Direct PDF download triggered');
     
-    // Find the original download button and click it
+    // Find the original download button and click it immediately
     const originalBtn = findDownloadButton();
     if (originalBtn) {
-      console.log('Clicking original download button');
+      console.log('Triggering original download');
       originalBtn.click();
     } else {
-      console.log('No original button found, triggering PDF generation');
-      // Try to trigger PDF generation directly
+      // Try alternative methods
+      console.log('Trying alternative PDF generation methods');
+      
+      // Method 1: Look for generatePdf function
       if (typeof window.generatePdf === 'function') {
         window.generatePdf();
-      } else if (typeof window.html2pdf === 'function') {
-        window.html2pdf();
-      } else {
-        console.log('PDF generation method not found');
-        alert('PDF download functionality not available');
+        return;
       }
+      
+      // Method 2: Look for html2pdf
+      if (typeof window.html2pdf === 'function') {
+        const element = document.body; // or specific timetable element
+        window.html2pdf(element);
+        return;
+      }
+      
+      // Method 3: Look for any PDF-related function
+      const pdfFunctions = ['generatePdf', 'downloadPdf', 'exportPdf', 'printPdf', 'createPdf'];
+      for (let funcName of pdfFunctions) {
+        if (typeof window[funcName] === 'function') {
+          console.log(`Found PDF function: ${funcName}`);
+          window[funcName]();
+          return;
+        }
+      }
+      
+      console.log('No PDF generation method found');
     }
   }
 
+  // Remove any existing modal/dialog elements
+  function removeExistingDialogs() {
+    // Remove any modal overlays
+    const modals = document.querySelectorAll('[id*="modal"], [class*="modal"], [id*="dialog"], [class*="dialog"]');
+    modals.forEach(modal => {
+      if (modal.style.display !== 'none') {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Remove any backdrop overlays
+    const backdrops = document.querySelectorAll('[class*="backdrop"], [class*="overlay"]');
+    backdrops.forEach(backdrop => {
+      if (backdrop.style.display !== 'none') {
+        backdrop.style.display = 'none';
+      }
+    });
+  }
+
   function init() {
-    console.log('Initializing simple Download PDF button...');
-    createSimpleDownloadButton();
+    console.log('Initializing direct PDF download (no dialogs)...');
     
-    // Watch for dynamically added buttons
+    // Remove any existing dialogs first
+    removeExistingDialogs();
+    
+    // Create the button
+    createDirectDownloadButton();
+    
+    // Watch for dynamically added dialogs and remove them
     const observer = new MutationObserver(() => {
-      if (!document.getElementById('simpleDownloadBtn')) {
-        createSimpleDownloadButton();
+      removeExistingDialogs();
+      if (!document.getElementById('directDownloadBtn')) {
+        createDirectDownloadButton();
       }
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
     
-    console.log('✓ Simple Download PDF button initialized');
+    console.log('✓ Direct PDF download initialized (no dialogs)');
   }
 
   if (document.readyState === 'loading') {

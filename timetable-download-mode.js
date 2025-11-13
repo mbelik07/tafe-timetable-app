@@ -1,29 +1,10 @@
 // timetable-download-mode.js
-// Adds Draft/Final toggle buttons and modifies PDF generation
+// Embeds watermark directly into PDF generation
 
 (function () {
-  const WATERMARK_ID = 'timetableDraftWatermark';
   const DRAFT_TOGGLE_ID = 'draftModeToggle';
   const STATUS_INDICATOR_ID = 'downloadStatusIndicator';
-  
   let isDraftMode = false;
-
-  // Create watermark
-  function createWatermark() {
-    if (document.getElementById(WATERMARK_ID)) return;
-    const watermark = document.createElement('div');
-    watermark.id = WATERMARK_ID;
-    watermark.style.cssText = `
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%) rotate(-45deg);
-      font-size: 120px; font-weight: 900;
-      color: rgba(180, 180, 180, 0.14);
-      z-index: 99998; white-space: nowrap;
-      pointer-events: none; user-select: none; display: none;
-    `;
-    watermark.textContent = 'DRAFT';
-    document.body.appendChild(watermark);
-  }
 
   // Create Draft/Final toggle buttons
   function createDraftToggle() {
@@ -38,6 +19,8 @@
       padding: 4px;
       margin: 0 10px;
       border: 1px solid #e2e8f0;
+      position: relative;
+      z-index: 1000;
     `;
 
     const draftBtn = document.createElement('button');
@@ -70,7 +53,6 @@
       transition: all 0.2s ease;
     `;
 
-    // Toggle functionality
     function setDraftMode(draft) {
       isDraftMode = draft;
       if (draft) {
@@ -80,8 +62,6 @@
         finalBtn.style.background = 'transparent';
         finalBtn.style.border = 'none';
         finalBtn.style.color = '#22543d';
-        document.body.classList.add('timetable-mode-draft');
-        document.getElementById(WATERMARK_ID).style.display = 'block';
       } else {
         finalBtn.style.background = '#fff';
         finalBtn.style.border = '1px solid #48bb78';
@@ -89,22 +69,18 @@
         draftBtn.style.background = 'transparent';
         draftBtn.style.border = 'none';
         draftBtn.style.color = '#c05621';
-        document.body.classList.remove('timetable-mode-draft');
-        document.getElementById(WATERMARK_ID).style.display = 'none';
       }
       updateStatusIndicator();
     }
 
     draftBtn.addEventListener('click', () => setDraftMode(true));
     finalBtn.addEventListener('click', () => setDraftMode(false));
-    
-    // Default to Final mode
     setDraftMode(false);
 
     container.appendChild(draftBtn);
     container.appendChild(finalBtn);
 
-    // Insert after the existing Download PDF button
+    // Insert after the Download PDF button
     const downloadBtn = document.querySelector('button');
     if (downloadBtn && downloadBtn.parentNode) {
       downloadBtn.parentNode.insertBefore(container, downloadBtn.nextSibling);
@@ -149,70 +125,174 @@
     }
   }
 
-  // Modify the PDF generation function
+  // Add watermark to PDF content
+  function addWatermarkToPdfContent() {
+    if (!isDraftMode) return;
+
+    // Create a temporary watermark element for PDF
+    const watermarkDiv = document.createElement('div');
+    watermarkDiv.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 100px;
+      font-weight: 900;
+      color: rgba(160, 160, 160, 0.2);
+      z-index: 99999;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      width: 100%;
+      text-align: center;
+    `;
+    watermarkDiv.textContent = 'DRAFT';
+
+    // Add to document body temporarily
+    document.body.appendChild(watermarkDiv);
+    
+    // Return the element so it can be removed after PDF generation
+    return watermarkDiv;
+  }
+
+  // Modify PDF generation to include watermark
   function modifyPdfGeneration() {
-    // Check if generatePdf function exists
+    // Check for html2pdf or similar PDF generation
+    if (typeof window.html2pdf !== 'undefined') {
+      const originalHtml2pdf = window.html2pdf;
+      
+      window.html2pdf = function(element, options = {}) {
+        console.log('PDF generation detected, mode:', isDraftMode ? 'DRAFT' : 'FINAL');
+        
+        // Add watermark to options if in draft mode
+        if (isDraftMode) {
+          // Add watermark to the element before conversion
+          const watermark = addWatermarkToPdfContent();
+          
+          // Modify options to include watermark
+          if (!options.jsPDF) options.jsPDF = {};
+          if (!options.jsPDF.format) options.jsPDF.format = 'a4';
+          if (!options.jsPDF.orientation) options.jsPDF.orientation = 'portrait';
+          
+          // Add custom callback to handle watermark
+          const originalCallback = options.callback;
+          options.callback = function(pdf) {
+            // Remove temporary watermark
+            if (watermark && watermark.parentNode) {
+              watermark.parentNode.removeChild(watermark);
+            }
+            
+            if (originalCallback) {
+              originalCallback(pdf);
+            }
+          };
+        }
+        
+        return originalHtml2pdf.call(this, element, options);
+      };
+    }
+
+    // Also check for direct jsPDF usage
+    if (typeof window.jsPDF !== 'undefined') {
+      const originalJsPDF = window.jsPDF;
+      
+      window.jsPDF = function(options = {}) {
+        const doc = new originalJsPDF(options);
+        
+        // Override addPage to add watermark
+        const originalAddPage = doc.addPage;
+        doc.addPage = function() {
+          const result = originalAddPage.apply(this, arguments);
+          
+          if (isDraftMode) {
+            // Add watermark to each page
+            this.setFontSize(100);
+            this.setTextColor(200, 200, 200);
+            this.setFont(undefined, 'bold');
+            this.text('DRAFT', this.internal.pageSize.width / 2, this.internal.pageSize.height / 2, {
+              align: 'center',
+              angle: -45,
+              opacity: 0.2
+            });
+            this.setTextColor(0, 0, 0);
+          }
+          
+          return result;
+        };
+        
+        return doc;
+      };
+    }
+
+    // Check for generatePdf function
     if (typeof window.generatePdf === 'function') {
       const originalGeneratePdf = window.generatePdf;
       
       window.generatePdf = function() {
         console.log('PDF generation started, mode:', isDraftMode ? 'DRAFT' : 'FINAL');
         
-        // Set watermark based on mode
+        // Add watermark before generation
+        let watermarkElement = null;
         if (isDraftMode) {
-          document.body.classList.add('timetable-mode-draft');
-          document.getElementById(WATERMARK_ID).style.display = 'block';
-        } else {
-          document.body.classList.remove('timetable-mode-draft');
-          document.getElementById(WATERMARK_ID).style.display = 'none';
+          watermarkElement = addWatermarkToPdfContent();
         }
         
-        // Call original function
-        const result = originalGeneratePdf.apply(this, arguments);
-        
-        // Update filename if possible
-        setTimeout(() => {
-          updatePdfFilename();
-        }, 100);
-        
-        return result;
+        try {
+          const result = originalGeneratePdf.apply(this, arguments);
+          
+          // Clean up watermark after generation
+          if (watermarkElement && watermarkElement.parentNode) {
+            watermarkElement.parentNode.removeChild(watermarkElement);
+          }
+          
+          return result;
+        } catch (error) {
+          // Clean up even on error
+          if (watermarkElement && watermarkElement.parentNode) {
+            watermarkElement.parentNode.removeChild(watermarkElement);
+          }
+          throw error;
+        }
       };
-      
-      console.log('✓ PDF generation function modified');
-    } else {
-      console.log('generatePdf function not found, watching for it...');
-      
-      // Watch for the function to be created
-      const checkInterval = setInterval(() => {
-        if (typeof window.generatePdf === 'function') {
-          clearInterval(checkInterval);
-          modifyPdfGeneration();
-        }
-      }, 500);
     }
   }
 
-  function updatePdfFilename() {
-    // Try to modify the filename if possible
-    // This depends on how your PDF generation works
-    const semester = window.db?.currentSemester || 'Semester';
-    const college = window.db?.semesters?.[semester]?.currentCollege || 'Timetable';
-    const mode = isDraftMode ? 'DRAFT' : 'FINAL';
-    
-    // The filename will be handled by your PDF generation
-    console.log(`PDF filename should include: ${mode}_${semester}_${college}`);
+  // Add CSS for print media to ensure watermark appears
+  function addPrintStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+      @media print {
+        .draft-watermark {
+          position: fixed !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) rotate(-45deg) !important;
+          font-size: 140px !important;
+          font-weight: 900 !important;
+          color: rgba(160, 160, 160, 0.2) !important;
+          z-index: 99999 !important;
+          white-space: nowrap !important;
+          pointer-events: none !important;
+          user-select: none !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   function init() {
-    console.log('Initializing download mode...');
-    createWatermark();
+    console.log('Initializing download mode with PDF watermark...');
     createDraftToggle();
     createStatusIndicator();
-    modifyPdfGeneration();
+    addPrintStyles();
     
-    console.log('✓ Download mode initialized');
-    console.log('✓ Draft/Final toggle buttons added');
-    console.log('✓ PDF generation function modified');
+    // Wait a bit for other scripts to load, then modify PDF generation
+    setTimeout(() => {
+      modifyPdfGeneration();
+      console.log('✓ PDF generation modified for watermark support');
+    }, 1000);
+    
+    console.log('✓ Download mode initialized with PDF watermark');
   }
 
   if (document.readyState === 'loading') {

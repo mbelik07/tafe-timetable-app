@@ -1,7 +1,4 @@
-// timetable-download-mode.js
-// Adds single Download PDF button with dropdown for Draft/Final options
-// Intercepts the actual download mechanism
-
+// timetable-download-mode.js - COMPLETE CORRECTED VERSION
 (function () {
   const STORAGE_KEY = 'timetable_download_mode_v1';
   const DOWNLOAD_BTN_ID = 'downloadPdfMainBtn';
@@ -9,18 +6,15 @@
   const BUTTONS_CONTAINER_ID = 'downloadModeButtonsContainer';
   const WATERMARK_ID = 'timetableDraftWatermark';
 
-  // Store current mode globally
   let currentDownloadMode = 'final';
 
-  // CSS - matches Semester/View button styling
   const css = `
-/* Container for download button */
 #${BUTTONS_CONTAINER_ID} {
   display: inline-block !important;
   position: relative !important;
+  margin: 0 8px !important;
 }
 
-/* Main Download PDF Button - matches Semester/View styling */
 #${DOWNLOAD_BTN_ID} {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: #fff !important;
@@ -44,11 +38,6 @@
   transform: translateY(-1px) !important;
 }
 
-#${DOWNLOAD_BTN_ID}:active {
-  transform: translateY(0) !important;
-}
-
-/* Dropdown menu - matches existing menu styling */
 #${DOWNLOAD_MENU_ID} {
   position: absolute !important;
   top: 100% !important;
@@ -58,7 +47,7 @@
   border-radius: 8px !important;
   box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
   min-width: 240px !important;
-  z-index: 1001 !important;
+  z-index: 10000 !important;
   display: none !important;
   margin-top: 8px !important;
   overflow: hidden !important;
@@ -123,7 +112,6 @@
   font-weight: 400 !important;
 }
 
-/* Watermark - visible on screen and in print/PDF */
 #${WATERMARK_ID} {
   pointer-events: none !important;
   user-select: none !important;
@@ -143,17 +131,6 @@
 
 body.timetable-mode-draft #${WATERMARK_ID} {
   display: block !important;
-}
-
-/* Ensure dropdown menus appear ABOVE session boxes */
-[role="menu"],
-[role="listbox"],
-.dropdown,
-[class*="dropdown"],
-[class*="menu"],
-[class*="popover"],
-[class*="popup"] {
-  z-index: 1000 !important;
 }
 
 @media print {
@@ -211,12 +188,9 @@ body.timetable-mode-draft #${WATERMARK_ID} {
 
   function adjustedFilename(originalFilename, mode) {
     const sem = getCurrentSemester() || 'semester';
-    
-    // Try to get course and teacher information
     const semesterData = getCurrentSemesterData();
-    
-    // Get current view and additional context
     const currentView = window.currentView || 'main-timetable';
+    
     const viewLabels = {
       'main-timetable': 'Main Timetable',
       'staff-summary': 'Staff Summary',
@@ -226,24 +200,26 @@ body.timetable-mode-draft #${WATERMARK_ID} {
       'tasks': 'Tasks'
     };
 
-    // Determine course and teacher info based on current view
     let courseInfo = '';
     let teacherInfo = '';
 
     if (currentView === 'course-print') {
       const courseCode = document.querySelector('[data-course-code].active')?.dataset.courseCode;
-      const course = semesterData.courses.find(c => c.Code === courseCode);
-      courseInfo = course ? `${course.Code} - ${course.Name}` : '';
+      const course = semesterData.courses && semesterData.courses.find(c => c.Code === courseCode);
+      courseInfo = course ? `${course.Code}` : '';
     }
 
     if (currentView === 'teacher-print') {
       const teacherInitials = document.querySelector('[data-teacher-initials].active')?.dataset.teacherInitials;
-      const teacher = semesterData.teachers.find(t => t.Initials === teacherInitials);
-      teacherInfo = teacher ? `${teacher.Name} ${teacher.Surname}` : '';
+      const teacher = semesterData.teachers && semesterData.teachers.find(t => t.Initials === teacherInitials);
+      teacherInfo = teacher ? `${teacher.Name}_${teacher.Surname}` : '';
     }
 
-    // Construct filename
-    let name = `${window.db.currentSemester} - ${semesterData.currentCollege}`;
+    let name = `${window.db && window.db.currentSemester ? window.db.currentSemester : sem}`;
+    
+    if (semesterData.currentCollege) {
+      name += ` - ${semesterData.currentCollege}`;
+    }
     
     if (courseInfo) {
       name += ` - ${courseInfo}`;
@@ -255,111 +231,42 @@ body.timetable-mode-draft #${WATERMARK_ID} {
     
     name += ` - ${viewLabels[currentView]}`;
 
-    // Conditionally add "Draft" only when in draft mode
     if (mode === 'draft') {
-      name = `Draft - ${name}`;
+      name = `DRAFT - ${name}`;
+    } else {
+      name = `FINAL - ${name}`;
     }
 
-    // Ensure .pdf extension and sanitize filename
-    name = name.replace(/[^a-z0-9.-]/gi, '_') + '.pdf';
-
+    name = name.replace(/[^a-z0-9._-]/gi, '_') + '.pdf';
     return name;
   }
 
   function findOriginalDownloadButton() {
     const candidates = [];
-
-    // Try multiple selector strategies
     const selectors = [
+      'button[id*="print"]',
       'button[id*="download"]',
       'button[id*="pdf"]',
-      'a[id*="download"]',
-      'a[id*="pdf"]',
-      'button[data-action*="download"]',
-      'button[data-action*="pdf"]',
-      'a[data-action*="download"]',
-      'a[data-action*="pdf"]',
-      'button[data-testid*="download"]',
-      'a[data-testid*="download"]',
-      'button[onclick*="download"]',
-      'button[onclick*="pdf"]'
+      'button:contains("PDF")',
+      'button:contains("Download")',
+      'button:contains("Print")'
     ];
-    selectors.forEach(s => {
-      try {
-        document.querySelectorAll(s).forEach(el => {
-          if (el.id !== DOWNLOAD_BTN_ID) candidates.push(el);
-        });
-      } catch (e) {}
+
+    document.querySelectorAll('button').forEach(btn => {
+      const text = btn.textContent.toLowerCase();
+      if ((text.includes('pdf') || text.includes('download') || text.includes('print')) && btn.id !== DOWNLOAD_BTN_ID) {
+        candidates.push(btn);
+      }
     });
 
-    // Text-based search
-    const textRegex = /\b(download|export|save).*pdf|\bpdf.*(download|export|save)/i;
-    document.querySelectorAll('button, a, input[type="button"], input[type="submit"]').forEach(el => {
-      const txt = (el.textContent || el.value || '').trim();
-      if (textRegex.test(txt) && el.id !== DOWNLOAD_BTN_ID) candidates.push(el);
-    });
-
-    // Aria-label search
-    document.querySelectorAll('[aria-label]').forEach(el => {
-      const al = el.getAttribute('aria-label') || '';
-      if (/\bdownload.*pdf|\bpdf.*download/i.test(al) && el.id !== DOWNLOAD_BTN_ID) candidates.push(el);
-    });
-
-    // Remove duplicates
     const unique = Array.from(new Set(candidates));
     return unique.length > 0 ? unique[0] : null;
-  }
-
-  function setupDownloadInterception() {
-    // Intercept window.open for PDF downloads
-    const originalOpen = window.open;
-    window.open = function(url, target, features) {
-      console.log('window.open called with:', url);
-      if (url && url.includes('pdf')) {
-        // Modify URL if needed
-        if (currentDownloadMode === 'draft') {
-          document.body.classList.add('timetable-mode-draft');
-        } else {
-          document.body.classList.remove('timetable-mode-draft');
-        }
-      }
-      return originalOpen.apply(this, arguments);
-    };
-
-    // Intercept fetch for PDF downloads
-    const originalFetch = window.fetch;
-    window.fetch = function(resource, config) {
-      console.log('fetch called with:', resource);
-      if (typeof resource === 'string' && resource.includes('pdf')) {
-        if (currentDownloadMode === 'draft') {
-          document.body.classList.add('timetable-mode-draft');
-        } else {
-          document.body.classList.remove('timetable-mode-draft');
-        }
-      }
-      return originalFetch.apply(this, arguments);
-    };
-
-    // Intercept XMLHttpRequest
-    const originalOpen_xhr = XMLHttpRequest.prototype.open;
-n    XMLHttpRequest.prototype.open = function(method, url) {
-      console.log('XMLHttpRequest.open called with:', method, url);
-      if (typeof url === 'string' && url.includes('pdf')) {
-        if (currentDownloadMode === 'draft') {
-          document.body.classList.add('timetable-mode-draft');
-        } else {
-          document.body.classList.remove('timetable-mode-draft');
-        }
-      }
-      return originalOpen_xhr.apply(this, arguments);
-    };
   }
 
   function downloadPdf(mode) {
     console.log('=== Download PDF triggered:', mode, '===');
     currentDownloadMode = mode;
 
-    // Set watermark mode
     if (mode === 'draft') {
       document.body.classList.add('timetable-mode-draft');
       console.log('Added draft watermark');
@@ -368,18 +275,19 @@ n    XMLHttpRequest.prototype.open = function(method, url) {
       console.log('Removed draft watermark');
     }
 
-    // Find and click the original button
     const originalBtn = findOriginalDownloadButton();
     console.log('Original button found:', originalBtn);
     
     if (originalBtn) {
       console.log('Clicking button:', originalBtn.tagName, originalBtn.textContent);
-      originalBtn.click();
-n    } else {
+      setTimeout(() => {
+        originalBtn.click();
+      }, 100);
+    } else {
       console.warn('Original download button not found');
+      alert('Could not find the PDF download button. Please try again.');
     }
 
-    // Close menu
     closeMenu();
   }
 
@@ -413,14 +321,13 @@ n    } else {
     menu.id = DOWNLOAD_MENU_ID;
     menu.className = 'download-menu';
 
-    // Draft option
     const draftOption = document.createElement('button');
     draftOption.className = 'download-menu-item draft';
     draftOption.innerHTML = `
       <span class="menu-item-icon">📋</span>
       <div class="menu-item-text">
         <div>Download as Draft</div>
-        <div class="menu-item-label">with watermark</div>
+        <div class="menu-item-label">with DRAFT watermark</div>
       </div>
     `;
     draftOption.addEventListener('click', (e) => {
@@ -429,7 +336,6 @@ n    } else {
       downloadPdf('draft');
     });
 
-    // Final option
     const finalOption = document.createElement('button');
     finalOption.className = 'download-menu-item final';
     finalOption.innerHTML = `
@@ -447,11 +353,9 @@ n    } else {
 
     menu.appendChild(draftOption);
     menu.appendChild(finalOption);
-
     container.appendChild(btn);
     container.appendChild(menu);
 
-    // Close menu when clicking outside
     document.addEventListener('click', (e) => {
       if (!container.contains(e.target)) {
         closeMenu();
@@ -474,8 +378,7 @@ n    } else {
 
     try {
       if (originalBtn.parentNode) {
-        originalBtn.parentNode.insertBefore(buttonContainer, originalBtn.nextSibling);
-        // Hide original button
+        originalBtn.parentNode.insertBefore(buttonContainer, originalBtn);
         originalBtn.style.display = 'none';
         console.log('Successfully inserted new download button');
         return true;
@@ -502,7 +405,6 @@ n    } else {
   function init() {
     console.log('=== Initializing timetable download mode ===');
     ensureWatermark();
-    setupDownloadInterception();
     insertButton();
     startHeaderObserver();
   }

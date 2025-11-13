@@ -1,309 +1,146 @@
 // timetable-download-mode.js
-// Adds single Download PDF button with dropdown for Draft/Final options
+// Simple Draft/Final selector for PDF downloads
 
 (function () {
-  const DOWNLOAD_BTN_ID = 'downloadPdfMainBtn';
-  const DOWNLOAD_MENU_ID = 'downloadPdfMenu';
-  const BUTTONS_CONTAINER_ID = 'downloadModeButtonsContainer';
   const WATERMARK_ID = 'timetableDraftWatermark';
+  const MODAL_ID = 'downloadModeModal';
+  let currentMode = 'final';
+  let lastClickedButton = null;
 
-  let currentDownloadMode = 'final';
-
-  const css = `
-#${BUTTONS_CONTAINER_ID} {
-  display: inline-block !important;
-  position: relative !important;
-  margin: 0 5px !important;
-}
-
-#${DOWNLOAD_BTN_ID} {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  color: #fff !important;
-  border: none !important;
-  padding: 8px 16px !important;
-  border-radius: 6px !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-  z-index: 1000 !important;
-}
-
-#${DOWNLOAD_BTN_ID}:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #6a3a8f 100%) !important;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
-  transform: translateY(-1px) !important;
-}
-
-#${DOWNLOAD_MENU_ID} {
-  position: absolute !important;
-  top: 100% !important;
-  right: 0 !important;
-  background: #fff !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 8px !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
-  min-width: 240px !important;
-  z-index: 10001 !important;
-  display: none !important;
-  margin-top: 8px !important;
-  overflow: hidden !important;
-}
-
-#${DOWNLOAD_MENU_ID}.open {
-  display: block !important;
-}
-
-.download-menu-item {
-  padding: 14px 16px !important;
-  cursor: pointer !important;
-  border: none !important;
-  background: none !important;
-  width: 100% !important;
-  text-align: left !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  transition: all 0.15s ease !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  border-left: 4px solid transparent !important;
-}
-
-.download-menu-item:hover {
-  background: #f8f9fa !important;
-}
-
-.download-menu-item.draft {
-  color: #c05621 !important;
-  border-left-color: #f6ad55 !important;
-}
-
-.download-menu-item.draft:hover {
-  background: #fffaf0 !important;
-}
-
-.download-menu-item.final {
-  color: #22543d !important;
-  border-left-color: #48bb78 !important;
-}
-
-.download-menu-item.final:hover {
-  background: #f0fff4 !important;
-}
-
-.menu-item-icon {
-  font-size: 18px !important;
-  min-width: 24px !important;
-}
-
-.menu-item-text {
-  flex: 1 !important;
-}
-
-.menu-item-label {
-  font-size: 12px !important;
-  opacity: 0.65 !important;
-  margin-top: 2px !important;
-  font-weight: 400 !important;
-}
-
-#${WATERMARK_ID} {
-  pointer-events: none !important;
-  user-select: none !important;
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%,-50%) rotate(-45deg) !important;
-  font-size: 120px !important;
-  font-weight: 900 !important;
-  color: rgba(180,180,180,0.14) !important;
-  z-index: 99998 !important;
-  white-space: nowrap !important;
-  display: none !important;
-}
-
-body.timetable-mode-draft #${WATERMARK_ID} {
-  display: block !important;
-}
-
-@media print {
-  #${WATERMARK_ID} {
-    display: block !important;
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%,-50%) rotate(-45deg) !important;
-    color: rgba(160,160,160,0.16) !important;
-    font-size: 140px !important;
-    z-index: 99998 !important;
-  }
-}
-`;
-
-  const styleEl = document.createElement('style');
-  styleEl.setAttribute('data-name', 'timetable-download-mode-styles');
-  styleEl.appendChild(document.createTextNode(css));
-  document.head.appendChild(styleEl);
-
-  function ensureWatermark() {
-    let wm = document.getElementById(WATERMARK_ID);
-    if (!wm) {
-      wm = document.createElement('div');
-      wm.id = WATERMARK_ID;
-      wm.setAttribute('aria-hidden', 'true');
-      wm.textContent = 'DRAFT';
-      document.body.appendChild(wm);
-    }
-    return wm;
+  // Create watermark
+  function createWatermark() {
+    if (document.getElementById(WATERMARK_ID)) return;
+    const watermark = document.createElement('div');
+    watermark.id = WATERMARK_ID;
+    watermark.style.cssText = `
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 120px; font-weight: 900;
+      color: rgba(180, 180, 180, 0.14);
+      z-index: 99998; white-space: nowrap;
+      pointer-events: none; user-select: none; display: none;
+    `;
+    watermark.textContent = 'DRAFT';
+    document.body.appendChild(watermark);
   }
 
-  function findOriginalDownloadButton() {
-    // Look for button with "Download PDF" text
-    const buttons = document.querySelectorAll('button');
-    for (let btn of buttons) {
-      if (btn.textContent.includes('Download') && btn.textContent.includes('PDF')) {
-        if (btn.id !== DOWNLOAD_BTN_ID) {
-          return btn;
-        }
-      }
-    }
-    
-    // Look for any button with download-related attributes
-    const downloadBtn = document.querySelector('[data-action*="download"], [onclick*="download"], [onclick*="pdf"]');
-    if (downloadBtn && downloadBtn.id !== DOWNLOAD_BTN_ID) {
-      return downloadBtn;
-    }
-    
-    return null;
-  }
+  // Create modal
+  function createModal() {
+    if (document.getElementById(MODAL_ID)) return;
 
-  function downloadPdf(mode) {
-    console.log('Download triggered:', mode);
-    currentDownloadMode = mode;
+    const modal = document.createElement('div');
+    modal.id = MODAL_ID;
+    modal.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5); display: none; z-index: 10000;
+      align-items: center; justify-content: center;
+    `;
 
-    if (mode === 'draft') {
+    const content = document.createElement('div');
+    content.style.cssText = `
+      background: white; border-radius: 12px; padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center; min-width: 450px;
+    `;
+
+    content.innerHTML = `
+      <h2 style="margin: 0 0 15px 0; color: #333; font-size: 22px; font-weight: 700;">Download PDF</h2>
+      <p style="margin: 0 0 35px 0; color: #666; font-size: 15px;">Select download format:</p>
+      
+      <div style="display: flex; gap: 20px; justify-content: center;">
+        <button id="draftBtn" style="
+          background: linear-gradient(135deg, #f6ad55 0%, #c05621 100%);
+          color: white; border: none; padding: 14px 28px;
+          border-radius: 8px; font-size: 15px; font-weight: 600;
+          cursor: pointer; transition: all 0.2s;
+          box-shadow: 0 4px 12px rgba(192, 86, 33, 0.3);
+        " onmouseover="this.style.boxShadow='0 6px 16px rgba(192, 86, 33, 0.4)'" onmouseout="this.style.boxShadow='0 4px 12px rgba(192, 86, 33, 0.3)'">
+          📋 Draft (with watermark)
+        </button>
+        
+        <button id="finalBtn" style="
+          background: linear-gradient(135deg, #48bb78 0%, #22543d 100%);
+          color: white; border: none; padding: 14px 28px;
+          border-radius: 8px; font-size: 15px; font-weight: 600;
+          cursor: pointer; transition: all 0.2s;
+          box-shadow: 0 4px 12px rgba(34, 84, 61, 0.3);
+        " onmouseover="this.style.boxShadow='0 6px 16px rgba(34, 84, 61, 0.4)'" onmouseout="this.style.boxShadow='0 4px 12px rgba(34, 84, 61, 0.3)'">
+          ✓ Final (no watermark)
+        </button>
+      </div>
+    `;
+
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+
+    document.getElementById('draftBtn').addEventListener('click', () => {
+      currentMode = 'draft';
       document.body.classList.add('timetable-mode-draft');
-    } else {
-      document.body.classList.remove('timetable-mode-draft');
-    }
-
-    const originalBtn = findOriginalDownloadButton();
-    if (originalBtn) {
-      console.log('Clicking original button');
-      originalBtn.click();
-    } else {
-      console.warn('Original download button not found');
-    }
-
-    closeMenu();
-  }
-
-  function closeMenu() {
-    const menu = document.getElementById(DOWNLOAD_MENU_ID);
-    if (menu) menu.classList.remove('open');
-  }
-
-  function toggleMenu() {
-    const menu = document.getElementById(DOWNLOAD_MENU_ID);
-    if (menu) {
-      menu.classList.toggle('open');
-    }
-  }
-
-  function createDownloadButton() {
-    const container = document.createElement('div');
-    container.id = BUTTONS_CONTAINER_ID;
-
-    const btn = document.createElement('button');
-    btn.id = DOWNLOAD_BTN_ID;
-    btn.type = 'button';
-    btn.innerHTML = '📥 Download PDF <span style="font-size: 12px; margin-left: 4px;">▼</span>';
-    btn.setAttribute('title', 'Download PDF as Draft or Final');
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      toggleMenu();
-    });
-
-    const menu = document.createElement('div');
-    menu.id = DOWNLOAD_MENU_ID;
-
-    const draftOption = document.createElement('button');
-    draftOption.className = 'download-menu-item draft';
-    draftOption.innerHTML = `
-      <span class="menu-item-icon">📋</span>
-      <div class="menu-item-text">
-        <div>Download as Draft</div>
-        <div class="menu-item-label">with watermark</div>
-      </div>
-    `;
-    draftOption.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      downloadPdf('draft');
-    });
-
-    const finalOption = document.createElement('button');
-    finalOption.className = 'download-menu-item final';
-    finalOption.innerHTML = `
-      <span class="menu-item-icon">✓</span>
-      <div class="menu-item-text">
-        <div>Download as Final</div>
-        <div class="menu-item-label">no watermark</div>
-      </div>
-    `;
-    finalOption.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      downloadPdf('final');
-    });
-
-    menu.appendChild(draftOption);
-    menu.appendChild(finalOption);
-    container.appendChild(btn);
-    container.appendChild(menu);
-
-    document.addEventListener('click', (e) => {
-      if (!container.contains(e.target)) {
-        closeMenu();
+      document.getElementById(WATERMARK_ID).style.display = 'block';
+      closeModal();
+      if (lastClickedButton) {
+        setTimeout(() => lastClickedButton.click(), 50);
       }
-    }, true);
+    });
 
-    return container;
+    document.getElementById('finalBtn').addEventListener('click', () => {
+      currentMode = 'final';
+      document.body.classList.remove('timetable-mode-draft');
+      document.getElementById(WATERMARK_ID).style.display = 'none';
+      closeModal();
+      if (lastClickedButton) {
+        setTimeout(() => lastClickedButton.click(), 50);
+      }
+    });
   }
 
-  function insertButton() {
-    if (document.getElementById(BUTTONS_CONTAINER_ID)) return true;
+  function showModal() {
+    document.getElementById(MODAL_ID).style.display = 'flex';
+  }
 
-    const originalBtn = findOriginalDownloadButton();
-    if (!originalBtn) {
-      console.warn('Original download button not found yet');
-      return false;
+  function closeModal() {
+    document.getElementById(MODAL_ID).style.display = 'none';
+  }
+
+  function interceptDownloadButton() {
+    // Find button by looking for "Download" text
+    const allButtons = document.querySelectorAll('button');
+    
+    for (let btn of allButtons) {
+      const text = btn.textContent.trim();
+      if (text.includes('Download') && text.includes('PDF')) {
+        // Store original onclick
+        const originalOnClick = btn.onclick;
+        
+        // Replace with our handler
+        btn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          lastClickedButton = btn;
+          showModal();
+          return false;
+        };
+        
+        console.log('✓ Download button intercepted:', text);
+        return;
+      }
     }
-
-    const buttonContainer = createDownloadButton();
-    originalBtn.parentNode.insertBefore(buttonContainer, originalBtn.nextSibling);
-    originalBtn.style.display = 'none';
-    console.log('Download button inserted successfully');
-    return true;
   }
 
   function init() {
-    console.log('Initializing download mode');
-    ensureWatermark();
-    
-    // Try to insert button immediately
-    if (!insertButton()) {
-      // If not found, wait for DOM to be ready
-      setTimeout(() => {
-        insertButton();
-      }, 500);
-    }
+    console.log('Initializing download mode...');
+    createWatermark();
+    createModal();
+    interceptDownloadButton();
+
+    // Watch for new buttons
+    const observer = new MutationObserver(() => {
+      if (!lastClickedButton) {
+        interceptDownloadButton();
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
   if (document.readyState === 'loading') {

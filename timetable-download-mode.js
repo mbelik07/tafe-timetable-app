@@ -1,11 +1,12 @@
 // timetable-download-mode.js
-// Simple Draft/Final selector for PDF downloads
+// Adds Draft/Final toggle buttons and modifies PDF generation
 
 (function () {
   const WATERMARK_ID = 'timetableDraftWatermark';
-  const MODAL_ID = 'downloadModeModal';
-  let currentMode = 'final';
-  let lastClickedButton = null;
+  const DRAFT_TOGGLE_ID = 'draftModeToggle';
+  const STATUS_INDICATOR_ID = 'downloadStatusIndicator';
+  
+  let isDraftMode = false;
 
   // Create watermark
   function createWatermark() {
@@ -24,123 +25,194 @@
     document.body.appendChild(watermark);
   }
 
-  // Create modal
-  function createModal() {
-    if (document.getElementById(MODAL_ID)) return;
+  // Create Draft/Final toggle buttons
+  function createDraftToggle() {
+    if (document.getElementById(DRAFT_TOGGLE_ID)) return;
 
-    const modal = document.createElement('div');
-    modal.id = MODAL_ID;
-    modal.style.cssText = `
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5); display: none; z-index: 10000;
-      align-items: center; justify-content: center;
+    const container = document.createElement('div');
+    container.id = DRAFT_TOGGLE_ID;
+    container.style.cssText = `
+      display: inline-flex;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 4px;
+      margin: 0 10px;
+      border: 1px solid #e2e8f0;
     `;
 
-    const content = document.createElement('div');
-    content.style.cssText = `
-      background: white; border-radius: 12px; padding: 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      text-align: center; min-width: 450px;
+    const draftBtn = document.createElement('button');
+    draftBtn.id = 'draftBtn';
+    draftBtn.innerHTML = '📋 Draft';
+    draftBtn.style.cssText = `
+      background: #fff;
+      color: #c05621;
+      border: 1px solid #f6ad55;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
     `;
 
-    content.innerHTML = `
-      <h2 style="margin: 0 0 15px 0; color: #333; font-size: 22px; font-weight: 700;">Download PDF</h2>
-      <p style="margin: 0 0 35px 0; color: #666; font-size: 15px;">Select download format:</p>
-      
-      <div style="display: flex; gap: 20px; justify-content: center;">
-        <button id="draftBtn" style="
-          background: linear-gradient(135deg, #f6ad55 0%, #c05621 100%);
-          color: white; border: none; padding: 14px 28px;
-          border-radius: 8px; font-size: 15px; font-weight: 600;
-          cursor: pointer; transition: all 0.2s;
-          box-shadow: 0 4px 12px rgba(192, 86, 33, 0.3);
-        " onmouseover="this.style.boxShadow='0 6px 16px rgba(192, 86, 33, 0.4)'" onmouseout="this.style.boxShadow='0 4px 12px rgba(192, 86, 33, 0.3)'">
-          📋 Draft (with watermark)
-        </button>
-        
-        <button id="finalBtn" style="
-          background: linear-gradient(135deg, #48bb78 0%, #22543d 100%);
-          color: white; border: none; padding: 14px 28px;
-          border-radius: 8px; font-size: 15px; font-weight: 600;
-          cursor: pointer; transition: all 0.2s;
-          box-shadow: 0 4px 12px rgba(34, 84, 61, 0.3);
-        " onmouseover="this.style.boxShadow='0 6px 16px rgba(34, 84, 61, 0.4)'" onmouseout="this.style.boxShadow='0 4px 12px rgba(34, 84, 61, 0.3)'">
-          ✓ Final (no watermark)
-        </button>
-      </div>
+    const finalBtn = document.createElement('button');
+    finalBtn.id = 'finalBtn';
+    finalBtn.innerHTML = '✓ Final';
+    finalBtn.style.cssText = `
+      background: transparent;
+      color: #22543d;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
     `;
 
-    modal.appendChild(content);
-    document.body.appendChild(modal);
-
-    document.getElementById('draftBtn').addEventListener('click', () => {
-      currentMode = 'draft';
-      document.body.classList.add('timetable-mode-draft');
-      document.getElementById(WATERMARK_ID).style.display = 'block';
-      closeModal();
-      if (lastClickedButton) {
-        setTimeout(() => lastClickedButton.click(), 50);
+    // Toggle functionality
+    function setDraftMode(draft) {
+      isDraftMode = draft;
+      if (draft) {
+        draftBtn.style.background = '#fff';
+        draftBtn.style.border = '1px solid #f6ad55';
+        draftBtn.style.color = '#c05621';
+        finalBtn.style.background = 'transparent';
+        finalBtn.style.border = 'none';
+        finalBtn.style.color = '#22543d';
+        document.body.classList.add('timetable-mode-draft');
+        document.getElementById(WATERMARK_ID).style.display = 'block';
+      } else {
+        finalBtn.style.background = '#fff';
+        finalBtn.style.border = '1px solid #48bb78';
+        finalBtn.style.color = '#22543d';
+        draftBtn.style.background = 'transparent';
+        draftBtn.style.border = 'none';
+        draftBtn.style.color = '#c05621';
+        document.body.classList.remove('timetable-mode-draft');
+        document.getElementById(WATERMARK_ID).style.display = 'none';
       }
-    });
+      updateStatusIndicator();
+    }
 
-    document.getElementById('finalBtn').addEventListener('click', () => {
-      currentMode = 'final';
-      document.body.classList.remove('timetable-mode-draft');
-      document.getElementById(WATERMARK_ID).style.display = 'none';
-      closeModal();
-      if (lastClickedButton) {
-        setTimeout(() => lastClickedButton.click(), 50);
-      }
-    });
-  }
-
-  function showModal() {
-    document.getElementById(MODAL_ID).style.display = 'flex';
-  }
-
-  function closeModal() {
-    document.getElementById(MODAL_ID).style.display = 'none';
-  }
-
-  function interceptDownloadButton() {
-    // Find button by looking for "Download" text
-    const allButtons = document.querySelectorAll('button');
+    draftBtn.addEventListener('click', () => setDraftMode(true));
+    finalBtn.addEventListener('click', () => setDraftMode(false));
     
-    for (let btn of allButtons) {
-      const text = btn.textContent.trim();
-      if (text.includes('Download') && text.includes('PDF')) {
-        // Store original onclick
-        const originalOnClick = btn.onclick;
-        
-        // Replace with our handler
-        btn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          lastClickedButton = btn;
-          showModal();
-          return false;
-        };
-        
-        console.log('✓ Download button intercepted:', text);
-        return;
+    // Default to Final mode
+    setDraftMode(false);
+
+    container.appendChild(draftBtn);
+    container.appendChild(finalBtn);
+
+    // Insert after the existing Download PDF button
+    const downloadBtn = document.querySelector('button');
+    if (downloadBtn && downloadBtn.parentNode) {
+      downloadBtn.parentNode.insertBefore(container, downloadBtn.nextSibling);
+    }
+  }
+
+  // Create status indicator
+  function createStatusIndicator() {
+    if (document.getElementById(STATUS_INDICATOR_ID)) return;
+
+    const indicator = document.createElement('div');
+    indicator.id = STATUS_INDICATOR_ID;
+    indicator.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    `;
+    document.body.appendChild(indicator);
+    updateStatusIndicator();
+  }
+
+  function updateStatusIndicator() {
+    const indicator = document.getElementById(STATUS_INDICATOR_ID);
+    if (indicator) {
+      if (isDraftMode) {
+        indicator.style.background = '#fffaf0';
+        indicator.style.color = '#c05621';
+        indicator.style.border = '1px solid #f6ad55';
+        indicator.innerHTML = '📋 DRAFT MODE ACTIVE';
+      } else {
+        indicator.style.background = '#f0fff4';
+        indicator.style.color = '#22543d';
+        indicator.style.border = '1px solid #48bb78';
+        indicator.innerHTML = '✓ FINAL MODE ACTIVE';
       }
     }
+  }
+
+  // Modify the PDF generation function
+  function modifyPdfGeneration() {
+    // Check if generatePdf function exists
+    if (typeof window.generatePdf === 'function') {
+      const originalGeneratePdf = window.generatePdf;
+      
+      window.generatePdf = function() {
+        console.log('PDF generation started, mode:', isDraftMode ? 'DRAFT' : 'FINAL');
+        
+        // Set watermark based on mode
+        if (isDraftMode) {
+          document.body.classList.add('timetable-mode-draft');
+          document.getElementById(WATERMARK_ID).style.display = 'block';
+        } else {
+          document.body.classList.remove('timetable-mode-draft');
+          document.getElementById(WATERMARK_ID).style.display = 'none';
+        }
+        
+        // Call original function
+        const result = originalGeneratePdf.apply(this, arguments);
+        
+        // Update filename if possible
+        setTimeout(() => {
+          updatePdfFilename();
+        }, 100);
+        
+        return result;
+      };
+      
+      console.log('✓ PDF generation function modified');
+    } else {
+      console.log('generatePdf function not found, watching for it...');
+      
+      // Watch for the function to be created
+      const checkInterval = setInterval(() => {
+        if (typeof window.generatePdf === 'function') {
+          clearInterval(checkInterval);
+          modifyPdfGeneration();
+        }
+      }, 500);
+    }
+  }
+
+  function updatePdfFilename() {
+    // Try to modify the filename if possible
+    // This depends on how your PDF generation works
+    const semester = window.db?.currentSemester || 'Semester';
+    const college = window.db?.semesters?.[semester]?.currentCollege || 'Timetable';
+    const mode = isDraftMode ? 'DRAFT' : 'FINAL';
+    
+    // The filename will be handled by your PDF generation
+    console.log(`PDF filename should include: ${mode}_${semester}_${college}`);
   }
 
   function init() {
     console.log('Initializing download mode...');
     createWatermark();
-    createModal();
-    interceptDownloadButton();
-
-    // Watch for new buttons
-    const observer = new MutationObserver(() => {
-      if (!lastClickedButton) {
-        interceptDownloadButton();
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
+    createDraftToggle();
+    createStatusIndicator();
+    modifyPdfGeneration();
+    
+    console.log('✓ Download mode initialized');
+    console.log('✓ Draft/Final toggle buttons added');
+    console.log('✓ PDF generation function modified');
   }
 
   if (document.readyState === 'loading') {

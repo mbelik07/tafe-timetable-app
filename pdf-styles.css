@@ -1,0 +1,165 @@
+/* PDF Print Styles - Fixes formatting, page breaks, and content cut-off issues */
+
+@media print {
+  /* Ensure box-sizing for predictable layout */
+  *, *:before, *:after {
+    box-sizing: border-box;
+  }
+
+  /* Prevent elements from breaking across pages */
+  .avoid-page-break,
+  .session-block,
+  .task-card,
+  .college-tab,
+  h1, h2, h3, h4, h5, h6,
+  p {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Force page breaks */
+  .page-break-after {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  /* Preserve textarea formatting */
+  .pdf-textarea-replacement,
+  .pdf-input-replacement {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    display: block;
+  }
+
+  /* Ensure colors are printed */
+  body,
+  .timetable-container,
+  .timetable,
+  .session-block {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide UI-only elements */
+  .noprint,
+  .ui-controls,
+  button,
+  .no-export,
+  #openSidebarBtn,
+  #closeSidebarBtn,
+  #semesterSelector,
+  #college-tabs-container {
+    display: none !important;
+  }
+
+  /* Optimize timetable for printing */
+  .timetable-main-grid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure proper margins */
+  body {
+    margin: 20mm;
+    padding: 0;
+  }
+
+  /* Optimize text rendering */
+  body {
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Remove shadows and unnecessary styling */
+  .shadow-lg,
+  .shadow-md,
+  .shadow {
+    box-shadow: none !important;
+  }
+
+  /* Ensure backgrounds are visible */
+  .bg-white {
+    background-color: white !important;
+  }
+
+  .bg-gray-100 {
+    background-color: #f3f4f6 !important;
+  }
+
+  /* Optimize table rendering */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #d1d5db;
+    padding: 8px;
+  }
+
+  th {
+    background-color: #007bff !important;
+    color: white !important;
+  }
+
+  /* Prevent image scaling issues */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Optimize links for printing */
+  a {
+    text-decoration: underline;
+  }
+
+  /* Ensure proper spacing */
+  .p-4 {
+    padding: 16px;
+  }
+
+  .mb-4 {
+    margin-bottom: 16px;
+  }
+
+  .mt-4 {
+    margin-top: 16px;
+  }
+
+  /* Fix time labels and hours at bottom */
+  .time-label {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .time-slot {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure content doesn't get cut off */
+  .day-column {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* Screen-only styles */
+@media screen {
+  .pdf-only {
+    display: none;
+  }
+}
+
+/* Print-only styles */
+@media print {
+  .screen-only {
+    display: none !important;
+  }
+
+  .pdf-only {
+    display: block;
+  }
+}

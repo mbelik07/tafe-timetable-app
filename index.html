@@ -7,117 +7,131 @@
 <meta content="A multi-college, interactive timetabling solution for TAFE NSW with data persistence and class notes." property="og:description"/>
 <title>TAFE Interactive Timetabling Application</title>
 <style>
-.task-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.task-actions button { padding: 0.25rem 0.75rem; font-size: 0.875rem; border-radius: 0.375rem; border: none; cursor: pointer; }
-.task-edit-btn { background: #3b82f6; color: white; }
-.task-edit-btn:hover { background: #2563eb; }
-.task-completed-btn { background: #10b981; color: white; }
-.task-completed-btn:hover { background: #059669; }
-.task-delete-btn { background: #ef4444; color: white; }
-.task-delete-btn:hover { background: #dc2626; }
-.task-card { padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; margin-bottom: 1rem; background: white; }
-.task-card.high { border-left: 4px solid #dc2626; background: #fee2e2; }
-.task-card.medium { border-left: 4px solid #f59e0b; background: #fef3c7; }
-.task-card.low { border-left: 4px solid #10b981; background: #ecfdf5; }
-.task-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; }
-.task-title { font-weight: bold; font-size: 1.1rem; color: #1f2937; }
-.task-status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
-.task-status-todo { background: #e5e7eb; color: #374151; }
-.task-status-inprogress { background: #dbeafe; color: #1e40af; }
-.task-status-done { background: #dcfce7; color: #166534; }
-.task-status-blocked { background: #fee2e2; color: #991b1b; }
-.task-meta { display: flex; gap: 1rem; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; flex-wrap: wrap; }
-.task-description { color: #4b5563; margin-bottom: 0.75rem; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+.sidebar { transition: transform 0.3s ease-in-out; }
+.sidebar-open { transform: translateX(0) !important; }
+.view-container { display: none; }
+.view-container.active { display: block; }
+.college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; }
+.college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
+.timetable-main-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(200px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
+.timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
+.time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
+.time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
+.day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; }
+.time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
+.time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
+.dragging .time-slot:hover { background-color: transparent !important; }
+.dragging .time-slot { cursor: default !important; }
+.time-slot.slot-selected { background-color: rgba(59, 130, 246, 0.3); }
+.session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
+.session-block.compulsory { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700; }
+.session-block.online { box-shadow: 0 0 0 3px #3b82f6; }
+.session-block.blended { box-shadow: 0 0 0 3px #3b82f6; }
+.session-block.compulsory.online { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700, 0 0 0 8px #3b82f6; }
+.session-block.compulsory.blended { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700, 0 0 0 8px #3b82f6; }
+.dispute-warning { border: 3px solid #ef4444 !important; z-index: 15; animation: pulse-border 1.5s infinite; }
+.dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
+@keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+.resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
+.context-menu { position: fixed; background: #2d3748; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; min-width: 200px; display: none; }
+.context-menu.active { display: block; }
+.context-menu-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #4a5568; }
+.context-menu-item:last-child { border-bottom: none; }
+.context-menu-item:hover { background: #4a5568; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
+.modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; z-index: 101; }
+.modal-overlay.active { display: block; }
+body.dragging .day-column:hover, body.dragging .time-slot:hover { background-color: transparent !important; box-shadow: none !important; }
+body.dragging .day-column { border-color: #d1d5db !important; }
+.drop-indicator { position: fixed; border: 2px dashed #3b82f6; background-color: rgba(59, 130, 246, 0.05); pointer-events: none; z-index: 9999; border-radius: 4px; display: none; }
+.drag-clone { position: fixed; pointer-events: none; z-index: 10000; opacity: 0.8; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); }
 </style>
 </head>
-<body>
-<div id="tasks-view" style="display: block;">
-  <div class="bg-white p-6 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-bold mb-2">📋 Task Management</h2>
-    <p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900">Sample</span></p>
-    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn">+ Add New Task</button>
-    <div id="tasks-container"></div>
-  </div>
+<body class="bg-gray-100">
+<div class="sidebar fixed top-0 left-0 h-full w-80 bg-white shadow-lg z-50 -translate-x-full" id="sidebar">
+<div class="p-4 bg-blue-900 text-white flex justify-between items-center"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
 </div>
-
+<div class="transition-all duration-300" id="mainContent">
+<header class="bg-white shadow-md p-4 flex justify-between items-center">
+<div class="flex items-center gap-4"><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
+<div class="flex items-center gap-3">
+<button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn">Open Menu</button>
+<select class="border border-gray-300 rounded px-3 py-2 font-bold" id="semesterSelector"></select>
+<button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded" id="printBtn">📄 Download PDF</button>
+</div>
+</header>
+<main class="p-4">
+<div class="flex items-center gap-2 mb-[-1px]" id="college-tabs-container"></div>
+<div id="print-area">
+<div class="view-container active" id="main-timetable-view"><div class="bg-white p-4 rounded-lg shadow-lg"><h2 class="text-xl font-bold text-center mb-4" id="main-timetable-title"></h2><div class="timetable-grid-container"><div class="timetable-main-grid" id="main-timetable-grid"><div class="text-center p-10 col-span-6 text-gray-500">Load sample data or add your own to begin.</div></div></div></div></div>
+</div>
+</main>
+</div>
+<div class="context-menu" id="contextMenu"></div>
 <script>
-// Sample task data
-const tasks = [
-  { id: 1, title: 'Prepare materials for FSK20119', description: 'Photocopy worksheets and prepare online resources.', teacher: 'JA', course: 'FSK20119', colleges: ['Moss Vale'], priority: 'high', status: 'todo', dueDate: '2024-08-01' },
-  { id: 2, title: 'Mark mid-term exams', description: '', teacher: 'MB', course: '11225NAT', colleges: ['Moss Vale'], priority: 'medium', status: 'inprogress', dueDate: '2024-08-15' },
-];
+let db = {};
+const colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
+const saveData = () => localStorage.setItem('timetableDataV2', JSON.stringify(db));
+const loadData = () => {
+const savedData = localStorage.getItem('timetableDataV2');
+if (savedData) db = JSON.parse(savedData);
+else db = { semesters: { 'Semester 1 2024': { courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale' } }, currentSemester: 'Semester 1 2024' };
+};
+const getCurrentSemesterData = () => db.semesters[db.currentSemester];
+const timeToMinutes = (timeStr) => !timeStr ? 0 : timeStr.split(':').map(Number).reduce((h, m) => h * 60 + m);
+const dayOrder = { 'Monday': 0, 'Tuesday': 1, 'Wednesday': 2, 'Thursday': 3, 'Friday': 4 };
 
-function renderTasksView() {
-  const container = document.getElementById('tasks-container');
-  
-  if (tasks.length === 0) {
-    container.innerHTML = '<p class="text-center text-gray-500 py-8">No tasks yet. Click "Add New Task" to create one.</p>';
-    return;
-  }
-
-  let html = '';
-  tasks.forEach(task => {
-    const statusClass = `task-status-${task.status}`;
-    const statusText = task.status === 'inprogress' ? 'In Progress' : (task.status === 'todo' ? 'To Do' : (task.status === 'done' ? 'Done' : 'Blocked'));
-    const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';
-    const collegeDisplay = task.colleges && task.colleges.length > 0 ? task.colleges.join(', ') : 'All Colleges';
-
-    html += `
-<div class="task-card ${task.priority}">
-  <div class="task-header">
-    <div class="task-title">${task.title}</div>
-    <span class="task-status-badge ${statusClass}">${statusText}</span>
-  </div>
-  <div class="task-meta">
-    <span>👤 ${task.teacher || 'Unassigned'}</span>
-    <span>📚 ${task.course || 'Unassigned'}</span>
-    <span>🏫 ${collegeDisplay}</span>
-    <span>📅 ${dueDate}</span>
-    <span>🎯 ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
-  </div>
-  ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
-  <div class="task-actions">
-    <button class="task-edit-btn" onclick="editTask(${task.id})">Edit</button>
-    <button class="task-completed-btn" onclick="markCompleted(${task.id})">✓ Completed</button>
-    <button class="task-delete-btn" onclick="deleteTask(${task.id})">Delete</button>
-  </div>
-</div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
-function markCompleted(taskId) {
-  const task = tasks.find(t => t.id === taskId);
-  if (task) {
-    task.status = 'done';
-    renderTasksView();
-    alert(`✓ Task "${task.title}" marked as completed!`);
-  }
-}
-
-function editTask(taskId) {
-  alert('Edit functionality would open a modal here');
-}
-
-function deleteTask(taskId) {
-  if (confirm('Are you sure you want to delete this task?')) {
-    const index = tasks.findIndex(t => t.id === taskId);
-    if (index !== -1) {
-      tasks.splice(index, 1);
-      renderTasksView();
-    }
-  }
-}
-
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-  renderTasksView();
-  document.getElementById('addTaskBtn').addEventListener('click', () => {
-    alert('Add task functionality would open a modal here');
-  });
+loadData();
+renderCollegeTabs();
+renderSemesterSelector();
+document.getElementById('openSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('sidebar-open'));
+document.getElementById('closeSidebarBtn').addEventListener('click', () => document.getElementById('sidebar').classList.remove('sidebar-open'));
+document.getElementById('semesterSelector').addEventListener('change', (e) => { db.currentSemester = e.target.value; renderCollegeTabs(); });
 });
+
+function renderSemesterSelector() {
+const selector = document.getElementById('semesterSelector');
+selector.innerHTML = Object.keys(db.semesters).map(name => `<option value="${name}" ${db.currentSemester === name ? 'selected' : ''}>${name}</option>`).join('');
+}
+
+function renderCollegeTabs() {
+const currentData = getCurrentSemesterData();
+const container = document.getElementById('college-tabs-container');
+let tabsHTML = `<button class="college-tab ${currentData.currentCollege === 'Master View' ? 'active' : ''}" data-college="Master View">Master View</button>`;
+tabsHTML += colleges.map(c => `<button class="college-tab ${currentData.currentCollege === c ? 'active' : ''}" data-college="${c}">${c}</button>`).join('');
+container.innerHTML = tabsHTML;
+container.querySelectorAll('.college-tab').forEach(tab => tab.addEventListener('click', (e) => {
+currentData.currentCollege = e.target.dataset.college;
+renderMainTimetableView();
+}));
+renderMainTimetableView();
+}
+
+function renderMainTimetableView() {
+const grid = document.getElementById('main-timetable-grid');
+const titleEl = document.getElementById('main-timetable-title');
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const startTime = 8, endTime = 22, slotHeight = 30;
+const totalRows = (endTime - startTime) * 2;
+const semesterData = getCurrentSemesterData();
+
+titleEl.textContent = `${semesterData.currentCollege} Timetable - ${db.currentSemester}`;
+
+let gridHTML = `<div style="grid-row: 1; grid-column: 1;"></div>` + days.map((day, i) => `<div class="timetable-header" style="grid-column: ${i + 2};">${day}</div>`).join('');
+gridHTML += `<div class="time-labels">${Array.from({length: totalRows}, (_, i) => `<div class="time-label">${(i % 2 === 0) ? `<strong>${startTime + i/2}:00</strong>` : ''}</div>`).join('')}</div>`;
+gridHTML += days.map((day, i) => {
+let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2}; height: ${totalRows * slotHeight}px">`;
+for (let j = 0; j < totalRows; j++) {
+const time = startTime + j * 0.5;
+const timeString = `${Math.floor(time).toString().padStart(2, '0')}:${((time % 1) * 60).toString().padStart(2, '0')}`;
+dayColHTML += `<div class="time-slot" data-day="${day}" data-time="${timeString}" data-slot-index="${j}"></div>`;
+}
+return dayColHTML + `</div>`;
+}).join('');
+grid.innerHTML = gridHTML;
+}
 </script>
 </body>
 </html>

@@ -150,4 +150,94 @@
   } else {
     init();
   }
+})();  }
+
+  function handleDirectDownload(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Direct PDF download triggered');
+    
+    // Find the original download button and click it immediately
+    const originalBtn = findDownloadButton();
+    if (originalBtn) {
+      console.log('Triggering original download');
+      originalBtn.click();
+    } else {
+      // Try alternative methods
+      console.log('Trying alternative PDF generation methods');
+      
+      // Method 1: Look for generatePdf function
+      if (typeof window.generatePdf === 'function') {
+        window.generatePdf();
+        return;
+      }
+      
+      // Method 2: Look for html2pdf
+      if (typeof window.html2pdf === 'function') {
+        const element = document.body;
+        window.html2pdf(element);
+        return;
+      }
+      
+      // Method 3: Look for any PDF-related function
+      const pdfFunctions = ['generatePdf', 'downloadPdf', 'exportPdf', 'printPdf', 'createPdf'];
+      for (let funcName of pdfFunctions) {
+        if (typeof window[funcName] === 'function') {
+          console.log(`Found PDF function: ${funcName}`);
+          window[funcName]();
+          return;
+        }
+      }
+      
+      console.log('No PDF generation method found');
+    }
+  }
+
+  // Remove any existing modal/dialog elements
+  function removeExistingDialogs() {
+    // Remove any modal overlays
+    const modals = document.querySelectorAll('[id*="modal"], [class*="modal"], [id*="dialog"], [class*="dialog"]');
+    modals.forEach(modal => {
+      if (modal.style.display !== 'none') {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Remove any backdrop overlays
+    const backdrops = document.querySelectorAll('[class*="backdrop"], [class*="overlay"]');
+    backdrops.forEach(backdrop => {
+      if (backdrop.style.display !== 'none') {
+        backdrop.style.display = 'none';
+      }
+    });
+  }
+
+  function init() {
+    console.log('Initializing direct PDF download (no dialogs)...');
+    
+    // Remove any existing dialogs first
+    removeExistingDialogs();
+    
+    // Create the button
+    createDirectDownloadButton();
+    
+    // Watch for dynamically added dialogs and remove them
+    const observer = new MutationObserver(() => {
+      removeExistingDialogs();
+      if (!document.getElementById('directDownloadBtn')) {
+        createDirectDownloadButton();
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    console.log('✓ Direct PDF download initialized (no dialogs)');
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();

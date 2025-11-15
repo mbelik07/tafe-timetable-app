@@ -1,281 +1,200 @@
 /**
  * IMPROVED PDF GENERATION SOLUTION
- * Fixes: Cut-off content, formatting loss, page breaks, day spacing, course notes formatting
- *
+ * Fixes: Cut-off content, formatting loss, page breaks, day spacing, text wrapping
+ * 
  * This solution uses jsPDF 2.x with html2canvas for reliable PDF export
  * with proper margin control, page breaks, and formatting preservation
  */
 
-// CSS for print media - add this to your stylesheet or inject via onclone
-const pdfPrintCss = `
-  /* Ensure box-sizing for predictable width */
-  *, *:before, *:after { box-sizing: border-box; }
+async function generatePdf() {
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  loadingOverlay.style.display = 'flex';
 
-  /* Avoid breaking inside these elements */
-  .avoid-page-break {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
+  try {
+    // Ensure jsPDF and html2canvas are loaded
+    if (!window.jsPDF || !window.html2canvas) {
+      throw new Error('jsPDF or html2canvas not loaded. Please ensure CDN scripts are included.');
+    }
+
+    const element = document.getElementById('print-area');
+    if (!element) {
+      throw new Error('Print area element not found');
+    }
+
+    // Get current semester for filename
+    const semesterLabel = document.getElementById('main-timetable-title')?.textContent || 'timetable';
+    const filename = `${semesterLabel.replace(/\s+/g, '_')}.pdf`;
+
+    await generatePdfFromElement(element, filename);
+    
+  } catch (error) {
+    console.error('PDF generation failed:', error);
+    alert('Error generating PDF: ' + error.message);
+  } finally {
+    loadingOverlay.style.display = 'none';
   }
-
-  /* Force a page break after elements */
-  .page-break-after {
-    break-after: page;
-    page-break-after: always;
-  }
-
-  /* Preserve textarea formatting - CRITICAL FIX */
-  .pdf-textarea-replacement {
-    white-space: pre-wrap !important;
-    word-wrap: break-word !important;
-    display: block !important;
-    overflow: visible !important;
-    line-height: 1.4 !important;
-    margin: 8px 0 !important;
-    padding: 8px !important;
-    border: 1px solid #ccc !important;
-    background-color: #fafafa !important;
-    font-family: 'Courier New', monospace !important;
-    font-size: 10pt !important;
-  }
-
-  /* FIX: Add spacing under day headers */
-  .day-header,
-  .day-column-header,
-  .day-label,
-  .day-name {
-    margin-bottom: 12px !important;
-    padding-bottom: 8px !important;
-    border-bottom: 2px solid #333 !important;
-  }
-
-  /* Ensure colors are printed */
-  body, .timetable-container, .timetable {
-    -webkit-print-color-adjust: exact;
-    color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Hide UI-only elements */
-  .noprint, .ui-controls, .button, .no-export { display: none !important; }
-
-  /* Course/Session blocks - ensure proper spacing */
-  .course-block,
-  .session-item {
-    margin-bottom: 8px !important;
-    padding: 8px !important;
-    border: 1px solid #999 !important;
-  }
-
-  /* Notes section formatting */
-  .notes-section,
-  .course-notes {
-    margin-top: 12px !important;
-    padding: 8px !important;
-    background-color: #f9f9f9 !important;
-    border-left: 3px solid #007bff !important;
-  }
-`;
+}
 
 /**
- * generatePdfUsingJsPdfHtml - Main PDF generation function
- *
- * @param {string|Element} elementOrSelector - DOM element or selector for content to export
- * @param {string} filename - Output filename (e.g., 'timetable.pdf')
+ * Main PDF generation function using jsPDF + html2canvas
+ * 
+ * @param {Element} element - DOM element to convert to PDF
+ * @param {string} filename - Output filename
  * @param {Object} options - Configuration options
- * - margin: { top, right, bottom, left } in mm (default: 20mm all sides)
- * - format: 'a4' (default)
- * - orientation: 'portrait' or 'landscape' (default: 'portrait')
- * - scale: html2canvas scale (default: 2 for crisp output)
  */
-async function generatePdfUsingJsPdfHtml(elementOrSelector, filename = 'timetable.pdf', options = {}) {
-  // Default options
+async function generatePdfFromElement(element, filename = 'timetable.pdf', options = {}) {
   const defaults = {
-    margin: { top: 20, right: 20, bottom: 20, left: 20 }, // mm
+    margin: 20,
     format: 'a4',
     orientation: 'portrait',
-    scale: Math.min(2, window.devicePixelRatio || 1.5)
+    scale: 2,
+    quality: 0.95
   };
+  
   options = Object.assign({}, defaults, options);
 
-  // Resolve element
-  const rootEl = (typeof elementOrSelector === 'string')
-    ? document.querySelector(elementOrSelector)
-    : elementOrSelector;
-
-  if (!rootEl) throw new Error('generatePdf: element not found');
-
-  // Wait for webfonts to be ready
+  // Wait for fonts to be ready
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
 
-  // Clone element into offscreen container
-  const clone = rootEl.cloneNode(true);
-  const offscreenContainer = document.createElement('div');
-  offscreenContainer.style.position = 'fixed';
-  offscreenContainer.style.left = '-10000px';
-  offscreenContainer.style.top = '0';
-  offscreenContainer.style.width = 'auto';
-  offscreenContainer.style.height = 'auto';
-  offscreenContainer.style.overflow = 'visible';
-  offscreenContainer.setAttribute('aria-hidden', 'true');
+  // Clone the element
+  const clone = element.cloneNode(true);
+  
+  // Create offscreen container
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-10000px';
+  container.style.top = '0';
+  container.style.width = 'auto';
+  container.style.height = 'auto';
+  container.style.overflow = 'visible';
+  container.style.zIndex = '-9999';
+  
+  // Add the pdf-snapshot class to enable snapshot-friendly CSS
+  clone.classList.add('pdf-snapshot');
+  
+  container.appendChild(clone);
+  document.body.appendChild(container);
 
-  // Calculate content width to match A4 minus margins
-  const PX_PER_MM = 96 / 25.4;
-  const pageWidthMm = options.format.toLowerCase() === 'a4' ? 210 : 210;
-  const contentWidthMm = pageWidthMm - (options.margin.left + options.margin.right);
-  const contentWidthPx = Math.round(contentWidthMm * PX_PER_MM);
+  try {
+    // Calculate dimensions
+    const PX_PER_MM = 96 / 25.4;
+    const pageWidthMm = options.format === 'a4' ? 210 : 210;
+    const pageHeightMm = options.format === 'a4' ? 297 : 297;
+    const contentWidthMm = pageWidthMm - (options.margin * 2);
+    const contentWidthPx = Math.round(contentWidthMm * PX_PER_MM);
 
-  // Apply print-specific styles to clone
-  clone.style.boxSizing = 'border-box';
-  clone.style.width = `${contentWidthPx}px`;
-  clone.style.maxWidth = `${contentWidthPx}px`;
-  clone.style.background = getComputedStyle(rootEl).background || '#ffffff';
+    // Set clone width to match page content width
+    clone.style.width = `${contentWidthPx}px`;
+    clone.style.maxWidth = `${contentWidthPx}px`;
+    clone.style.boxSizing = 'border-box';
+    clone.style.background = '#ffffff';
 
-  // Replace textareas with static divs that preserve formatting
-  function replaceFormControlsWithStatic(el) {
-    const textareas = el.querySelectorAll('textarea');
-    textareas.forEach(ta => {
-      const div = document.createElement('div');
-      div.className = 'pdf-textarea-replacement';
-      // Preserve line breaks and formatting
-      div.textContent = ta.value;
+    // Replace form controls with static content
+    replaceFormControls(clone);
 
-      const s = window.getComputedStyle(ta);
-      div.style.whiteSpace = 'pre-wrap';
-      div.style.wordWrap = 'break-word';
-      div.style.fontFamily = s.fontFamily || "'Courier New', monospace";
-      div.style.fontSize = s.fontSize || '10pt';
-      div.style.lineHeight = s.lineHeight || '1.4';
-      div.style.color = s.color;
-      div.style.padding = s.padding || '8px';
-      div.style.margin = s.margin || '8px 0';
-      div.style.border = s.border || '1px solid #ccc';
-      div.style.backgroundColor = '#fafafa';
-      div.classList.add('avoid-page-break');
-
-      ta.parentNode.replaceChild(div, ta);
+    // Create jsPDF instance
+    const { jsPDF } = window;
+    const doc = new jsPDF({
+      unit: 'mm',
+      format: options.format,
+      orientation: options.orientation,
+      compress: true
     });
 
-    // Replace input fields
-    const inputs = el.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"]');
-    inputs.forEach(inp => {
-      const span = document.createElement('span');
-      span.className = 'pdf-input-replacement';
-      span.textContent = inp.value;
+    // Prepare html2canvas options for better snapshot quality
+    const html2canvasOptions = {
+      scale: options.scale,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      backgroundColor: '#ffffff',
+      windowWidth: contentWidthPx,
+      windowHeight: clone.scrollHeight,
+      scrollX: 0,
+      scrollY: 0
+    };
 
-      const s = window.getComputedStyle(inp);
-      span.style.fontFamily = s.fontFamily;
-      span.style.fontSize = s.fontSize;
-      span.style.lineHeight = s.lineHeight;
-      span.style.color = s.color;
-
-      inp.parentNode.replaceChild(span, inp);
-    });
-
-    // Add spacing to day headers
-    const dayHeaders = el.querySelectorAll('.day-header, .day-column-header, .day-label, .day-name');
-    dayHeaders.forEach(header => {
-      header.style.marginBottom = '12px';
-      header.style.paddingBottom = '8px';
-      header.style.borderBottom = '2px solid #333';
-    });
-  }
-
-  replaceFormControlsWithStatic(clone);
-
-  // Append clone to offscreen container
-  offscreenContainer.appendChild(clone);
-  document.body.appendChild(offscreenContainer);
-
-  // Create jsPDF document
-  const { jsPDF } = window;
-  if (!jsPDF) {
-    document.body.removeChild(offscreenContainer);
-    throw new Error('jsPDF not found. Ensure jspdf is loaded before calling generatePdf.');
-  }
-
-  const doc = new jsPDF({
-    unit: 'mm',
-    format: options.format || 'a4',
-    orientation: options.orientation || 'portrait'
-  });
-
-  // Prepare html2canvas options
-  const html2canvasOpts = {
-    scale: options.scale,
-    useCORS: true,
-    allowTaint: false,
-    logging: false,
-    windowWidth: clone.scrollWidth
-  };
-
-  // Use jsPDF.html with autoPaging for proper text flow
-  return new Promise((resolve, reject) => {
-    try {
-      doc.html(clone, {
-        x: options.margin.left,
-        y: options.margin.top,
-        html2canvas: html2canvasOpts,
-        autoPaging: 'text',
-        callback: function (pdfDoc) {
-          try {
-            pdfDoc.save(filename);
-            resolve();
-          } catch (e) {
-            reject(e);
+    // Use jsPDF.html with proper options
+    await new Promise((resolve, reject) => {
+      try {
+        doc.html(clone, {
+          x: options.margin,
+          y: options.margin,
+          width: contentWidthMm,
+          html2canvas: html2canvasOptions,
+          autoPaging: 'slice',
+          callback: function(pdfDoc) {
+            try {
+              pdfDoc.save(filename);
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
           }
-        },
-        onclone: function (clonedDoc) {
-          // Inject print CSS into cloned document
-          const style = clonedDoc.createElement('style');
-          style.textContent = pdfPrintCss;
-          clonedDoc.head.appendChild(style);
-        }
-      });
-    } catch (e) {
-      reject(e);
-    }
-  }).finally(() => {
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+
+  } finally {
     // Cleanup
-    document.body.removeChild(offscreenContainer);
-  });
+    document.body.removeChild(container);
+  }
 }
 
 /**
- * INTEGRATION INSTRUCTIONS:
- *
- * 1. Add CDN scripts to your HTML <head>:
- * <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
- * <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
- *
- * 2. Replace your existing generatePdf function call with:
- * document.getElementById('printBtn').addEventListener('click', async () => {
- *   const loadingOverlay = document.getElementById('loadingOverlay');
- *   loadingOverlay.style.display = 'flex';
- *   try {
- *     await generatePdfUsingJsPdfHtml('#print-area', 'timetable.pdf', {
- *       margin: { top: 20, right: 20, bottom: 20, left: 20 },
- *       scale: 2
- *     });
- *   } catch (error) {
- *     console.error('PDF generation failed:', error);
- *     alert('Error generating PDF: ' + error.message);
- *   } finally {
- *     loadingOverlay.style.display = 'none';
- *   }
- * });
- *
- * 3. Add this CSS to your stylesheet:
- * @media print {
- *   .avoid-page-break {
- *     break-inside: avoid;
- *     page-break-inside: avoid;
- *   }
- *   .pdf-textarea-replacement {
- *     white-space: pre-wrap;
- *     word-wrap: break-word;
- *   }
- * }
+ * Replace form controls with static content for PDF rendering
+ * @param {Element} element - Element to process
  */
+function replaceFormControls(element) {
+  // Replace textareas
+  const textareas = element.querySelectorAll('textarea');
+  textareas.forEach(textarea => {
+    const div = document.createElement('div');
+    div.className = 'pdf-textarea-replacement';
+    div.textContent = textarea.value;
+    
+    const style = window.getComputedStyle(textarea);
+    div.style.whiteSpace = 'pre-wrap';
+    div.style.wordWrap = 'break-word';
+    div.style.fontFamily = style.fontFamily || "'Courier New', monospace";
+    div.style.fontSize = style.fontSize || '10pt';
+    div.style.lineHeight = style.lineHeight || '1.4';
+    div.style.color = style.color;
+    div.style.padding = style.padding || '8px';
+    div.style.margin = style.margin || '8px 0';
+    div.style.border = style.border || '1px solid #ccc';
+    div.style.backgroundColor = '#fafafa';
+    div.style.display = 'block';
+    
+    textarea.parentNode.replaceChild(div, textarea);
+  });
+
+  // Replace input fields
+  const inputs = element.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"]');
+  inputs.forEach(input => {
+    const span = document.createElement('span');
+    span.className = 'pdf-input-replacement';
+    span.textContent = input.value;
+    
+    const style = window.getComputedStyle(input);
+    span.style.fontFamily = style.fontFamily;
+    span.style.fontSize = style.fontSize;
+    span.style.lineHeight = style.lineHeight;
+    span.style.color = style.color;
+    span.style.display = 'inline-block';
+    
+    input.parentNode.replaceChild(span, input);
+  });
+}
+
+// Initialize PDF generation when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  const printBtn = document.getElementById('printBtn');
+  if (printBtn) {
+    printBtn.addEventListener('click', generatePdf);
+  }
+});

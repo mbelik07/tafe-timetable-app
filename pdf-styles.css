@@ -168,16 +168,18 @@
     justify-content: center;
   }
 
+  /* INCREASED HEIGHT FOR DAY HEADERS - FIX FOR SPACING ISSUE */
   .print-day-header {
     background: #595959;
     color: white;
     font-weight: bold;
     padding: 16px 4px;
-    min-height: 60px;
+    min-height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
+    margin-bottom: 0;
+    border: 1px solid #999;
   }
 
   .print-period-label {

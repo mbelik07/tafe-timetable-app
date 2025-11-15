@@ -1,7 +1,7 @@
 /**
  * IMPROVED PDF GENERATION SOLUTION
- * Fixes: Cut-off content, formatting loss, page breaks
- * 
+ * Fixes: Cut-off content, formatting loss, page breaks, day spacing, course notes formatting
+ *
  * This solution uses jsPDF 2.x with html2canvas for reliable PDF export
  * with proper margin control, page breaks, and formatting preservation
  */
@@ -10,46 +10,83 @@
 const pdfPrintCss = `
   /* Ensure box-sizing for predictable width */
   *, *:before, *:after { box-sizing: border-box; }
-  
+
   /* Avoid breaking inside these elements */
   .avoid-page-break {
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
     page-break-inside: avoid;
   }
-  
+
   /* Force a page break after elements */
   .page-break-after {
     break-after: page;
     page-break-after: always;
   }
-  
-  /* Preserve textarea formatting */
+
+  /* Preserve textarea formatting - CRITICAL FIX */
   .pdf-textarea-replacement {
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    display: block !important;
+    overflow: visible !important;
+    line-height: 1.4 !important;
+    margin: 8px 0 !important;
+    padding: 8px !important;
+    border: 1px solid #ccc !important;
+    background-color: #fafafa !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 10pt !important;
   }
-  
+
+  /* FIX: Add spacing under day headers */
+  .day-header,
+  .day-column-header,
+  .day-label,
+  .day-name {
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 2px solid #333 !important;
+  }
+
   /* Ensure colors are printed */
   body, .timetable-container, .timetable {
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
+    print-color-adjust: exact;
   }
-  
+
   /* Hide UI-only elements */
   .noprint, .ui-controls, .button, .no-export { display: none !important; }
+
+  /* Course/Session blocks - ensure proper spacing */
+  .course-block,
+  .session-item {
+    margin-bottom: 8px !important;
+    padding: 8px !important;
+    border: 1px solid #999 !important;
+  }
+
+  /* Notes section formatting */
+  .notes-section,
+  .course-notes {
+    margin-top: 12px !important;
+    padding: 8px !important;
+    background-color: #f9f9f9 !important;
+    border-left: 3px solid #007bff !important;
+  }
 `;
 
 /**
  * generatePdfUsingJsPdfHtml - Main PDF generation function
- * 
+ *
  * @param {string|Element} elementOrSelector - DOM element or selector for content to export
  * @param {string} filename - Output filename (e.g., 'timetable.pdf')
  * @param {Object} options - Configuration options
- *   - margin: { top, right, bottom, left } in mm (default: 20mm all sides)
- *   - format: 'a4' (default)
- *   - orientation: 'portrait' or 'landscape' (default: 'portrait')
- *   - scale: html2canvas scale (default: 2 for crisp output)
+ * - margin: { top, right, bottom, left } in mm (default: 20mm all sides)
+ * - format: 'a4' (default)
+ * - orientation: 'portrait' or 'landscape' (default: 'portrait')
+ * - scale: html2canvas scale (default: 2 for crisp output)
  */
 async function generatePdfUsingJsPdfHtml(elementOrSelector, filename = 'timetable.pdf', options = {}) {
   // Default options
@@ -65,7 +102,7 @@ async function generatePdfUsingJsPdfHtml(elementOrSelector, filename = 'timetabl
   const rootEl = (typeof elementOrSelector === 'string')
     ? document.querySelector(elementOrSelector)
     : elementOrSelector;
-  
+
   if (!rootEl) throw new Error('generatePdf: element not found');
 
   // Wait for webfonts to be ready
@@ -102,20 +139,22 @@ async function generatePdfUsingJsPdfHtml(elementOrSelector, filename = 'timetabl
     textareas.forEach(ta => {
       const div = document.createElement('div');
       div.className = 'pdf-textarea-replacement';
+      // Preserve line breaks and formatting
       div.textContent = ta.value;
-      
+
       const s = window.getComputedStyle(ta);
       div.style.whiteSpace = 'pre-wrap';
       div.style.wordWrap = 'break-word';
-      div.style.fontFamily = s.fontFamily;
-      div.style.fontSize = s.fontSize;
-      div.style.lineHeight = s.lineHeight;
+      div.style.fontFamily = s.fontFamily || "'Courier New', monospace";
+      div.style.fontSize = s.fontSize || '10pt';
+      div.style.lineHeight = s.lineHeight || '1.4';
       div.style.color = s.color;
-      div.style.padding = s.padding;
-      div.style.margin = s.margin;
-      div.style.border = s.border;
+      div.style.padding = s.padding || '8px';
+      div.style.margin = s.margin || '8px 0';
+      div.style.border = s.border || '1px solid #ccc';
+      div.style.backgroundColor = '#fafafa';
       div.classList.add('avoid-page-break');
-      
+
       ta.parentNode.replaceChild(div, ta);
     });
 
@@ -125,14 +164,22 @@ async function generatePdfUsingJsPdfHtml(elementOrSelector, filename = 'timetabl
       const span = document.createElement('span');
       span.className = 'pdf-input-replacement';
       span.textContent = inp.value;
-      
+
       const s = window.getComputedStyle(inp);
       span.style.fontFamily = s.fontFamily;
       span.style.fontSize = s.fontSize;
       span.style.lineHeight = s.lineHeight;
       span.style.color = s.color;
-      
+
       inp.parentNode.replaceChild(span, inp);
+    });
+
+    // Add spacing to day headers
+    const dayHeaders = el.querySelectorAll('.day-header, .day-column-header, .day-label, .day-name');
+    dayHeaders.forEach(header => {
+      header.style.marginBottom = '12px';
+      header.style.paddingBottom = '8px';
+      header.style.borderBottom = '2px solid #333';
     });
   }
 
@@ -198,37 +245,37 @@ async function generatePdfUsingJsPdfHtml(elementOrSelector, filename = 'timetabl
 
 /**
  * INTEGRATION INSTRUCTIONS:
- * 
+ *
  * 1. Add CDN scripts to your HTML <head>:
- *    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
- *    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
- * 
+ * <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+ * <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+ *
  * 2. Replace your existing generatePdf function call with:
- *    document.getElementById('printBtn').addEventListener('click', async () => {
- *      const loadingOverlay = document.getElementById('loadingOverlay');
- *      loadingOverlay.style.display = 'flex';
- *      try {
- *        await generatePdfUsingJsPdfHtml('#print-area', 'timetable.pdf', {
- *          margin: { top: 20, right: 20, bottom: 20, left: 20 },
- *          scale: 2
- *        });
- *      } catch (error) {
- *        console.error('PDF generation failed:', error);
- *        alert('Error generating PDF: ' + error.message);
- *      } finally {
- *        loadingOverlay.style.display = 'none';
- *      }
- *    });
- * 
+ * document.getElementById('printBtn').addEventListener('click', async () => {
+ *   const loadingOverlay = document.getElementById('loadingOverlay');
+ *   loadingOverlay.style.display = 'flex';
+ *   try {
+ *     await generatePdfUsingJsPdfHtml('#print-area', 'timetable.pdf', {
+ *       margin: { top: 20, right: 20, bottom: 20, left: 20 },
+ *       scale: 2
+ *     });
+ *   } catch (error) {
+ *     console.error('PDF generation failed:', error);
+ *     alert('Error generating PDF: ' + error.message);
+ *   } finally {
+ *     loadingOverlay.style.display = 'none';
+ *   }
+ * });
+ *
  * 3. Add this CSS to your stylesheet:
- *    @media print {
- *      .avoid-page-break {
- *        break-inside: avoid;
- *        page-break-inside: avoid;
- *      }
- *      .pdf-textarea-replacement {
- *        white-space: pre-wrap;
- *        word-wrap: break-word;
- *      }
- *    }
+ * @media print {
+ *   .avoid-page-break {
+ *     break-inside: avoid;
+ *     page-break-inside: avoid;
+ *   }
+ *   .pdf-textarea-replacement {
+ *     white-space: pre-wrap;
+ *     word-wrap: break-word;
+ *   }
+ * }
  */

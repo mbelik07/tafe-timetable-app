@@ -1,19 +1,33 @@
-/* PDF Print Styles - Fixes formatting, page breaks, and content cut-off issues */
+/* PDF Styles - New approach for proper rendering */
 
-/* Snapshot-friendly styles for html2canvas/jsPDF (applied via .pdf-snapshot class) */
-.pdf-snapshot, .pdf-snapshot * {
+/* Screen styles for .print-day-header to ensure proper rendering */
+.print-day-header {
+  background: #595959;
+  color: white;
+  font-weight: bold;
+  padding: 16px 8px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #999;
+  font-size: 16px;
+  line-height: 1.3;
+  word-wrap: break-word;
+  white-space: normal;
   box-sizing: border-box;
 }
 
-.pdf-snapshot .print-grid {
+.print-grid {
   display: grid;
   grid-template-columns: 80px repeat(5, 1fr);
   border: 2px solid #000;
   width: 100%;
   gap: 0;
+  box-sizing: border-box;
 }
 
-.pdf-snapshot .print-header {
+.print-header {
   font-weight: bold;
   text-align: center;
   padding: 12px 4px;
@@ -25,28 +39,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
 
-/* CRITICAL FIX: Day header with proper spacing - uses min-height instead of fixed height */
-.pdf-snapshot .print-day-header {
-  background: #595959;
-  color: white;
-  font-weight: bold;
-  padding: 16px 8px;
-  min-height: 90px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #999;
-  font-size: 16px;
-  line-height: 1.3;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-}
-
-.pdf-snapshot .print-period-label {
+.print-period-label {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,232 +53,139 @@
   font-size: 13px;
   min-height: 140px;
   padding: 8px 4px;
+  box-sizing: border-box;
 }
 
-/* CRITICAL FIX: Cell content wrapping */
-.pdf-snapshot .print-cell {
+.print-cell {
   border: 1px solid #999;
   padding: 8px;
   vertical-align: top;
   min-height: 140px;
-  white-space: normal !important;
+  white-space: normal;
+  word-wrap: break-word;
   overflow-wrap: anywhere;
   word-break: break-word;
-  hyphens: auto;
+  box-sizing: border-box;
 }
 
-.pdf-snapshot .print-cell * {
-  white-space: normal !important;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  hyphens: auto;
-}
-
-.pdf-snapshot .print-session {
+.print-session {
   border-radius: 4px;
   padding: 8px;
   font-size: 15px;
   margin-bottom: 8px;
   border: 1px solid black;
   line-height: 1.4;
-  break-inside: avoid;
-  page-break-inside: avoid;
   white-space: normal;
+  word-wrap: break-word;
   overflow-wrap: break-word;
-  word-break: break-word;
+  box-sizing: border-box;
 }
 
-.pdf-snapshot .print-session.compulsory {
+.print-session.compulsory {
   border: 4px solid #ffff00;
   box-shadow: 0 0 0 1px #ffd700;
 }
 
-.pdf-snapshot .print-session.online {
+.print-session.online {
   border: 3px solid #3b82f6;
 }
 
-.pdf-snapshot .print-session.blended {
+.print-session.blended {
   border: 3px solid #3b82f6;
 }
 
-.pdf-snapshot .print-session.compulsory.online {
+.print-session.compulsory.online {
   border: 4px solid #ffff00;
   box-shadow: 0 0 0 1px #ffd700, 0 0 0 4px #3b82f6;
 }
 
-.pdf-snapshot .print-session.compulsory.blended {
+.print-session.compulsory.blended {
   border: 4px solid #ffff00;
   box-shadow: 0 0 0 1px #ffd700, 0 0 0 4px #3b82f6;
 }
 
-.pdf-snapshot .session-units {
+.session-units {
   font-size: 11px;
   color: #555;
   margin-top: 2px;
   font-style: italic;
 }
 
-/* Original @media print rules (kept for actual print functionality) */
+.color-circle {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #999;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.bottom-sections-container {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.teacher-contact-info {
+  flex: 3.5;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  background-color: #f3f4f6;
+  box-sizing: border-box;
+}
+
+.notes-section {
+  flex: 3.5;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}
+
+.legend-section {
+  flex: 1;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}
+
+/* Print media queries for actual browser printing */
 @media print {
-  /* Ensure box-sizing for predictable layout */
   *, *:before, *:after {
     box-sizing: border-box;
   }
 
-  /* Prevent elements from breaking across pages */
-  .avoid-page-break,
-  .session-block,
-  .task-card,
-  .college-tab,
-  h1, h2, h3, h4, h5, h6,
-  p {
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  /* Force page breaks */
-  .page-break-after {
-    break-after: page;
-    page-break-after: always;
-  }
-
-  /* Preserve textarea formatting */
-  .pdf-textarea-replacement,
-  .pdf-input-replacement {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    display: block;
-  }
-
-  /* Ensure colors are printed */
-  body,
-  .timetable-container,
-  .timetable,
-  .session-block {
-    -webkit-print-color-adjust: exact;
-    color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Hide UI-only elements */
   .noprint,
   .ui-controls,
   button,
-  .no-export,
   #openSidebarBtn,
   #closeSidebarBtn,
-  #semesterSelector,
   #college-tabs-container {
     display: none !important;
   }
 
-  /* Optimize timetable for printing */
-  .timetable-main-grid {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  /* Ensure proper margins */
   body {
     margin: 20mm;
     padding: 0;
   }
 
-  /* Optimize text rendering */
-  body {
-    font-size: 11pt;
-    line-height: 1.5;
-  }
-
-  /* Remove shadows and unnecessary styling */
   .shadow-lg,
   .shadow-md,
   .shadow {
     box-shadow: none !important;
   }
 
-  /* Ensure backgrounds are visible */
-  .bg-white {
-    background-color: white !important;
-  }
-
-  .bg-gray-100 {
-    background-color: #f3f4f6 !important;
-  }
-
-  /* Optimize table rendering */
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  th, td {
-    border: 1px solid #d1d5db;
-    padding: 8px;
-  }
-
-  th {
-    background-color: #007bff !important;
-    color: white !important;
-  }
-
-  /* Prevent image scaling issues */
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  /* Optimize links for printing */
-  a {
-    text-decoration: underline;
-  }
-
-  /* Ensure proper spacing */
-  .p-4 {
-    padding: 16px;
-  }
-
-  .mb-4 {
-    margin-bottom: 16px;
-  }
-
-  .mt-4 {
-    margin-top: 16px;
-  }
-
-  /* Fix time labels and hours at bottom */
-  .time-label {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  .time-slot {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  /* Ensure content doesn't get cut off */
-  .day-column {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-}
-
-/* Screen-only styles */
-@media screen {
-  .pdf-only {
-    display: none;
-  }
-}
-
-/* Print-only styles */
-@media print {
-  .screen-only {
-    display: none !important;
-  }
-
-  .pdf-only {
-    display: block;
+  body,
+  .timetable-container,
+  .session-block {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
   }
 }

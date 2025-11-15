@@ -144,6 +144,102 @@
     break-inside: avoid;
     page-break-inside: avoid;
   }
+
+  /* FIX: Print grid day headers with proper spacing */
+  .print-grid {
+    display: grid;
+    grid-template-columns: 80px repeat(5, 1fr);
+    border: 2px solid #000;
+    width: 100%;
+    gap: 0;
+  }
+
+  .print-header {
+    font-weight: bold;
+    text-align: center;
+    padding: 12px 4px;
+    border: 1px solid #999;
+    background: #d9d9d9;
+    font-size: 18px;
+    line-height: 1.4;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .print-day-header {
+    background: #595959;
+    color: white;
+    font-weight: bold;
+    padding: 16px 4px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .print-period-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: bold;
+    background: #fde9d9;
+    border: 1px solid #999;
+    font-size: 13px;
+    min-height: 140px;
+    padding: 8px 4px;
+  }
+
+  .print-cell {
+    border: 1px solid #999;
+    padding: 8px;
+    vertical-align: top;
+    min-height: 140px;
+  }
+
+  .print-session {
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 15px;
+    margin-bottom: 8px;
+    border: 1px solid black;
+    line-height: 1.4;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-session.compulsory {
+    border: 4px solid #ffff00;
+    box-shadow: 0 0 0 1px #ffd700;
+  }
+
+  .print-session.online {
+    border: 3px solid #3b82f6;
+  }
+
+  .print-session.blended {
+    border: 3px solid #3b82f6;
+  }
+
+  .print-session.compulsory.online {
+    border: 4px solid #ffff00;
+    box-shadow: 0 0 0 1px #ffd700, 0 0 0 4px #3b82f6;
+  }
+
+  .print-session.compulsory.blended {
+    border: 4px solid #ffff00;
+    box-shadow: 0 0 0 1px #ffd700, 0 0 0 4px #3b82f6;
+  }
+
+  .session-units {
+    font-size: 11px;
+    color: #555;
+    margin-top: 2px;
+    font-style: italic;
+  }
 }
 
 /* Screen-only styles */

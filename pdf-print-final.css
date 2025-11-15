@@ -53,13 +53,13 @@
     justify-content: center;
   }
 
-  /* DAY HEADERS - SIGNIFICANTLY INCREASED SPACING */
+  /* DAY HEADERS - MUCH LARGER SPACING */
   .print-day-header {
     background: #595959;
     color: white;
     font-weight: bold;
-    padding: 30px 8px;
-    min-height: 180px;
+    padding: 40px 8px;
+    min-height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -250,34 +250,5 @@
     <script src="makeDraggable.js"></script>
     <script src="draft-toggle.js"></script>
     <script src="timetable-download-mode.js"></script>
-    <script>
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeTimetable();
-            setupEventListeners();
-        });
-
-        function initializeTimetable() {
-            // Load data from localStorage
-            const data = JSON.parse(localStorage.getItem('timetableData')) || {};
-            // Initialize timetable rendering
-            renderTimetable(data);
-        }
-
-        function setupEventListeners() {
-            document.getElementById('openSidebarBtn').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.add('open');
-            });
-            document.getElementById('closeSidebarBtn').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.remove('open');
-            });
-            document.getElementById('printBtn').addEventListener('click', generatePdf);
-        }
-
-        function renderTimetable(data) {
-            // Timetable rendering logic
-            console.log('Rendering timetable with data:', data);
-        }
-    </script>
 </body>
 </html>

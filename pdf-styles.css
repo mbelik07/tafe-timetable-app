@@ -145,10 +145,11 @@
     page-break-inside: avoid;
   }
 
-  /* FIX: Print grid day headers with proper spacing */
+  /* FIX: Print grid with explicit row heights for day headers */
   .print-grid {
     display: grid;
     grid-template-columns: 80px repeat(5, 1fr);
+    grid-template-rows: auto auto;
     border: 2px solid #000;
     width: 100%;
     gap: 0;
@@ -168,18 +169,20 @@
     justify-content: center;
   }
 
-  /* INCREASED HEIGHT FOR DAY HEADERS - FIX FOR SPACING ISSUE */
+  /* FIXED: Day header with explicit height and padding */
   .print-day-header {
     background: #595959;
     color: white;
     font-weight: bold;
-    padding: 16px 4px;
-    min-height: 80px;
+    padding: 20px 4px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 0;
     border: 1px solid #999;
+    font-size: 16px;
+    line-height: 1.2;
+    word-wrap: break-word;
   }
 
   .print-period-label {

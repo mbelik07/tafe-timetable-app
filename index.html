@@ -12,6 +12,21 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
+:root {
+  --container-padding: 12px;
+  --cell-padding: 6px;
+  --section-margin: 12px;
+  --font-main: 12px;
+  --font-headers: 14px;
+  --font-session: 12px;
+  --line-height: 1.15;
+  --slot-height: 45px;
+  --time-column-width: 85px;
+  --border-color: #ddd;
+  --session-bg: #f7fbff;
+  --session-border: #c7e0ff;
+}
+
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
 .sidebar { transition: transform 0.3s ease-in-out; }
 .sidebar-open { transform: translateX(0) !important; }
@@ -19,17 +34,82 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .view-container.active { display: block; }
 .college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; }
 .college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
-.timetable-main-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(200px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
-.timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
-.time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
-.time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
-.day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; }
-.time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
+
+/* FIXED TIME GRID STYLES */
+.timetable-main-grid {
+  display: grid;
+  grid-template-columns: var(--time-column-width) repeat(5, 1fr);
+  gap: 0;
+  border: 1px solid var(--border-color);
+  background: white;
+}
+
+.timetable-header {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  padding: var(--cell-padding);
+  text-align: center;
+  border-left: 1px solid var(--border-color);
+  grid-row: 1;
+  font-size: var(--font-headers);
+  letter-spacing: 0.5px;
+}
+
+.time-labels {
+  grid-row: 2;
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.time-label {
+  height: var(--slot-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #333;
+  border-top: 1px solid #f0f0f0;
+  box-sizing: border-box;
+  background: #fafafa;
+  font-weight: 600;
+  padding: var(--cell-padding);
+}
+
+.day-column {
+  grid-row: 2;
+  position: relative;
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.time-slot {
+  height: var(--slot-height);
+  border-top: 1px solid #f0f0f0;
+  box-sizing: border-box;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
 .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
-.dragging .time-slot:hover { background-color: transparent !important; }
-.dragging .time-slot { cursor: default !important; }
 .time-slot.slot-selected { background-color: rgba(59, 130, 246, 0.3); }
-.session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
+
+.session-block {
+  position: absolute;
+  border-radius: 4px;
+  padding: var(--cell-padding);
+  font-size: var(--font-session);
+  line-height: var(--line-height);
+  overflow: hidden;
+  border: 1px solid #c7e0ff;
+  z-index: 10;
+  cursor: grab;
+  background: var(--session-bg);
+  letter-spacing: 0.2px;
+}
+
 .session-block.compulsory { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700; }
 .session-block.online { box-shadow: 0 0 0 3px #3b82f6; }
 .session-block.blended { box-shadow: 0 0 0 3px #3b82f6; }
@@ -39,49 +119,51 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
 @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
+
 .context-menu { position: fixed; background: #2d3748; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; min-width: 200px; display: none; }
 .context-menu.active { display: block; }
 .context-menu-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #4a5568; }
 .context-menu-item:last-child { border-bottom: none; }
 .context-menu-item:hover { background: #4a5568; }
+
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
 .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; z-index: 101; }
 .modal-overlay.active { display: block; }
 
 /* PDF Print Styles - Optimized for single page */
 .pdf-print-grid { width: 100%; border-collapse: collapse; margin-bottom: 8px; table-layout: fixed; }
-.pdf-print-grid th, .pdf-print-grid td { border: 1px solid #000; padding: 4px; text-align: left; font-size: 9px; }
+.pdf-print-grid th, .pdf-print-grid td { border: 1px solid #000; padding: 6px; text-align: left; font-size: 10px; }
 .pdf-print-grid th { background-color: #595959; color: white; font-weight: bold; }
-.pdf-print-grid td:first-child, .pdf-print-grid th:first-child { width: 65px !important; max-width: 65px !important; }
+.pdf-print-grid td:first-child, .pdf-print-grid th:first-child { width: 85px !important; max-width: 85px !important; }
 .pdf-day-header { background-color: #595959; color: white; font-weight: bold; text-align: center; }
-.pdf-period-label { background-color: #fde9d9; font-weight: bold; text-align: center; vertical-align: middle; min-height: 100px; width: 65px !important; max-width: 65px !important; padding: 3px 2px; font-size: 10px; word-break: break-word; overflow-wrap: break-word; }
-.pdf-cell { vertical-align: top; min-height: 100px; padding: 3px !important; }
-.pdf-session { border: 1px solid #000; border-radius: 2px; padding: 2px; margin-bottom: 2px; font-size: 8px; line-height: 1.1; }
+.pdf-period-label { background-color: #fde9d9; font-weight: bold; text-align: center; vertical-align: middle; min-height: 100px; width: 85px !important; max-width: 85px !important; padding: 6px; font-size: 11px; word-break: break-word; overflow-wrap: break-word; }
+.pdf-cell { vertical-align: top; min-height: 100px; padding: 6px !important; }
+.pdf-session { border: 1px solid #000; border-radius: 2px; padding: 4px; margin-bottom: 2px; font-size: 10px; line-height: 1.2; }
 .pdf-session.compulsory { border: 2px solid #ffff00; background-color: #fffacd; }
 .pdf-session.online { border: 1px solid #3b82f6; }
 .pdf-session.blended { border: 1px solid #3b82f6; }
 
-.pdf-container { width: 100%; padding: 8px; background: white; }
-.pdf-title { text-align: center; margin-bottom: 4px; }
+.pdf-container { width: 100%; padding: 12px; background: white; }
+.pdf-title { text-align: center; margin-bottom: 12px; }
 .pdf-title h2 { font-size: 16px; font-weight: bold; margin: 0; }
-.pdf-title h3 { font-size: 11px; margin: 2px 0 0 0; color: #666; }
+.pdf-title h3 { font-size: 12px; margin: 4px 0 0 0; color: #666; }
 
-.pdf-bottom-section { margin-top: 6px; display: flex; gap: 6px; }
-.pdf-teacher-info { flex: 0.6; padding: 4px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
-.pdf-teacher-info h4 { font-weight: bold; margin-bottom: 2px; font-size: 9px; }
-.pdf-teacher-info p { margin: 1px 0; font-size: 8px; }
+.pdf-bottom-section { margin-top: 12px; display: flex; gap: 8px; align-items: flex-start; }
+.pdf-teacher-info { flex: 0 0 25%; padding: 8px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
+.pdf-teacher-info h4 { font-weight: bold; margin-bottom: 6px; font-size: 12px; }
+.pdf-teacher-info p { margin: 4px 0; font-size: 11px; }
 
-.pdf-notes-section { flex: 1.2; padding: 4px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
-.pdf-notes-section h4 { font-weight: bold; margin-bottom: 2px; font-size: 9px; }
-.pdf-notes-content { border: 1px solid #ccc; padding: 4px; background-color: #fff; min-height: 45px; font-size: 9px; line-height: 1.2; white-space: pre-wrap; word-wrap: break-word; }
+.pdf-notes-section { flex: 1 1 55%; padding: 8px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
+.pdf-notes-section h4 { font-weight: bold; margin-bottom: 6px; font-size: 12px; }
+.pdf-notes-content { border: 1px solid #ccc; padding: 6px; background-color: #fff; min-height: 60px; font-size: 11px; line-height: 1.2; white-space: pre-wrap; word-wrap: break-word; }
 
-.pdf-legend-section { flex: 0.5; padding: 4px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
-.pdf-legend-section h4 { font-weight: bold; margin-bottom: 2px; font-size: 9px; }
-.pdf-legend-item { display: flex; align-items: center; gap: 3px; margin-bottom: 2px; font-size: 8px; }
-.pdf-legend-circle { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.pdf-legend-section { flex: 0 0 20%; padding: 8px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
+.pdf-legend-section h4 { font-weight: bold; margin-bottom: 6px; font-size: 12px; }
+.pdf-legend-item { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; font-size: 10px; }
+.pdf-legend-circle { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 
-.pdf-total-hours { margin-top: 6px; text-align: right; font-size: 10px; font-weight: bold; }
-.pdf-total-hours-value { display: inline-block; background: #1f2937; color: white; padding: 3px 8px; border-radius: 2px; margin-left: 4px; font-size: 9px; }
+.pdf-total-hours { margin-top: 12px; text-align: right; font-size: 12px; font-weight: bold; }
+.pdf-total-hours-value { display: inline-block; background: #1f2937; color: white; padding: 4px 10px; border-radius: 2px; margin-left: 6px; font-size: 11px; }
 
 .color-circle { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #999; margin-right: 8px; vertical-align: middle; }
 .course-list-item { padding: 12px; margin-bottom: 8px; background: #f3f4f6; border: 2px solid transparent; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
@@ -125,8 +207,8 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
   #print-area, #print-area * { visibility: visible; } 
   #print-area { position: absolute; left: 0; top: 0; width: 100%; } 
   .no-print { display: none !important; }
-  .pdf-container { padding: 6px; }
-  .pdf-print-grid { margin-bottom: 4px; }
+  .pdf-container { padding: 10px; }
+  .pdf-print-grid { margin-bottom: 6px; }
 }
 </style>
 </head>
@@ -182,20 +264,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
-<div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
-<div class="text-center p-8 bg-white rounded-lg shadow-xl border-2 border-blue-500">
-<div style="width: 60px; height: 60px; border: 4px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
-<h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
-<p class="text-gray-600">Please wait, this may take a moment.</p>
-</div>
-</div>
-<style>
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-</style>
 
-<!-- PDF Generator Script -->
 <script src="pdf-generator.js"></script>
 
 <script>
@@ -324,42 +393,19 @@ teachers: [
 { Name: 'Juan', Surname: 'Aburto', Initials: 'JA', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'juan.aburto@tafe.edu.au' },
 { Name: 'Cary', Surname: 'Buecher', Initials: 'CB', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 8, Email: 'cary.buecher@tafe.edu.au' },
 { Name: 'Miroslav', Surname: 'Belik', Initials: 'MB', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'miroslav.belik@tafe.edu.au' },
-{ Name: 'Carlie', Surname: 'Dally', Initials: 'CD', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'carlie.dally@tafe.edu.au' },
-{ Name: 'Bernadette', Surname: 'Flynn-Whitehall', Initials: 'BF', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4, Email: 'bernadette.flynn@tafe.edu.au' },
-{ Name: 'Cary', Surname: 'Buecher', Initials: 'CB2', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 8, Email: 'cary.buecher2@tafe.edu.au' },
-{ Name: 'Christopher', Surname: 'Worland', Initials: 'CW', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'christopher.worland@tafe.edu.au' },
-{ Name: 'David', Surname: 'Baird', Initials: 'DB', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'david.baird@tafe.edu.au' },
-{ Name: 'David', Surname: 'Cole', Initials: 'DC', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'david.cole@tafe.edu.au' },
-{ Name: 'Georgina', Surname: 'Templeton', Initials: 'GT', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'georgina.templeton@tafe.edu.au' },
-{ Name: 'Ian', Surname: 'Willis', Initials: 'IW', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 4, Email: 'ian.willis@tafe.edu.au' },
-{ Name: 'Karen', Surname: 'Gardner', Initials: 'KG', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'karen.gardner@tafe.edu.au' },
-{ Name: 'Kerri-Anne', Surname: 'Smith', Initials: 'KS', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4, Email: 'kerri-anne.smith@tafe.edu.au' },
-{ Name: 'Rosalind', Surname: 'Phillips', Initials: 'RP', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4, Email: 'rosalind.phillips@tafe.edu.au' },
-{ Name: 'Rosalind', Surname: 'Tuohy', Initials: 'RT', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'rosalind.tuohy@tafe.edu.au' },
-{ Name: 'Susan', Surname: 'Neild', Initials: 'SN', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4, Email: 'susan.neild@tafe.edu.au' },
-{ Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'anna.nikonova@tafe.edu.au' }
 ],
 subjects: [
 { Subject: 'Health TPC', CourseCode: 'FSK20119', Color: '#ffa57d', Units: ['NAT11225026'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
 { Subject: 'Maths B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225020'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
-{ Subject: 'History TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225017'], Compulsory: false, DeliveryMode: 'Online' },
-{ Subject: 'Film and Media TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225015'], Compulsory: false, DeliveryMode: 'Blended' },
-{ Subject: 'English B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225002'], Compulsory: true, DeliveryMode: 'Face-to-Face' },
-{ Subject: 'Maths B Calculus TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225021'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
-{ Subject: 'Compulsory Dig Lit Units PFS', CourseCode: 'FSK20119', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'], Compulsory: true, DeliveryMode: 'Blended' },
-{ Subject: 'English A PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'], Compulsory: true, DeliveryMode: 'Face-to-Face' },
-{ Subject: 'Human Rights PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'], Compulsory: false, DeliveryMode: 'Online' },
-{ Subject: 'Study Skills', CourseCode: '11225NAT', Color: '#90ee90', Units: ['NAT11225030'], Compulsory: true, DeliveryMode: 'Face-to-Face' }
 ],
 schedule: [
-{ id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
-{ id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
+{ id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '11:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
+{ id: 2, Day: 'Tuesday', ClassStart: '09:00', ClassEnd: '11:00', TeacherInitials: 'CB', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
+{ id: 3, Day: 'Monday', ClassStart: '11:00', ClassEnd: '12:30', TeacherInitials: 'MB', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C2', colleges: ['Moss Vale'], notes: '', dispute: null },
+{ id: 4, Day: 'Wednesday', ClassStart: '11:00', ClassEnd: '12:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C5', colleges: ['Moss Vale'], notes: '', dispute: null },
 ],
 courseNotes: {},
-tasks: [
-{ id: 1, title: 'Prepare materials for FSK20119', description: 'Photocopy worksheets and prepare online resources.', teacher: 'JA', course: 'FSK20119', colleges: ['Moss Vale'], priority: 'high', status: 'todo', dueDate: '2024-08-01' },
-{ id: 2, title: 'Mark mid-term exams', description: '', teacher: 'MB', course: '11225NAT', colleges: ['Moss Vale'], priority: 'medium', status: 'inprogress', dueDate: '2024-08-15' },
-]
+tasks: []
 });
 
 openSidebarBtn.addEventListener('click', () => {
@@ -1090,51 +1136,11 @@ renderTeacherPrintView(teacherInitials);
 document.getElementById('teacherDropdown').classList.remove('show');
 };
 
-function arrangeOverlappingSessions(dayCol, sessions) {
-const groups = [];
-sessions.forEach(session => {
-let addedToGroup = false;
-for (let group of groups) {
-const overlaps = group.some(s => {
-const s1Start = timeToMinutes(session.ClassStart);
-const s1End = timeToMinutes(session.ClassEnd);
-const s2Start = timeToMinutes(s.ClassStart);
-const s2End = timeToMinutes(s.ClassEnd);
-return s1Start < s2End && s2Start < s1End;
-});
-if (overlaps) {
-group.push(session);
-addedToGroup = true;
-break;
-}
-}
-if (!addedToGroup) {
-groups.push([session]);
-}
-});
-
-groups.forEach(group => {
-const count = group.length;
-if (count > 1) {
-group.forEach((session, index) => {
-const block = dayCol.querySelector(`[data-session-id="${session.id}"]`);
-if (block) {
-const widthPercent = (100 / count);
-const leftPercent = (100 / count) * index;
-block.style.left = `${leftPercent}%`;
-block.style.right = `${100 - leftPercent - widthPercent}%`;
-block.style.width = 'auto';
-}
-});
-}
-});
-}
-
 function renderMainTimetableView() {
 const grid = document.getElementById('main-timetable-grid');
 const titleEl = document.getElementById('main-timetable-title');
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const startTime = 8, endTime = 22, slotHeight = 30;
+const startTime = 8, endTime = 22, slotHeight = 45;
 const totalRows = (endTime - startTime) * 2;
 const semesterData = getCurrentSemesterData();
 
@@ -1402,7 +1408,7 @@ function makeResizable(element, session) {
 const handle = element.querySelector('.resize-handle');
 handle.addEventListener('mousedown', (e) => {
 e.stopPropagation();
-const startY = e.clientY, startHeight = element.offsetHeight, slotHeight = 30;
+const startY = e.clientY, startHeight = element.offsetHeight, slotHeight = 45;
 const onMouseMove = (e) => { element.style.height = `${Math.max(slotHeight, startHeight + (e.clientY - startY))}px`; };
 const onMouseUp = () => {
 document.removeEventListener('mousemove', onMouseMove);
@@ -1415,6 +1421,46 @@ processAndRenderAll();
 };
 document.addEventListener('mousemove', onMouseMove);
 document.addEventListener('mouseup', onMouseUp);
+});
+}
+
+function arrangeOverlappingSessions(dayCol, sessions) {
+const groups = [];
+sessions.forEach(session => {
+let addedToGroup = false;
+for (let group of groups) {
+const overlaps = group.some(s => {
+const s1Start = timeToMinutes(session.ClassStart);
+const s1End = timeToMinutes(session.ClassEnd);
+const s2Start = timeToMinutes(s.ClassStart);
+const s2End = timeToMinutes(s.ClassEnd);
+return s1Start < s2End && s2Start < s1End;
+});
+if (overlaps) {
+group.push(session);
+addedToGroup = true;
+break;
+}
+}
+if (!addedToGroup) {
+groups.push([session]);
+}
+});
+
+groups.forEach(group => {
+const count = group.length;
+if (count > 1) {
+group.forEach((session, index) => {
+const block = dayCol.querySelector(`[data-session-id="${session.id}"]`);
+if (block) {
+const widthPercent = (100 / count);
+const leftPercent = (100 / count) * index;
+block.style.left = `${leftPercent}%`;
+block.style.right = `${100 - leftPercent - widthPercent}%`;
+block.style.width = 'auto';
+}
+});
+}
 });
 }
 
@@ -1653,23 +1699,23 @@ const teacherDisplay = s.TeacherInitials
 : (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials))
 : 'UNASSIGNED';
 const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 10px; color: #4338ca; margin-bottom: 2px;">${s.colleges?.join(', ') || ''}</div>` : '';
-const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 8px; margin-top: 2px;">${s.notes}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 8px; color: #555; margin-top: 1px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 8px; color: #d32f2f; margin-top: 1px;">COMPULSORY</div>` : '';
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 10px; margin-top: 3px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
 const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
-const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 8px; color: #3b82f6; margin-top: 1px;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
 const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
 return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
-<div style="font-weight: bold; margin-bottom: 1px; font-size: 10px;">${s.CourseCode} | ${s.Subject}</div>
+<div style="font-weight: bold; margin-bottom: 3px; font-size: 11px;">${s.CourseCode} | ${s.Subject}</div>
 ${compulsoryBadge}
 ${deliveryBadge}
 ${unitsHTML}
-<div style="margin-top: 1px; font-size: 8px;">${teacherDisplay} | ${hours.toFixed(2)}h | Rm ${s.Room}</div>
+<div style="margin-top: 3px; font-size: 10px;">${teacherDisplay} | ${hours.toFixed(2)}h | Rm ${s.Room}</div>
 ${notesHTML}
-<div style="margin-top: 1px; font-size: 8px;">${s.ClassStart}-${s.ClassEnd}</div>
+<div style="margin-top: 3px; font-size: 10px;">${s.ClassStart}-${s.ClassEnd}</div>
 </div>`;
 }).join('');
 
@@ -1795,23 +1841,23 @@ const coTeacher = s.TeacherInitials === teacherInitials
 : semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
 const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
 const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 10px; color: #4338ca; margin-bottom: 2px;">${s.colleges?.join(', ') || ''}</div>` : '';
-const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 8px; margin-top: 2px;">${s.notes}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 8px; color: #555; margin-top: 1px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 8px; color: #d32f2f; margin-top: 1px;">COMPULSORY</div>` : '';
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 10px; margin-top: 3px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
 const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
-const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 8px; color: #3b82f6; margin-top: 1px;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
 const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
 return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
-<div style="font-weight: bold; margin-bottom: 1px; font-size: 10px;">${s.CourseCode} | ${s.Subject}</div>
+<div style="font-weight: bold; margin-bottom: 3px; font-size: 11px;">${s.CourseCode} | ${s.Subject}</div>
 ${compulsoryBadge}
 ${deliveryBadge}
 ${unitsHTML}
-<div style="margin-top: 1px; font-size: 8px;">${hours.toFixed(2)}h | Rm ${s.Room}${coTeacherDisplay}</div>
+<div style="margin-top: 3px; font-size: 10px;">${hours.toFixed(2)}h | Rm ${s.Room}${coTeacherDisplay}</div>
 ${notesHTML}
-<div style="margin-top: 1px; font-size: 8px;">${s.ClassStart}-${s.ClassEnd}</div>
+<div style="margin-top: 3px; font-size: 10px;">${s.ClassStart}-${s.ClassEnd}</div>
 </div>`;
 }).join('');
 

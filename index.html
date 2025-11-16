@@ -1693,8 +1693,13 @@ const courseTeachers = Array.from(uniqueTeacherInitials)
 
 const teacherContactHTML = courseTeachers.length > 0 ? `
 <div class="pdf-teacher-info">
-<h4>Teacher Contact:</h4>
-${courseTeachers.map(t => `<p>${t.Name} ${t.Surname} - ${t.Email}</p>`).join('')}
+<h4 style="font-size: 14px; margin-bottom: 8px;">Teacher Contact:</h4>
+${courseTeachers.map(t => `
+<div style="margin-bottom: 8px; font-size: 12px; line-height: 1.5;">
+<strong>${t.Name} ${t.Surname}</strong><br/>
+${t.Email ? `<a href="mailto:${t.Email}" style="color: #0066cc; text-decoration: underline; word-break: break-all; font-size: 12px;">${t.Email}</a>` : ''}
+</div>
+`).join('')}
 </div>
 ` : '';
 

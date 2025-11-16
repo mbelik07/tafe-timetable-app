@@ -49,11 +49,11 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .modal-overlay.active { display: block; }
 
 /* PDF Print Styles */
-.pdf-print-grid { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.pdf-print-grid { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
 .pdf-print-grid th, .pdf-print-grid td { border: 1px solid #000; padding: 8px; text-align: left; }
 .pdf-print-grid th { background-color: #595959; color: white; font-weight: bold; }
 .pdf-day-header { background-color: #595959; color: white; font-weight: bold; text-align: center; }
-.pdf-period-label { background-color: #fde9d9; font-weight: bold; text-align: center; vertical-align: middle; min-height: 160px; }
+.pdf-period-label { background-color: #fde9d9; font-weight: bold; text-align: center; vertical-align: middle; min-height: 160px; width: 60px; padding: 8px 4px; font-size: 12px; word-wrap: break-word; }
 .pdf-cell { vertical-align: top; min-height: 160px; }
 .pdf-session { border: 1px solid #000; border-radius: 4px; padding: 8px; margin-bottom: 6px; font-size: 12px; line-height: 1.4; }
 .pdf-session.compulsory { border: 3px solid #ffff00; background-color: #fffacd; }
@@ -81,7 +81,9 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 
 .pdf-total-hours { margin-top: 15px; text-align: right; font-size: 14px; font-weight: bold; }
 .pdf-total-hours-value { display: inline-block; background: #1f2937; color: white; padding: 8px 16px; border-radius: 4px; margin-left: 10px; }
-
+.pdf-print-grid td:first-child { width: 60px; }
+.pdf-print-grid th:first-child { width: 60px; }
+  
 .color-circle { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #999; margin-right: 8px; vertical-align: middle; }
 .course-list-item { padding: 12px; margin-bottom: 8px; background: #f3f4f6; border: 2px solid transparent; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
 .course-list-item:hover { background: #e5e7eb; }

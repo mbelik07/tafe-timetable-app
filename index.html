@@ -19,17 +19,17 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .view-container.active { display: block; }
 .college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; }
 .college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
-.timetable-main-grid { display: grid; grid-template-columns: 40px repeat(5, minmax(150px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
+.timetable-main-grid { display: grid; grid-template-columns: 40px repeat(5, 1fr); grid-template-rows: auto repeat(28, 30px); border: 1px solid #d1d5db; }
 .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
-.time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
+.time-labels { grid-row: 2 / span 28; grid-column: 1; display: flex; flex-direction: column; }
 .time-label { height: 30px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #6b7280; border-top: 1px solid #e5e7eb; box-sizing: border-box; }
-.day-column { grid-row: 2; position: relative; border-left: 1px solid #d1d5db; }
+.day-column { grid-row: 2 / span 28; position: relative; border-left: 1px solid #d1d5db; }
 .time-slot { height: 30px; border-top: 1px solid #e5e7eb; box-sizing: border-box; cursor: pointer; }
 .time-slot:hover { background-color: rgba(229, 231, 235, 0.5); }
 .dragging .time-slot:hover { background-color: transparent !important; }
 .dragging .time-slot { cursor: default !important; }
 .time-slot.slot-selected { background-color: rgba(59, 130, 246, 0.3); }
-.session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; }
+.session-block { position: absolute; border-radius: 4px; padding: 6px; font-size: 14px; line-height: 1.3; overflow: hidden; border: 1px solid rgba(0,0,0,0.4); z-index: 10; cursor: grab; left: 2px; right: 2px; }
 .session-block.compulsory { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700; }
 .session-block.online { box-shadow: 0 0 0 3px #3b82f6; }
 .session-block.blended { box-shadow: 0 0 0 3px #3b82f6; }
@@ -353,7 +353,7 @@ subjects: [
 ],
 schedule: [
 { id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
-{ id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
+{ id: 2, Day: 'Tuesday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
 ],
 courseNotes: {},
 tasks: [
@@ -1134,21 +1134,15 @@ function renderMainTimetableView() {
 const grid = document.getElementById('main-timetable-grid');
 const titleEl = document.getElementById('main-timetable-title');
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const startTime = 8, endTime = 22, slotHeight = 30;
-const totalRows = (endTime - startTime) * 2;
+const startTime = 8, endTime = 22;
 const semesterData = getCurrentSemesterData();
 
 titleEl.textContent = `${semesterData.currentCollege} Timetable - ${db.currentSemester}`;
 
 let gridHTML = `<div style="grid-row: 1; grid-column: 1;"></div>` + days.map((day, i) => `<div class="timetable-header" style="grid-column: ${i + 2};">${day}</div>`).join('');
-gridHTML += `<div class="time-labels">${Array.from({length: totalRows}, (_, i) => `<div class="time-label">${(i % 2 === 0) ? `<strong>${startTime + i/2}:00</strong>` : ''}</div>`).join('')}</div>`;
+gridHTML += `<div class="time-labels">${Array.from({length: 28}, (_, i) => `<div class="time-label">${(i % 2 === 0) ? `<strong>${startTime + i/2}:00</strong>` : ''}</div>`).join('')}</div>`;
 gridHTML += days.map((day, i) => {
-let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2}; height: ${totalRows * slotHeight}px">`;
-for (let j = 0; j < totalRows; j++) {
-const time = startTime + j * 0.5;
-const timeString = `${Math.floor(time).toString().padStart(2, '0')}:${((time % 1) * 60).toString().padStart(2, '0')}`;
-dayColHTML += `<div class="time-slot" data-day="${day}" data-time="${timeString}" data-slot-index="${j}"></div>`;
-}
+let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2};">`;
 return dayColHTML + `</div>`;
 }).join('');
 grid.innerHTML = gridHTML;
@@ -1157,17 +1151,12 @@ const scheduleToRender = semesterData.currentCollege === 'Master View'
 ? semesterData.schedule 
 : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
-const sessionsByDay = {};
-days.forEach(day => sessionsByDay[day] = []);
-
 scheduleToRender.forEach(session => {
 const dayCol = grid.querySelector(`.day-column[data-day="${session.Day}"]`);
 if (!dayCol) return;
 
-sessionsByDay[session.Day].push(session);
-
-const start = timeToMinutes(session.ClassStart) / 30 - startTime * 2;
-const height = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 30 * slotHeight;
+const start = (timeToMinutes(session.ClassStart) - startTime * 60) / 30;
+const height = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 30;
 const subjectInfo = semesterData.subjects.find(s => s.Subject === session.Subject);
 const teacher1Info = semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
 const teacher2Info = session.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === session.TeacherInitials2) : null;
@@ -1186,7 +1175,11 @@ const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === '
 const sessionBlock = document.createElement('div');
 sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}`;
 sessionBlock.setAttribute('data-session-id', session.id);
-Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
+Object.assign(sessionBlock.style, { 
+  top: `${start * 30}px`, 
+  height: `${height * 30}px`, 
+  backgroundColor: subjectInfo?.Color || '#e5e7eb'
+});
 sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
 sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
 sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
@@ -1194,15 +1187,6 @@ dayCol.appendChild(sessionBlock);
 makeDraggable(sessionBlock, session, grid);
 makeResizable(sessionBlock, session);
 });
-
-days.forEach(day => {
-const dayCol = grid.querySelector(`.day-column[data-day="${day}"]`);
-if (dayCol && sessionsByDay[day].length > 0) {
-arrangeOverlappingSessions(dayCol, sessionsByDay[day]);
-}
-});
-
-addSlotSelectionListeners();
 }
 
 function showContextMenu(e, session) {
@@ -1277,55 +1261,6 @@ processAndRenderAll();
 contextMenu.classList.remove('active');
 };
 
-function addSlotSelectionListeners() {
-if (getCurrentSemesterData().currentCollege === 'Master View') return;
-let isSelecting = false, startSlot = null, dayOfSelection = null;
-const grid = document.getElementById('main-timetable-grid');
-
-grid.addEventListener('mousedown', (e) => {
-const slot = e.target.closest('.time-slot');
-if (!slot || e.target.closest('.session-block')) return;
-isSelecting = true;
-dayOfSelection = slot.dataset.day;
-startSlot = slot;
-clearSlotSelection();
-slot.classList.add('slot-selected');
-document.addEventListener('mousemove', onMouseMove);
-document.addEventListener('mouseup', onMouseUp);
-});
-
-function onMouseMove(e) {
-if (!isSelecting) return;
-const slot = e.target.closest('.time-slot');
-if (!slot || slot.dataset.day !== dayOfSelection) return;
-clearSlotSelection();
-const startIndex = parseInt(startSlot.dataset.slotIndex, 10);
-const currentIndex = parseInt(slot.dataset.slotIndex, 10);
-const [minIndex, maxIndex] = [Math.min(startIndex, currentIndex), Math.max(startIndex, currentIndex)];
-const dayColumn = grid.querySelector(`.day-column[data-day="${dayOfSelection}"]`);
-const slotsInDay = dayColumn.querySelectorAll('.time-slot');
-for (let i = minIndex; i <= maxIndex; i++) {
-if (slotsInDay[i]) slotsInDay[i].classList.add('slot-selected');
-}
-}
-
-function onMouseUp() {
-if (!isSelecting) return;
-isSelecting = false;
-document.removeEventListener('mousemove', onMouseMove);
-document.removeEventListener('mouseup', onMouseUp);
-const selected = grid.querySelectorAll('.slot-selected');
-if (selected.length > 0) {
-const day = selected[0].dataset.day, startTime = selected[0].dataset.time;
-const lastSlotIndex = parseInt(selected[selected.length - 1].dataset.slotIndex, 10);
-const endMinutes = (8 * 60) + ((lastSlotIndex + 1) * 30);
-const endTime = `${Math.floor(endMinutes / 60).toString().padStart(2, '0')}:${(endMinutes % 60).toString().padStart(2, '0')}`;
-openSessionModal(null, day, startTime, endTime);
-}
-}
-const clearSlotSelection = () => grid.querySelectorAll('.slot-selected').forEach(s => s.classList.remove('slot-selected'));
-}
-
 function makeDraggable(element, session, grid) {
 let clone, offsetX, offsetY;
 let isDragging = false;
@@ -1378,14 +1313,18 @@ if (grid) grid.classList.remove('dragging');
 
 clone.style.visibility = 'hidden';
 const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
-const timeSlot = dropTarget?.closest('.time-slot');
+const dayCol = dropTarget?.closest('.day-column');
 
-if (timeSlot) {
+if (dayCol) {
+const rect = dayCol.getBoundingClientRect();
+const relativeY = e.clientY - rect.top;
+const slotIndex = Math.floor(relativeY / 30);
+const startTime = 8 + (slotIndex * 0.5);
+const startMins = Math.floor(startTime) * 60 + ((startTime % 1) * 60);
 const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
-const startMins = (8 * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
 const endMins = startMins + duration;
 const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
-session.Day = timeSlot.dataset.day;
+session.Day = dayCol.dataset.day;
 session.ClassStart = format(startMins);
 session.ClassEnd = format(endMins);
 }
@@ -1402,13 +1341,13 @@ function makeResizable(element, session) {
 const handle = element.querySelector('.resize-handle');
 handle.addEventListener('mousedown', (e) => {
 e.stopPropagation();
-const startY = e.clientY, startHeight = element.offsetHeight, slotHeight = 30;
-const onMouseMove = (e) => { element.style.height = `${Math.max(slotHeight, startHeight + (e.clientY - startY))}px`; };
+const startY = e.clientY, startHeight = element.offsetHeight;
+const onMouseMove = (e) => { element.style.height = `${Math.max(30, startHeight + (e.clientY - startY))}px`; };
 const onMouseUp = () => {
 document.removeEventListener('mousemove', onMouseMove);
 document.removeEventListener('mouseup', onMouseUp);
-const finalHeight = Math.round(element.offsetHeight / slotHeight) * slotHeight;
-const duration = (finalHeight / slotHeight) * 30;
+const finalHeight = Math.round(element.offsetHeight / 30) * 30;
+const duration = (finalHeight / 30) * 30;
 const endMins = timeToMinutes(session.ClassStart) + duration;
 session.ClassEnd = `${Math.floor(endMins / 60).toString().padStart(2, '0')}:${(endMins % 60).toString().padStart(2, '0')}`;
 processAndRenderAll();

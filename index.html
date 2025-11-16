@@ -9,8 +9,8 @@
 <meta content="website" property="og:type"/>
 <link href="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762158838/u1103083350_img_64x64_ad306614_xji6gn.png" rel="icon"/>
 <title>TAFE Interactive Timetabling Application</title>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
 .sidebar { transition: transform 0.3s ease-in-out; }
@@ -47,42 +47,30 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
 .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; z-index: 101; }
 .modal-overlay.active { display: block; }
-
-/* PDF Print Styles */
-.pdf-print-grid { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-.pdf-print-grid th, .pdf-print-grid td { border: 1px solid #000; padding: 8px; text-align: left; }
-.pdf-print-grid th { background-color: #595959; color: white; font-weight: bold; }
-.pdf-day-header { background-color: #595959; color: white; font-weight: bold; text-align: center; }
-.pdf-period-label { background-color: #fde9d9; font-weight: bold; text-align: center; vertical-align: middle; min-height: 160px; }
-.pdf-cell { vertical-align: top; min-height: 160px; }
-.pdf-session { border: 1px solid #000; border-radius: 4px; padding: 8px; margin-bottom: 6px; font-size: 12px; line-height: 1.4; }
-.pdf-session.compulsory { border: 3px solid #ffff00; background-color: #fffacd; }
-.pdf-session.online { border: 2px solid #3b82f6; }
-.pdf-session.blended { border: 2px solid #3b82f6; }
-
-.pdf-container { width: 100%; padding: 20px; background: white; }
-.pdf-title { text-align: center; margin-bottom: 10px; }
-.pdf-title h2 { font-size: 24px; font-weight: bold; margin: 0; }
-.pdf-title h3 { font-size: 16px; margin: 5px 0 0 0; color: #666; }
-
-.pdf-bottom-section { margin-top: 20px; display: flex; gap: 15px; }
-.pdf-teacher-info { flex: 1; }
-.pdf-teacher-info h4 { font-weight: bold; margin-bottom: 10px; font-size: 14px; }
-.pdf-teacher-info p { margin: 5px 0; font-size: 12px; }
-
-.pdf-notes-section { flex: 1; }
-.pdf-notes-section h4 { font-weight: bold; margin-bottom: 10px; font-size: 14px; }
-.pdf-notes-content { border: 1px solid #ccc; padding: 10px; background-color: #f9f9f9; min-height: 100px; font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
-
-.pdf-legend-section { flex: 0.5; }
-.pdf-legend-section h4 { font-weight: bold; margin-bottom: 10px; font-size: 14px; }
-.pdf-legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
-.pdf-legend-circle { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; }
-
-.pdf-total-hours { margin-top: 15px; text-align: right; font-size: 14px; font-weight: bold; }
-.pdf-total-hours-value { display: inline-block; background: #1f2937; color: white; padding: 8px 16px; border-radius: 4px; margin-left: 10px; }
-
+.print-grid { display: grid; grid-template-columns: 80px repeat(5, 1fr); border: 2px solid #000; }
+.print-header { font-weight: bold; text-align: center; padding: 4px; border: 1px solid #999; background: #d9d9d9; font-size: 18px; line-height: 1.2; }
+.print-day-header { background: #595959; color: white; }
+.print-period-label { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; background: #fde9d9; border: 1px solid #999; font-size: 13px; min-height: 140px; }
+.print-cell { border: 1px solid #999; padding: 4px; vertical-align: top; min-height: 140px; }
+.print-session { border-radius: 4px; padding: 6px; font-size: 15px; margin-top: 5px; border: 1px solid black; line-height: 1.3; }
+.print-session.compulsory { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700; }
+.print-session.online { border: 3px solid #3b82f6; }
+.print-session.blended { border: 3px solid #3b82f6; }
+.print-session.compulsory.online { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700, 0 0 0 4px #3b82f6; }
+.print-session.compulsory.blended { border: 4px solid #ffff00; box-shadow: 0 0 0 1px #ffd700, 0 0 0 4px #3b82f6; }
+.session-units { font-size: 11px; color: #555; margin-top: 2px; font-style: italic; }
 .color-circle { display: inline-block; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #999; margin-right: 8px; vertical-align: middle; }
+.bottom-sections-container { display: flex; gap: 1.5rem; margin-top: 1rem; }
+.teacher-contact-info { flex: 3.5; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background-color: #f3f4f6; }
+.teacher-contact-info h4 { font-weight: bold; margin-bottom: 0.5rem; color: #1f2937; font-size: 1rem; }
+.teacher-contact-info p { margin: 0.25rem 0; font-size: 1rem; color: #374151; }
+.notes-section { flex: 3.5; padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background-color: #f9fafb; display: flex; flex-direction: column; }
+.notes-section label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #1f2937; font-size: 1rem; }
+.notes-section textarea { flex: 1; width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 0.875rem; resize: vertical; min-height: 80px; }
+.legend-section { flex: 1; padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; background-color: #f9fafb; }
+.legend-section h4 { font-weight: bold; margin-bottom: 0.75rem; color: #1f2937; font-size: 1rem; }
+.legend-item { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; font-size: 0.95rem; color: #374151; }
+.legend-circle { display: inline-block; width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
 .course-list-item { padding: 12px; margin-bottom: 8px; background: #f3f4f6; border: 2px solid transparent; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
 .course-list-item:hover { background: #e5e7eb; }
 .course-list-item.active { background: #dbeafe; border-color: #3b82f6; font-weight: bold; }
@@ -118,13 +106,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .college-checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500; }
 .college-checkbox-label input { cursor: pointer; width: 18px; height: 18px; }
 .unassigned-badge { display: inline-block; background: #fbbf24; color: #78350f; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
-
-@media print { 
-  body * { visibility: hidden; } 
-  #print-area, #print-area * { visibility: visible; } 
-  #print-area { position: absolute; left: 0; top: 0; width: 100%; } 
-  .no-print { display: none !important; } 
-}
+@media print { body * { visibility: hidden; } #print-area, #print-area * { visibility: visible; } #print-area { position: absolute; left: 0; top: 0; width: 100%; } .no-print { display: none; } .bottom-sections-container { page-break-inside: avoid; } }
 </style>
 </head>
 <body class="bg-gray-100">
@@ -179,22 +161,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
-<div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
-<div class="text-center p-8 bg-white rounded-lg shadow-xl border-2 border-blue-500">
-<div style="width: 60px; height: 60px; border: 4px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+<div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.8); z-index: 200;">
+<div class="text-center p-8 bg-white rounded-lg shadow-xl">
 <h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
 <p class="text-gray-600">Please wait, this may take a moment.</p>
 </div>
 </div>
-<style>
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-</style>
-
-<!-- PDF Generator Script -->
-<script src="pdf-generator.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js/dist/html2pdf.bundle.min.js"></script>
 <script>
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
@@ -359,6 +332,7 @@ tasks: [
 ]
 });
 
+// Toggle sidebar with Open Menu button
 openSidebarBtn.addEventListener('click', () => {
 sidebarOpen = !sidebarOpen;
 if (sidebarOpen) {
@@ -368,16 +342,13 @@ sidebar.classList.remove('sidebar-open');
 }
 });
 
+// Close sidebar with X button
 closeSidebarBtn.addEventListener('click', () => {
 sidebarOpen = false;
 sidebar.classList.remove('sidebar-open');
 });
 
-document.getElementById('printBtn').addEventListener('click', () => {
-const pdfGen = new PDFGenerator(db, getCurrentSemesterData);
-pdfGen.generate();
-});
-
+document.getElementById('printBtn').addEventListener('click', generatePdf);
 document.getElementById('exportDataBtn').addEventListener('click', exportData);
 document.getElementById('importDataBtn').addEventListener('click', importData);
 document.getElementById('addTaskBtn').addEventListener('click', openTaskModal);
@@ -411,6 +382,7 @@ document.getElementById('deleteSessionBtn').addEventListener('click', handleDele
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
 document.addEventListener('click', () => contextMenu.classList.remove('active'));
 
+// Dropdown menu functionality
 const semesterDropdownBtn = document.getElementById('semesterDropdownBtn');
 const semesterDropdown = document.getElementById('semesterDropdown');
 const viewDropdownBtn = document.getElementById('viewDropdownBtn');
@@ -623,6 +595,7 @@ const sortedColleges = [...colleges].sort();
 teacherSelect.innerHTML = '<option value="">-- None --</option>' + sortedTeachers.map(t => `<option value="${t.Initials}">${t.Name} ${t.Surname}</option>`).join('');
 courseSelect.innerHTML = '<option value="">-- None --</option>' + sortedCourses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('');
 
+// Create college checkboxes
 let collegeCheckboxesHTML = '';
 sortedColleges.forEach(col => {
 const isChecked = task?.colleges?.includes(col) ? 'checked' : '';
@@ -1434,6 +1407,7 @@ const teacher2Select = document.getElementById('sessionTeacher2');
 courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
 subjectSelect.innerHTML = semesterData.subjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
 
+// Sort teachers alphabetically by surname, then name
 const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
 const surnameA = (a.Surname || '').toLowerCase();
 const surnameB = (b.Surname || '').toLowerCase();
@@ -1614,22 +1588,15 @@ const title = `${courseInfo.Name} (${courseCode}) - ${semesterData.currentColleg
 
 const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
 
-let gridHTML = `<table class="pdf-print-grid">
-<thead>
-<tr>
-<th class="pdf-print-grid"></th>
-${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
-</tr>
-</thead>
-<tbody>`;
+let gridHTML = `<div class="print-grid">
+<div class="print-header"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
 
 const periods = ['Morning', 'Afternoon'];
 if (hasNightSessions) periods.push('Night');
 
 periods.forEach(period => {
-gridHTML += `<tr>
-<td class="pdf-period-label">${period}</td>`;
-
+gridHTML += `<div class="print-period-label">${period}</div>`;
 ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
 const daySessions = sessions.filter(s => {
 const start = timeToMinutes(s.ClassStart);
@@ -1648,35 +1615,31 @@ const teacherDisplay = s.TeacherInitials
 ? (teacher2Info 
 ? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}` 
 : (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials))
-: 'UNASSIGNED';
+: '<span style="font-weight: bold; color: #f59e0b;">UNASSIGNED</span>';
 const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
-const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 11px; color: #d32f2f;">COMPULSORY</div>` : '';
 const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
-const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 11px; color: #3b82f6;">${deliveryMode.toUpperCase()}</div>` : '';
 const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
-return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
-<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+<div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
 ${compulsoryBadge}
 ${deliveryBadge}
 ${unitsHTML}
-<div style="margin-top: 3px; font-size: 11px;">${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
+<div>${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
 ${notesHTML}
-<div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
+<div>${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
 }).join('');
-
-gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
+gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
 });
-
-gridHTML += `</tr>`;
 });
-
-gridHTML += `</tbody></table>`;
+gridHTML += `</div>`;
 
 const uniqueTeacherInitials = new Set();
 sessions.forEach(s => {
@@ -1689,16 +1652,16 @@ const courseTeachers = Array.from(uniqueTeacherInitials)
 .sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
 
 const teacherContactHTML = courseTeachers.length > 0 ? `
-<div class="pdf-teacher-info">
+<div class="teacher-contact-info">
 <h4>Teacher Contact Information:</h4>
 ${courseTeachers.map(t => `<p>${t.Name} ${t.Surname} - ${t.Email}</p>`).join('')}
 </div>
 ` : '';
 
 const notesSection = `
-<div class="pdf-notes-section">
-<h4>Course Notes:</h4>
-<div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div>
+<div class="notes-section">
+<label for="course-notes-textarea">Course Notes:</label>
+<textarea id="course-notes-textarea" rows="4" placeholder="Add any additional notes for this course...">${courseNotes}</textarea>
 </div>
 `;
 
@@ -1709,26 +1672,23 @@ const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Sub
 let legendHTML = '';
 if (hasCompulsory || hasOnline || hasBlended) {
 legendHTML = `
-<div class="pdf-legend-section">
+<div class="legend-section">
 <h4>Legend:</h4>
-${hasCompulsory ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
-${hasOnline ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
-${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
+${hasCompulsory ? '<div class="legend-item"><div class="legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
+${hasOnline ? '<div class="legend-item"><div class="legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
+${hasBlended ? '<div class="legend-item"><div class="legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
 </div>
 `;
 }
 
-const bottomSections = `<div style="display: flex; gap: 15px; margin-top: 20px;">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
+const bottomSections = `<div class="bottom-sections-container">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
 
-container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${title}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
+container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
 
-// Add event listener for course notes textarea
-const courseNotesTextarea = container.querySelector('.pdf-notes-content');
-if (courseNotesTextarea) {
-// Make it editable
-courseNotesTextarea.contentEditable = true;
-courseNotesTextarea.addEventListener('blur', (e) => {
-semesterData.courseNotes[courseCode] = e.target.textContent;
+const notesTextarea = document.getElementById('course-notes-textarea');
+if (notesTextarea) {
+notesTextarea.addEventListener('input', (e) => {
+semesterData.courseNotes[courseCode] = e.target.value;
 saveData();
 });
 }
@@ -1761,22 +1721,15 @@ const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.curre
 
 const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
 
-let gridHTML = `<table class="pdf-print-grid">
-<thead>
-<tr>
-<th class="pdf-print-grid"></th>
-${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
-</tr>
-</thead>
-<tbody>`;
+let gridHTML = `<div class="print-grid">
+<div class="print-header"></div>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<div class="print-header print-day-header">${d}</div>`).join('')}`;
 
 const periods = ['Morning', 'Afternoon'];
 if (hasNightSessions) periods.push('Night');
 
 periods.forEach(period => {
-gridHTML += `<tr>
-<td class="pdf-period-label">${period}</td>`;
-
+gridHTML += `<div class="print-period-label">${period}</div>`;
 ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
 const daySessions = sessions.filter(s => {
 const start = timeToMinutes(s.ClassStart);
@@ -1794,35 +1747,73 @@ const coTeacher = s.TeacherInitials === teacherInitials
 : semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
 const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
 const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
-const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 13px; color: #4338ca;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 13px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 11px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 11px; color: #d32f2f;">COMPULSORY</div>` : '';
 const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
-const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 11px; color: #3b82f6;">${deliveryMode.toUpperCase()}</div>` : '';
 const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
-return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+return `<div class="print-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
-<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+<div style="font-weight: bold;">${s.CourseCode} | ${s.Subject}</div>
 ${compulsoryBadge}
 ${deliveryBadge}
 ${unitsHTML}
-<div style="margin-top: 3px; font-size: 11px;">${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
+<div>${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
 ${notesHTML}
-<div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
+<div>${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
 }).join('');
-
-gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
+gridHTML += `<div class="print-cell">${sessionsHTML}</div>`;
 });
-
-gridHTML += `</tr>`;
 });
+gridHTML += `</div>`;
 
-gridHTML += `</tbody></table>`;
+container.innerHTML = `<div class="bg-white p-6"><div class="text-center mb-4"><h2 class="text-2xl font-bold">${title}</h2><h3 class="text-lg">TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="text-right mt-4 font-bold text-xl">Total Hours: <span class="bg-black text-white px-3 py-1">${totalHours.toFixed(2)}</span></div></div>`;
+}
 
-container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${title}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div></div>`;
+function generatePdf() {
+const loadingOverlay = document.getElementById('loadingOverlay');
+const activeView = document.querySelector('.view-container.active');
+const semesterData = getCurrentSemesterData();
+
+if (!activeView) {
+alert('Could not find an active view to print.');
+return;
+}
+loadingOverlay.style.display = 'flex';
+
+const currentView = window.currentView || 'main-timetable';
+const viewLabels = {
+'main-timetable': 'Main Timetable',
+'staff-summary': 'Staff Summary',
+'dispute-log': 'Dispute Log',
+'course-print': 'Course Print',
+'teacher-print': 'Teacher Print',
+'tasks': 'Tasks'
+};
+
+let filename = `${db.currentSemester} - ${semesterData.currentCollege} - ${viewLabels[currentView]}.pdf`.replace(/[\s/]/g, '_');
+
+const elementToPrint = activeView.firstElementChild || activeView;
+
+const opt = {
+margin:       [0.5, 0.5, 0.5, 0.5],
+filename:     filename,
+image:        { type: 'jpeg', quality: 0.98 },
+html2canvas:  { scale: 2, useCORS: true, letterRendering: true, scrollY: -window.scrollY },
+jsPDF:        { unit: 'in', format: 'a3', orientation: 'landscape' }
+};
+
+html2pdf().from(elementToPrint).set(opt).save().then(() => {
+loadingOverlay.style.display = 'none';
+}).catch(err => {
+console.error("PDF generation failed:", err);
+alert("Sorry, there was an error generating the PDF.");
+loadingOverlay.style.display = 'none';
+});
 }
 
 loadData();

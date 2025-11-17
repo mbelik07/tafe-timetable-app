@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grid-based Timetable (08:00–18:00)</title>
+<style>
+  :root{
+    --time-col-width: 80px;
+    --slot-height: 45px;
+    --slot-count: 20;
+    --grid-gap: 0;
+    --accent: #3b82f6;
+    --bg: #ffffff;
+    --muted: #666;
+    --line: #e8e8ea;
+    --session-radius: 8px;
+  }
+
+  body{
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    margin: 18px;
+    background: #f7f8fb;
+    color: #111;
+  }
+
+  h1 { font-size: 16px; margin: 0 0 12px 0; }
+
+  .timetable {
+    display: grid;
+    grid-template-columns: var(--time-col-width) repeat(var(--day-count), 1fr);
+    grid-template-rows: repeat(var(--slot-count), var(--slot-height));
+    gap: var(--grid-gap);
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    overflow: auto;
+    min-width: 720px;
+  }
+
+  .time-cell {
+    padding: 6px 8px;
+    font-size: 12px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    box-sizing: border-box;
+  }
+
+  .day-header {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(#fff,#fff);
+    z-index: 5;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    font-weight:600;
+  }
+
+  .cell {
+    border-bottom: 1px solid var(--line);
+    box-sizing: border-box;
+    padding: 0;
+    min-height: 0;
+  }
+
+  .session {
+    margin: 6px 8px;
+    border-radius: var(--session-radius);
+    background: linear-gradient(180deg,#ffffff,#fbfdff);
+    border: 1px solid rgba(16,24,40,0.06);
+    box-shadow: 0 1px 0 rgba(16,24,40,0.03);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .session .inner {
+    padding: 8px 10px;
+    font-size: 13px;
+    line-height: 1.35;
+    overflow: auto;
+    max-height: 100%;
+    min-height: 0;
+  }
+
+  .session-title { font-weight: 600; font-size: 13px; margin-bottom: 6px; color: #0f172a; }
+  .session-meta { font-size: 12px; color: #334155; margin-bottom:6px; }
+  .session-teacher { font-size: 12px; color: #0f172a; }
+  .session-teacher a { color: #0066cc; text-decoration: underline; word-break: break-all; }
+
+  .time-label { height: calc(var(--slot-height)); display:flex; align-items:center; justify-content:flex-end; padding-right:8px; box-sizing:border-box; }
+
+  .timetable > * { min-height: 0; }
+
+  .notes {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    line-height: 1.6;
+    color: #111827;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  @media (max-width: 900px) {
+    :root { --time-col-width: 64px; }
+    body { margin: 8px; }
+    .timetable { min-width: 600px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Course Timetable — CSS Grid (08:00–18:00, 30-min slots)</h1>
+
+<div id="timetableWrapper">
+  <!-- JS will render the grid here -->
+</div>
+
+<div class="notes" id="generalNotes">
+  <strong>Notes:</strong>
+  This timetable uses CSS Grid with grid-template-rows: repeat(20, 45px). Each 30-minute slot is one grid row. Sessions are placed using grid-row so they align horizontally across all days. Session content scrolls inside the block and will not change its height.
+</div>
+
+<script>
+const config = {
+  startHour: 8,
+  slotMinutes: 30,
+  slotCount: 20,
+  slotHeightPx: 45
+};
+
+const days = [
+  {
+    name: "Monday",
+    sessions: [
+      { start: "09:00", end: "11:00", title: "Maths B TPC", room: "C1", teacher: { name: "Cary Buecher", email: "cary.buecher@tafensw.edu.au" }, notes: "Bring laptop." },
+      { start: "13:30", end: "15:00", title: "Workshop", room: "Lab 2", teacher: { name: "David Cole", email: "david.cole@tafensw.edu.au" } }
+    ]
+  },
+  {
+    name: "Tuesday",
+    sessions: [
+      { start: "11:00", end: "13:00", title: "English TPC", room: "R201", teacher: { name: "Miroslav Belik", email: "miroslav.belik@tafensw.edu.au" }, notes: "Group work; heavy reading required." },
+      { start: "15:00", end: "17:30", title: "Project Time", room: "Studio 3", teacher: { name: "Cary Buecher", email: "cary.buecher@tafensw.edu.au" }, notes: "Bring materials. This note is intentionally long to demonstrate scrolling inside the session content area without expanding the block height." }
+    ]
+  },
+  {
+    name: "Wednesday",
+    sessions: [
+      { start: "08:00", end: "09:30", title: "Orientation", room: "Auditorium", teacher: { name: "David Cole", email: "david.cole@tafensw.edu.au" } },
+      { start: "11:00", end: "13:00", title: "Study Skills", room: "Lab 1", teacher: { name: "Miroslav Belik", email: "miroslav.belik@tafensw.edu.au" } }
+    ]
+  },
+  {
+    name: "Thursday",
+    sessions: [
+      { start: "10:30", end: "12:00", title: "Guest Lecture", room: "R102", teacher: { name: "Cary Buecher", email: "cary.buecher@tafensw.edu.au" } }
+    ]
+  },
+  {
+    name: "Friday",
+    sessions: [
+      { start: "09:00", end: "11:00", title: "Assessment", room: "R103", teacher: { name: "David Cole", email: "david.cole@tafensw.edu.au" } }
+    ]
+  }
+];
+
+function parseHM(hm) {
+  const m = hm.match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return NaN;
+  return parseInt(m[1],10)*60 + parseInt(m[2],10);
+}
+
+function renderTimetable(containerId, days, cfg){
+  const wrapper = document.getElementById(containerId);
+  wrapper.innerHTML = '';
+
+  const dayCount = days.length;
+  const grid = document.createElement('div');
+  grid.className = 'timetable';
+  grid.style.setProperty('--day-count', dayCount.toString());
+  grid.style.setProperty('--slot-count', cfg.slotCount.toString());
+  grid.style.setProperty('--slot-height', cfg.slotHeightPx + 'px');
+
+  const startMinutes = cfg.startHour * 60;
+  for(let r = 1; r <= cfg.slotCount; r++){
+    const timeCell = document.createElement('div');
+    timeCell.className = 'time-cell';
+    timeCell.style.gridColumn = '1';
+    timeCell.style.gridRow = r;
+    const minutes = startMinutes + (r-1)*cfg.slotMinutes;
+    const hh = Math.floor(minutes/60);
+    const mm = minutes % 60;
+    if(mm === 0){
+      timeCell.innerHTML = `<div class="time-label">${String(hh).padStart(2,'0')}:00</div>`;
+    } else {
+      timeCell.innerHTML = `<div style="height:calc(var(--slot-height));"></div>`;
+    }
+    grid.appendChild(timeCell);
+  }
+
+  for(let d = 0; d < dayCount; d++){
+    const colIndex = d + 2;
+    for(let r = 1; r <= cfg.slotCount; r++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.style.gridColumn = String(colIndex);
+      cell.style.gridRow = String(r);
+      if(r === 1){
+        const header = document.createElement('div');
+        header.className = 'day-header';
+        header.style.position = 'sticky';
+        header.style.top = '0';
+        header.style.background = '#fff';
+        header.textContent = days[d].name;
+        header.style.zIndex = 4;
+        header.style.padding = '8px 10px';
+        header.style.borderBottom = '1px solid var(--line)';
+        cell.appendChild(header);
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  for(let d = 0; d < dayCount; d++){
+    const col = d + 2;
+    const day = days[d];
+    for(const s of (day.sessions || [])){
+      const startMin = parseHM(s.start);
+      const endMin = parseHM(s.end);
+      if (isNaN(startMin) || isNaN(endMin)) continue;
+      const dayStart = cfg.startHour * 60;
+      const dayEnd = dayStart + cfg.slotCount * cfg.slotMinutes;
+      const clampedStart = Math.max(dayStart, Math.min(dayEnd, startMin));
+      const clampedEnd = Math.max(dayStart, Math.min(dayEnd, endMin));
+      if(clampedEnd <= clampedStart) continue;
+
+      const startSlotIndex = Math.floor((clampedStart - dayStart) / cfg.slotMinutes) + 1;
+      const durationSlots = Math.round((clampedEnd - clampedStart) / cfg.slotMinutes);
+      const endSlotIndex = startSlotIndex + durationSlots;
+      const sEl = document.createElement('div');
+      sEl.className = 'session';
+      sEl.style.gridColumn = String(col);
+      sEl.style.gridRow = `${startSlotIndex} / ${endSlotIndex}`;
+      sEl.style.alignSelf = 'stretch';
+      sEl.style.justifySelf = 'stretch';
+      sEl.innerHTML = `
+        <div class="inner">
+          <div class="session-title">${escapeHtml(s.title || '')}</div>
+          <div class="session-meta">${escapeHtml((s.room ? s.room + ' • ' : '') + (s.start + '–' + s.end))}</div>
+          ${s.teacher ? `<div class="session-teacher">${escapeHtml(s.teacher.name || '')}${s.teacher.email ? ': ' : ''}${s.teacher.email ? `<a href="mailto:${encodeURI(s.teacher.email)}">${escapeHtml(s.teacher.email)}</a>` : ''}</div>` : ''}
+          ${s.notes ? `<div style="margin-top:6px;color:#0f172a;font-size:13px;">${escapeHtml(s.notes)}</div>` : ''}
+        </div>
+      `;
+      grid.appendChild(sEl);
+    }
+  }
+
+  wrapper.appendChild(grid);
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;')
+    .replace(/\n/g,'<br>');
+}
+
+renderTimetable('timetableWrapper', days, config);
+
+</script>
+</body>
+</html>

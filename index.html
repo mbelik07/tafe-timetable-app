@@ -1692,14 +1692,14 @@ const courseTeachers = Array.from(uniqueTeacherInitials)
 .sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
 
 const teacherContactHTML = courseTeachers.length > 0 ? `
-<div class="pdf-teacher-info">
-<h4 style="font-size: 14px; margin-bottom: 8px;">Teacher Contact:</h4>
-${courseTeachers.map(t => `
-<div style="margin-bottom: 8px; font-size: 12px; line-height: 1.5;">
-<strong>${t.Name} ${t.Surname}</strong><br/>
-${t.Email ? `<a href="mailto:${t.Email}" style="color: #0066cc; text-decoration: underline; word-break: break-all; font-size: 12px;">${t.Email}</a>` : ''}
-</div>
-`).join('')}
+<div class="pdf-teacher-info" style="margin-top:8px;">
+  <h4 style="margin:0 0 6px 0; font-size:14px; font-weight:600;">Teacher Contact:</h4>
+  ${courseTeachers.map(t => `
+    <div style="margin-bottom:6px; font-size:12px; line-height:1.4; color:#222;">
+      <span style="font-weight:600;">${t.Name} ${t.Surname}</span><span style="margin:0 6px;">:</span>
+      ${t.Email ? `<a href="mailto:${t.Email}" style="color:#0066cc; text-decoration:underline; font-size:12px; word-break:break-all;">${t.Email}</a>` : ''}
+    </div>
+  `).join('')}
 </div>
 ` : '';
 

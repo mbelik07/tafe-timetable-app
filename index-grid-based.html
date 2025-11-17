@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TAFE Grid-Based Timetable</title>
+<style>
+:root {
+  --slot-height: 30px;
+  --time-col-width: 72px;
+  --primary: #0b66c3;
+  --bg: #fafafa;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 16px;
+  background: #f5f7fa;
+  color: #222;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container { max-width: 1200px; margin: 0 auto; }
+
+h1 { font-size: 20px; margin: 0 0 16px 0; color: #1a1a1a; }
+
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0a5aa8;
+  box-shadow: 0 2px 8px rgba(11, 102, 195, 0.2);
+}
+
+.btn-secondary {
+  background: #e8eef7;
+  color: var(--primary);
+}
+
+.btn-secondary:hover {
+  background: #d8e2f0;
+}
+
+/* Grid-based timetable styles */
+.rcpv-wrapper {
+  font-family: inherit;
+  color: #222;
+}
+
+.rcpv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e6eb;
+}
+
+.rcpv-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: #1a1a1a;
+}
+
+.rcpv-legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 13px;
+  color: #666;
+}
+
+.rcpv-grid {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.rcpv-time-column {
+  width: var(--time-col-width);
+  background: var(--bg);
+  border-right: 1px solid #eee;
+  padding: 8px 6px;
+  flex-shrink: 0;
+}
+
+.rcpv-time-label {
+  height: var(--slot-height);
+  line-height: var(--slot-height);
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+  padding-right: 8px;
+}
+
+.rcpv-days {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.rcpv-day {
+  flex: 1;
+  border-right: 1px solid #eee;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+}
+
+.rcpv-day:last-child { border-right: 0; }
+
+.rcpv-day-header {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 700;
+  font-size: 14px;
+  background: #fbfbfb;
+  text-align: center;
+  color: var(--primary);
+}
+
+.rcpv-slot-grid {
+  position: relative;
+  flex: 1;
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+  background-size: 100% var(--slot-height);
+  min-height: calc(var(--slot-height) * 20);
+}
+
+.rcpv-placeholder {
+  height: var(--slot-height);
+}
+
+.rcpv-session {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, #ffffff, #fbfbff);
+  border: 1px solid rgba(11, 102, 195, 0.12);
+  border-left: 4px solid var(--primary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  overflow: auto;
+  font-size: 13px;
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rcpv-session-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #073a7a;
+}
+
+.rcpv-session-meta {
+  font-size: 12px;
+  color: #486075;
+}
+
+.rcpv-session-teacher {
+  font-size: 12px;
+  color: #333;
+}
+
+.rcpv-session-teacher a {
+  color: var(--primary);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.rcpv-notes {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid #e2e6eb;
+  background: white;
+  border-radius: 8px;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+  line-height: 1.6;
+  color: #222;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+@media print {
+  body { background: white; padding: 0; }
+  .controls { display: none; }
+  .rcpv-session { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>TAFE Grid-Based Timetable (30-min slots, 08:00–18:00)</h1>
+  
+  <div class="controls">
+    <button class="btn btn-primary" onclick="loadSampleData()">Load Sample Data</button>
+    <button class="btn btn-secondary" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+
+  <div id="course-print-view"></div>
+</div>
+
+<script>
+// Sample course data with grid-based layout
+const sampleCourseData = {
+  title: "Cert IV Tertiary Prep (11225NAT) - Goulburn Campus",
+  days: [
+    {
+      name: "Monday",
+      sessions: [
+        {
+          start: "09:00",
+          end: "11:00",
+          title: "Maths B TPC",
+          room: "C1",
+          teacher: { name: "Cary Buecher", email: "cary.buecher@tafensw.edu.au" },
+          notes: "Foundations and algebra basics"
+        },
+        {
+          start: "11:00",
+          end: "12:30",
+          title: "English TPC",
+          room: "C2",
+          teacher: { name: "David Cole", email: "david.cole@tafensw.edu.au" },
+          notes: "Writing and comprehension"
+        }
+      ]
+    },
+    {
+      name: "Tuesday",
+      sessions: [
+        {
+          start: "09:00",
+          end: "11:00",
+          title: "Maths B TPC",
+          room: "C3",
+          teacher: { name: "Cary Buecher", email: "cary.buecher@tafensw.edu.au" },
+          notes: "Calculus introduction"
+        }
+      ]
+    },
+    {
+      name: "Wednesday",
+      sessions: [
+        {
+          start: "11:00",
+          end: "12:00",
+          title: "English TPC",
+          room: "C4",
+          teacher: { name: "David Cole", email: "david.cole@tafensw.edu.au" },
+          notes: "Essay writing workshop"
+        },
+        {
+          start: "14:00",
+          end: "16:00",
+          title: "Study Skills",
+          room: "C5",
+          teacher: { name: "Miroslav Belik", email: "miroslav.belik@tafensw.edu.au" },
+          notes: "Time management and note-taking techniques"
+        }
+      ]
+    },
+    {
+      name: "Thursday",
+      sessions: [
+        {
+          start: "09:00",
+          end: "11:00",
+          title: "Maths B TPC",
+          room: "C1",
+          teacher: { name: "Cary Buecher", email: "cary.buecher@tafensw.edu.au" },
+          notes: "Problem-solving workshop"
+        }
+      ]
+    },
+    {
+      name: "Friday",
+      sessions: [
+        {
+          start: "11:00",
+          end: "13:00",
+          title: "English TPC",
+          room: "C2",
+          teacher: { name: "David Cole", email: "david.cole@tafensw.edu.au" },
+          notes: "Group discussion and feedback"
+        }
+      ]
+    }
+  ],
+  notes: "Course Notes:\n- Bring laptop and charger to all sessions\n- Read assigned chapters before each class\n- Assessment details will be emailed separately\n- Attendance is mandatory for all sessions\n- Contact your teacher if you need support"
+};
+
+function renderCoursePrintView(containerSelector = '#course-print-view', courseData = window.courseData || window.currentCourse) {
+  // Self-contained timetable renderer using 30-minute grid (08:00-18:00)
+  
+  // Helper utilities
+  function q(sel, ctx = document) { return ctx.querySelector(sel); }
+  function qa(sel, ctx = document) { return Array.from(ctx.querySelectorAll(sel)); }
+  function el(tag, attrs = {}, children = []) {
+    const e = document.createElement(tag);
+    for (const k in attrs) {
+      if (k === 'style' && typeof attrs[k] === 'object') {
+        Object.assign(e.style, attrs[k]);
+      } else if (k === 'dataset' && typeof attrs[k] === 'object') {
+        Object.assign(e.dataset, attrs[k]);
+      } else if (k === 'html') {
+        e.innerHTML = attrs[k];
+      } else if (k === 'text') {
+        e.textContent = attrs[k];
+      } else {
+        e.setAttribute(k, attrs[k]);
+      }
+    }
+    (Array.isArray(children) ? children : [children]).forEach(c => {
+      if (c == null) return;
+      if (typeof c === 'string') e.appendChild(document.createTextNode(c));
+      else e.appendChild(c);
+    });
+    return e;
+  }
+  function parseTimeToMinutes(t) {
+    if (typeof t !== 'string') return NaN;
+    const m = t.match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return NaN;
+    return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  }
+
+  // Grid parameters
+  const startMinutes = 8 * 60; // 08:00
+  const endMinutes = 18 * 60; // 18:00
+  const slotMinutes = 30;
+  const slotCount = (endMinutes - startMinutes) / slotMinutes; // 20
+  const slotHeight = 30; // px per slot
+  const gridHeightPx = slotCount * slotHeight;
+
+  // Find container
+  const container = document.querySelector(containerSelector) || document.getElementById('coursePrintView') || document.getElementById('course-print-view') || document.body;
+  container.innerHTML = '';
+
+  // Inject styles
+  const styleId = 'renderCoursePrintView-styles';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      .rcpv-wrapper { font-family: inherit; color: #222; }
+      .rcpv-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+      .rcpv-title { font-weight: 700; font-size: 16px; }
+      .rcpv-grid { display: flex; border: 1px solid #ddd; box-sizing: border-box; overflow: hidden; }
+      .rcpv-time-column { width: 72px; background: #fafafa; border-right: 1px solid #eee; box-sizing: border-box; padding: 8px 6px; }
+      .rcpv-time-label { height: 30px; line-height: 30px; font-size: 12px; color: #666; }
+      .rcpv-days { display: flex; flex: 1; min-width: 0; }
+      .rcpv-day { flex: 1; border-right: 1px solid #eee; position: relative; min-width: 160px; box-sizing: border-box; display: flex; flex-direction: column; }
+      .rcpv-day:last-child { border-right: 0; }
+      .rcpv-day-header { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; font-weight: 700; font-size: 13px; text-align: center; background: #fbfbfb; }
+      .rcpv-slot-grid { position: relative; flex: 1; height: 600px; background-image: linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px); background-size: 100% 30px; }
+      .rcpv-placeholder { height: 30px; box-sizing: border-box; }
+      .rcpv-session { position: absolute; left: 8px; right: 8px; border-radius: 6px; padding: 8px 10px; box-sizing: border-box; background: linear-gradient(180deg, #fff, #fbfbff); border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 0 rgba(0,0,0,0.03); overflow: auto; font-size: 13px; line-height: 1.35; }
+      .rcpv-session .rcpv-session-title { font-weight: 700; margin-bottom: 4px; font-size: 13px; }
+      .rcpv-session .rcpv-session-meta { font-size: 12px; color: #444; margin-bottom: 4px; }
+      .rcpv-session .rcpv-session-teacher { font-size: 12px; color: #333; }
+      .rcpv-notes { margin-top: 14px; padding: 12px; border: 1px solid #eee; background: #fff; font-size: 13px; letter-spacing: 0.2px; line-height: 1.6; color: #222; border-radius: 6px; white-space: pre-wrap; word-wrap: break-word; }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Build wrapper
+  const wrapper = el('div', { class: 'rcpv-wrapper' });
+  const header = el('div', { class: 'rcpv-header' }, [
+    el('div', { class: 'rcpv-title', text: courseData && courseData.title ? courseData.title : 'Timetable' })
+  ]);
+  wrapper.appendChild(header);
+
+  // Build grid
+  const grid = el('div', { class: 'rcpv-grid' });
+  
+  // Time column
+  const timeColumn = el('div', { class: 'rcpv-time-column' });
+  for (let i = 0; i < slotCount; i++) {
+    const minutes = startMinutes + i * slotMinutes;
+    const isHour = (minutes % 60) === 0;
+    const label = isHour ? `${String(Math.floor(minutes / 60)).padStart(2, '0')}:00` : '';
+    timeColumn.appendChild(el('div', { class: 'rcpv-time-label', text: label }));
+  }
+  grid.appendChild(timeColumn);
+
+  // Days columns
+  const daysContainer = el('div', { class: 'rcpv-days' });
+  const days = Array.isArray(courseData && courseData.days) ? courseData.days : [];
+  const defaultDayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const dayCount = days.length || 5;
+
+  for (let d = 0; d < dayCount; d++) {
+    const dayInfo = days[d] || { name: defaultDayNames[d] || `Day ${d+1}`, sessions: [] };
+    const dayCol = el('div', { class: 'rcpv-day', 'data-day': dayInfo.name });
+    
+    // Day header
+    const dayHeader = el('div', { class: 'rcpv-day-header', text: dayInfo.name });
+    dayCol.appendChild(dayHeader);
+    
+    // Slot grid with placeholders
+    const slotGrid = el('div', { class: 'rcpv-slot-grid' });
+    for (let i = 0; i < slotCount; i++) {
+      slotGrid.appendChild(el('div', { class: 'rcpv-placeholder' }));
+    }
+    dayCol.appendChild(slotGrid);
+    daysContainer.appendChild(dayCol);
+  }
+
+  grid.appendChild(daysContainer);
+  wrapper.appendChild(grid);
+
+  // Notes
+  if (courseData && courseData.notes) {
+    wrapper.appendChild(el('div', { class: 'rcpv-notes', text: courseData.notes }));
+  }
+
+  container.appendChild(wrapper);
+
+  // Place sessions
+  for (let d = 0; d < dayCount; d++) {
+    const dayInfo = days[d] || { name: defaultDayNames[d] || `Day ${d+1}`, sessions: [] };
+    const dayCol = daysContainer.children[d];
+    if (!dayCol) continue;
+    const slotGrid = dayCol.querySelector('.rcpv-slot-grid');
+    if (!slotGrid) continue;
+
+    for (const sess of Array.isArray(dayInfo.sessions) ? dayInfo.sessions : []) {
+      const startMin = parseTimeToMinutes(sess.start);
+      const endMin = parseTimeToMinutes(sess.end);
+      if (isNaN(startMin) || isNaN(endMin)) continue;
+
+      const clampedStart = Math.max(startMinutes, Math.min(endMinutes, startMin));
+      const clampedEnd = Math.max(startMinutes, Math.min(endMinutes, endMin));
+      if (clampedEnd <= clampedStart) continue;
+
+      const startSlotIndex = Math.round((clampedStart - startMinutes) / slotMinutes);
+      const durationSlots = Math.round((clampedEnd - clampedStart) / slotMinutes);
+      const topPx = startSlotIndex * slotHeight;
+      const heightPx = Math.max(slotHeight, durationSlots * slotHeight - 4);
+
+      const sessionEl = el('div', { class: 'rcpv-session' });
+      sessionEl.style.top = `${topPx}px`;
+      sessionEl.style.height = `${heightPx}px`;
+
+      sessionEl.appendChild(el('div', { class: 'rcpv-session-title', text: sess.title || '' }));
+      
+      const metaParts = [];
+      if (sess.room) metaParts.push(sess.room);
+      metaParts.push(`${sess.start}–${sess.end}`);
+      sessionEl.appendChild(el('div', { class: 'rcpv-session-meta', text: metaParts.join(' • ') }));
+
+      if (sess.teacher && (sess.teacher.name || sess.teacher.email)) {
+        const teacherWrap = el('div', { class: 'rcpv-session-teacher' });
+        const teacherName = sess.teacher.name ? String(sess.teacher.name) : '';
+        const teacherEmail = sess.teacher.email ? String(sess.teacher.email) : '';
+        if (teacherEmail) {
+          const nameText = teacherName ? `${teacherName}: ` : '';
+          teacherWrap.appendChild(document.createTextNode(nameText));
+          const mailLink = el('a', { href: `mailto:${teacherEmail}`, text: teacherEmail });
+          teacherWrap.appendChild(mailLink);
+        } else if (teacherName) {
+          teacherWrap.textContent = teacherName;
+        }
+        sessionEl.appendChild(teacherWrap);
+      }
+
+      if (sess.notes) {
+        sessionEl.appendChild(el('div', { text: sess.notes }));
+      }
+
+      slotGrid.appendChild(sessionEl);
+    }
+  }
+
+  return { container, wrapper, grid, daysContainer };
+}
+
+function loadSampleData() {
+  renderCoursePrintView('#course-print-view', sampleCourseData);
+  alert('✅ Sample data loaded! Scroll down to see the timetable.');
+}
+
+// Auto-load on page load
+document.addEventListener('DOMContentLoaded', loadSampleData);
+</script>
+</body>
+</html>

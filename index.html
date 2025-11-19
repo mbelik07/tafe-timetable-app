@@ -67,7 +67,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .pdf-title h3 { font-size: 12px; margin: 2px 0 0 0; color: #666; }
 
 .pdf-bottom-section { margin-top: 8px; display: flex; gap: 8px; }
-.pdf-teacher-info { flex: 1.3; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
+.pdf-teacher-info { flex: 0.7; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
 .pdf-teacher-info h4 { font-weight: bold; margin-bottom: 6px; font-size: 15px; }
 .pdf-teacher-info p { margin: 2px 0; font-size: 13px; }
 
@@ -1448,30 +1448,6 @@ document.getElementById('deleteSessionBtn').style.display = session ? 'block' : 
 
 const courseSelect = document.getElementById('sessionCourse');
 const subjectSelect = document.getElementById('sessionSubject');
-// Filter subjects based on selected course
-courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
-
-// Filter subjects based on selected course
-const updateSubjects = () => {
-  const selectedCourseCode = courseSelect.value;
-  const filteredSubjects = semesterData.subjects.filter(s => s.CourseCode === selectedCourseCode);
-  subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>' + filteredSubjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
-};
-
-// Initial population
-updateSubjects();
-
-// Update subjects when course changes
-courseSelect.addEventListener('change', updateSubjects);
-  
-  // Clear subject selection if no subjects match
-  if (filteredSubjects.length === 0) {
-    subjectSelect.innerHTML = '<option value="">-- No subjects available --</option>';
-  }
-});
-
-// Trigger the filter on initial load
-courseSelect.dispatchEvent(new Event('change'));
 const teacherSelect = document.getElementById('sessionTeacher');
 const teacher2Select = document.getElementById('sessionTeacher2');
 courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');

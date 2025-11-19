@@ -69,7 +69,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .pdf-bottom-section { margin-top: 8px; display: flex; gap: 8px; }
 .pdf-teacher-info { flex: 0.7; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
 .pdf-teacher-info h4 { font-weight: bold; margin-bottom: 6px; font-size: 13px; }
-.pdf-teacher-info p { margin: 2px 0; font-size: 12px; }
+.pdf-teacher-info p { margin: 2px 0; font-size: 13px; }
 
 .pdf-notes-section { flex: 1.3; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; }
 .pdf-notes-section h4 { font-weight: bold; margin-bottom: 6px; font-size: 13px; }
@@ -1733,11 +1733,11 @@ const courseTeachers = Array.from(uniqueTeacherInitials)
 
 const teacherContactHTML = courseTeachers.length > 0 ? `
 <div class="pdf-teacher-info" style="margin-top:8px;">
-<h4 style="margin:0 0 6px 0; font-size:10px; font-weight:600;">Teacher Contact:</h4>
+<h4 style="margin:0 0 6px 0; font-size:13px; font-weight:600;">Teacher Contact:</h4>
 ${courseTeachers.map(t => `
-<div style="margin-bottom:6px; font-size:12px; line-height:1.4; color:#222;">
+<div style="margin-bottom:6px; font-size:13px; line-height:1.4; color:#222;">
 <span style="font-weight:600;">${t.Name} ${t.Surname}</span><span style="margin:0 6px;">:</span>
-${t.Email ? `<a href="mailto:${t.Email}" style="color:#0066cc; text-decoration:underline; font-size:12px; word-break:break-all;">${t.Email}</a>` : ''}
+${t.Email ? `<a href="mailto:${t.Email}" style="color:#0066cc; text-decoration:underline; font-size:13px; word-break:break-all;">${t.Email}</a>` : ''}
 </div>
 `).join('')}
 </div>

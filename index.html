@@ -1448,6 +1448,23 @@ document.getElementById('deleteSessionBtn').style.display = session ? 'block' : 
 
 const courseSelect = document.getElementById('sessionCourse');
 const subjectSelect = document.getElementById('sessionSubject');
+// Filter subjects based on selected course
+courseSelect.addEventListener('change', () => {
+  const selectedCourseCode = courseSelect.value;
+  const filteredSubjects = semesterData.subjects.filter(s => s.CourseCode === selectedCourseCode);
+  
+  subjectSelect.innerHTML = filteredSubjects
+    .map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`)
+    .join('');
+  
+  // Clear subject selection if no subjects match
+  if (filteredSubjects.length === 0) {
+    subjectSelect.innerHTML = '<option value="">-- No subjects available --</option>';
+  }
+});
+
+// Trigger the filter on initial load
+courseSelect.dispatchEvent(new Event('change'));
 const teacherSelect = document.getElementById('sessionTeacher');
 const teacher2Select = document.getElementById('sessionTeacher2');
 courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');

@@ -1449,13 +1449,20 @@ document.getElementById('deleteSessionBtn').style.display = session ? 'block' : 
 const courseSelect = document.getElementById('sessionCourse');
 const subjectSelect = document.getElementById('sessionSubject');
 // Filter subjects based on selected course
-courseSelect.addEventListener('change', () => {
+courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
+
+// Filter subjects based on selected course
+const updateSubjects = () => {
   const selectedCourseCode = courseSelect.value;
   const filteredSubjects = semesterData.subjects.filter(s => s.CourseCode === selectedCourseCode);
-  
-  subjectSelect.innerHTML = filteredSubjects
-    .map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`)
-    .join('');
+  subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>' + filteredSubjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
+};
+
+// Initial population
+updateSubjects();
+
+// Update subjects when course changes
+courseSelect.addEventListener('change', updateSubjects);
   
   // Clear subject selection if no subjects match
   if (filteredSubjects.length === 0) {

@@ -417,33 +417,42 @@ document.getElementById('deleteSessionBtn').addEventListener('click', handleDele
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
 document.addEventListener('click', () => contextMenu.classList.remove('active'));
 
+
 const semesterDropdownBtn = document.getElementById('semesterDropdownBtn');
 const semesterDropdown = document.getElementById('semesterDropdown');
 const viewDropdownBtn = document.getElementById('viewDropdownBtn');
 const viewDropdown = document.getElementById('viewDropdown');
 
+function closeAllMenus() {
+  semesterDropdown.classList.remove('show');
+  viewDropdown.classList.remove('show');
+  const courseDropdown = document.getElementById('courseDropdown');
+  const teacherDropdown = document.getElementById('teacherDropdown');
+  if (courseDropdown) courseDropdown.classList.remove('show');
+  if (teacherDropdown) teacherDropdown.classList.remove('show');
+}
+
 semesterDropdownBtn.addEventListener('click', (e) => {
-e.stopPropagation();
-semesterDropdown.classList.toggle('show');
-viewDropdown.classList.remove('show');
-document.getElementById('courseDropdown')?.classList.remove('show');
-document.getElementById('teacherDropdown')?.classList.remove('show');
+  e.stopPropagation();
+  closeAllMenus();
+  semesterDropdown.classList.toggle('show');
 });
 
 viewDropdownBtn.addEventListener('click', (e) => {
-e.stopPropagation();
-viewDropdown.classList.toggle('show');
-semesterDropdown.classList.remove('show');
-document.getElementById('courseDropdown')?.classList.remove('show');
-document.getElementById('teacherDropdown')?.classList.remove('show');
+  e.stopPropagation();
+  closeAllMenus();
+  viewDropdown.classList.toggle('show');
 });
 
-document.addEventListener('click', () => {
-semesterDropdown.classList.remove('show');
-viewDropdown.classList.remove('show');
-document.getElementById('courseDropdown')?.classList.remove('show');
-document.getElementById('teacherDropdown')?.classList.remove('show');
+document.addEventListener('click', (e) => {
+  const isMenuButton = e.target.closest('[id$="DropdownBtn"]');
+  const isMenu = e.target.closest('[id$="Dropdown"]');
+  
+  if (!isMenuButton && !isMenu) {
+    closeAllMenus();
+  }
 });
+        
 
 function processAndRenderAll() {
 detectDisputes();

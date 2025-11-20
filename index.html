@@ -960,8 +960,8 @@ const existingAddBtn = modalHeader?.querySelector('[data-action="add-teacher"]')
 if (modalHeader && !existingAddBtn) {
 const closeBtn = modalHeader.querySelector('button');
 const addBtn = document.createElement('button');
-addBtn.className = 'text-3xl font-bold text-green-600 hover:text-green-800 mr-3';
-addBtn.textContent = '+';
+addBtn.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mr-3';
+addBtn.innerHTML = '➕ Add Teacher';
 addBtn.type = 'button';
 addBtn.setAttribute('data-action', 'add-teacher');
 addBtn.addEventListener('click', () => {
@@ -1092,6 +1092,21 @@ openManagementModal(title, dataCollection, fields);
 processAndRenderAll();
 }
 } else if (action === 'edit') {
+if (title === 'Teachers') {
+// Open the add/edit modal for teachers
+const item = dataCollection[index];
+document.getElementById('addTeacherModal').classList.add('active');
+document.getElementById('addTeacherForm').reset();
+document.querySelector('#addTeacherForm input[name="Name"]').value = item.Name;
+document.querySelector('#addTeacherForm input[name="Surname"]').value = item.Surname;
+document.querySelector('#addTeacherForm input[name="Initials"]').value = item.Initials;
+document.querySelector('#addTeacherForm input[name="Email"]').value = item.Email;
+document.querySelector('#addTeacherForm select[name="HomeCollege"]').value = item.HomeCollege;
+document.querySelector('#addTeacherForm select[name="EmploymentType"]').value = item.EmploymentType;
+document.querySelector('#addTeacherForm input[name="TotalHours"]').value = item.TotalHours;
+document.querySelector('#addTeacherForm input[name="editIndex"]').value = index;
+} else {
+// Original edit behavior for other types
 const item = dataCollection[index];
 for (const key in item) {
 const input = form.querySelector(`[name="${key}"]`);
@@ -1106,6 +1121,7 @@ input.value = Array.isArray(item[key]) ? item[key].join(', ') : item[key];
 form.querySelector('[name="editIndex"]').value = index;
 form.querySelector('button[type="submit"]').textContent = `Update ${title.slice(0, -1)}`;
 cancelBtn.classList.remove('hidden');
+}
 }
 }));
 }

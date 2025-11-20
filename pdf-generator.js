@@ -41,7 +41,7 @@ class PDFGenerator {
     const filename = `timetable-${this.db.currentSemester}-${semesterData.currentCollege}-${currentView}${additionalInfo}-${new Date().toISOString().split('T')[0]}.pdf`;
 
     const opt = {
-      margin: [5, 10, 10, 10],
+      margin: [2, 10, 10, 2],
       filename: filename,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },

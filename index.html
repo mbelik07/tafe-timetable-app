@@ -973,17 +973,6 @@ document.querySelector('#addTeacherForm input[name="Initials"]').value = '';
 modalHeader.insertBefore(addBtn, closeBtn);
 }
 }, 100);
-}
-const surnameA = (a.Surname || '').toLowerCase();
-const surnameB = (b.Surname || '').toLowerCase();
-if (surnameA < surnameB) return -1;
-if (surnameA > surnameB) return 1;
-const nameA = (a.Name || '').toLowerCase();
-const nameB = (b.Name || '').toLowerCase();
-if (nameA < nameB) return -1;
-if (nameA > nameB) return 1;
-return 0;
-});
 } else if (title === 'Courses') {
 displayData = [...data].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
 }

@@ -986,23 +986,7 @@ contentHTML += `<tr class="border-b">${fields.map(f => `<td class="p-2">${Array.
 contentHTML += `</tbody></table></div>`;
 
 let formHTML = '';
-if (title === 'Teachers') {
-formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4 border-t pt-4">
-<h3 class="text-lg font-bold col-span-full mb-2">Add / Edit Teacher</h3>
-<div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div>
-<div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div>
-<div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div>
-<div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div>
-<div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" class="w-full border p-2 rounded" required>${colleges.map(c => `<option value="${c}">${c}</option>`).join('')}</select></div>
-<div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div>
-<div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div>
-<input type="hidden" name="editIndex">
-<div class="col-span-full flex items-center gap-4">
-<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Teacher</button>
-<button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
-</div>
-</form>`;
-} else {
+if (title !== 'Teachers') {
 formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 border-t pt-4">
 <h3 class="text-lg font-bold col-span-full mb-2">Add / Edit ${title.slice(0, -1)}</h3>
 ${fields.map(f => `<div><label class="block text-sm font-medium">${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" class="w-full border p-2 rounded" required></div>`).join('')}

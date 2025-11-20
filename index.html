@@ -1071,6 +1071,9 @@ let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="cour
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('courseDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
+semesterDropdown.classList.remove('show');
+viewDropdown.classList.remove('show');
+document.getElementById('teacherDropdown')?.classList.remove('show');
 document.getElementById('courseDropdown').classList.toggle('show');
 });
 }
@@ -1088,12 +1091,15 @@ let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teac
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('teacherDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
+semesterDropdown.classList.remove('show');
+viewDropdown.classList.remove('show');
+document.getElementById('courseDropdown')?.classList.remove('show');
 document.getElementById('teacherDropdown').classList.toggle('show');
 });
 }
 }
 }
-
+  
 window.selectCourse = (courseCode) => {
 renderCoursePrintView(courseCode);
 document.getElementById('courseDropdown').classList.remove('show');

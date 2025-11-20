@@ -426,12 +426,23 @@ semesterDropdownBtn.addEventListener('click', (e) => {
 e.stopPropagation();
 semesterDropdown.classList.toggle('show');
 viewDropdown.classList.remove('show');
+document.getElementById('courseDropdown')?.classList.remove('show');
+document.getElementById('teacherDropdown')?.classList.remove('show');
 });
 
 viewDropdownBtn.addEventListener('click', (e) => {
 e.stopPropagation();
 viewDropdown.classList.toggle('show');
 semesterDropdown.classList.remove('show');
+document.getElementById('courseDropdown')?.classList.remove('show');
+document.getElementById('teacherDropdown')?.classList.remove('show');
+});
+
+document.addEventListener('click', () => {
+semesterDropdown.classList.remove('show');
+viewDropdown.classList.remove('show');
+document.getElementById('courseDropdown')?.classList.remove('show');
+document.getElementById('teacherDropdown')?.classList.remove('show');
 });
 
 document.addEventListener('click', () => {

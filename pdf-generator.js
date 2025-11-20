@@ -18,14 +18,24 @@ class PDFGenerator {
     
     // Get additional info based on view type
     let additionalInfo = '';
+    
     if (currentView === 'teacher-print') {
-      const teacherDropdown = document.getElementById('teacherDropdown');
-      const selectedTeacherItem = teacherDropdown?.querySelector('.dropdown-item');
-      additionalInfo = selectedTeacherItem ? `-${selectedTeacherItem.textContent.replace(/\s+/g, '-')}` : '';
+      // Get the selected teacher from the active view
+      const teacherPrintView = document.getElementById('teacher-print-view');
+      const teacherTitle = teacherPrintView?.querySelector('.pdf-title h2')?.textContent || '';
+      if (teacherTitle) {
+        additionalInfo = `-${teacherTitle.split(' - ')[0].replace(/\s+/g, '-')}`;
+      }
     } else if (currentView === 'course-print') {
-      const courseDropdown = document.getElementById('courseDropdown');
-      const selectedCourseItem = courseDropdown?.querySelector('.dropdown-item');
-      additionalInfo = selectedCourseItem ? `-${selectedCourseItem.textContent.split(' - ')[0]}` : '';
+      // Get the selected course from the active view
+      const coursePrintView = document.getElementById('course-print-view');
+      const courseTitle = coursePrintView?.querySelector('.pdf-title h2')?.textContent || '';
+      if (courseTitle) {
+        const courseCode = courseTitle.split(' (')[1]?.replace(')', '') || '';
+        if (courseCode) {
+          additionalInfo = `-${courseCode}`;
+        }
+      }
     }
 
     const filename = `timetable-${this.db.currentSemester}-${semesterData.currentCollege}-${currentView}${additionalInfo}-${new Date().toISOString().split('T')[0]}.pdf`;

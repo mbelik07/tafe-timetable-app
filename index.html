@@ -9,8 +9,13 @@
 <meta content="website" property="og:type"/>
 <link href="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762158838/u1103083350_img_64x64_ad306614_xji6gn.png" rel="icon"/>
 <title>TAFE Interactive Timetabling Application</title>
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- HTML2PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- Font Awesome for Professional Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
 .sidebar { transition: transform 0.3s ease-in-out; }
@@ -70,7 +75,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 
 /* Action Buttons - Compact */
 .action-buttons { display: flex; gap: 0.5rem; justify-content: center; }
-.action-btn { padding: 0.375rem 0.75rem; border: none; border-radius: 0.25rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.action-btn { padding: 0.375rem 0.75rem; border: none; border-radius: 0.25rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 0.25rem; }
 .edit-btn { background: #3b82f6; color: white; }
 .edit-btn:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); }
 .delete-btn { background: #ef4444; color: white; }
@@ -178,52 +183,52 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 </head>
 <body class="bg-gray-100">
 <div class="sidebar fixed top-0 left-0 h-full w-80 bg-white shadow-lg z-50 -translate-x-full" id="sidebar">
-<div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
+<div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold"><i class="fas fa-database mr-2"></i> Data Hub</h2><button class="text-2xl hover:text-gray-300 transition-colors" id="closeSidebarBtn"><i class="fas fa-times"></i></button></div>
 <div class="p-4 space-y-3 no-print">
-<h3 class="text-lg font-bold text-gray-700 border-b pb-2">Management</h3>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn">🗓️ Manage Semesters</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn">👨‍🏫 Manage Teachers</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn">📚 Manage Courses</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn">🎨 Manage Subjects</button>
+<h3 class="text-lg font-bold text-gray-700 border-b pb-2 flex items-center"><i class="fas fa-tools mr-2"></i> Management</h3>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold transition-colors" id="manageSemestersBtn"><i class="fas fa-calendar-alt mr-2 text-blue-700"></i> Manage Semesters</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold transition-colors" id="manageTeachersBtn"><i class="fas fa-chalkboard-teacher mr-2 text-blue-700"></i> Manage Teachers</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold transition-colors" id="manageCoursesBtn"><i class="fas fa-book mr-2 text-blue-700"></i> Manage Courses</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold transition-colors" id="manageSubjectsBtn"><i class="fas fa-book-open mr-2 text-blue-700"></i> Manage Subjects</button>
 <hr class="my-4"/>
-<h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
-<button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="exportDataBtn">💾 Export Data</button>
-<button class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" id="importDataBtn">📂 Import Data</button>
-<button class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" id="loadSampleDataBtn">🔄 Load Sample Data</button>
+<h3 class="text-lg font-bold text-gray-700 border-b pb-2 flex items-center"><i class="fas fa-database mr-2"></i> Data Actions</h3>
+<button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center transition-colors" id="exportDataBtn"><i class="fas fa-file-export mr-2"></i> Export Data</button>
+<button class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center transition-colors" id="importDataBtn"><i class="fas fa-file-import mr-2"></i> Import Data</button>
+<button class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center transition-colors" id="loadSampleDataBtn"><i class="fas fa-sync-alt mr-2"></i> Load Sample Data</button>
 <input type="file" id="importFileInput" accept=".json" style="display: none;"/>
 </div>
 </div>
 <div class="transition-all duration-300" id="mainContent">
-<header class="bg-white shadow-md p-4 flex justify-between items-center no-print">
-<div class="flex items-center gap-4"><img alt="TAFE Logo" src="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762673524/ci_1595_1762673524_TAFE_logo_ecudtj.png" style="height: 50px;"/><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
-<div class="flex items-center gap-3">
-<button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn">Open Menu</button>
+<header class="relative bg-cover bg-center shadow-md p-4 flex justify-between items-center no-print" style="background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)), url('https://cdn.simtheory.ai/image/upload/v1763700203/ideogram_generated_1595_1763700202_wxa6ge.png');">
+<div class="flex items-center gap-4 relative z-10"><img alt="TAFE Logo" src="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762673524/ci_1595_1762673524_TAFE_logo_ecudtj.png" style="height: 50px;"/><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
+<div class="flex items-center gap-3 relative z-10">
+<button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded transition-colors shadow-sm" id="openSidebarBtn"><i class="fas fa-bars mr-2"></i> Open Menu</button>
 <div class="dropdown-menu">
-<button class="dropdown-btn" id="semesterDropdownBtn">📅 Semester <span>▼</span></button>
+<button class="dropdown-btn" id="semesterDropdownBtn"><i class="fas fa-calendar mr-2"></i> Semester <span><i class="fas fa-caret-down ml-2"></i></span></button>
 <div class="dropdown-content" id="semesterDropdown"></div>
 </div>
 <div class="dropdown-menu">
-<button class="dropdown-btn" id="viewDropdownBtn">👁️ View <span>▼</span></button>
+<button class="dropdown-btn" id="viewDropdownBtn"><i class="fas fa-eye mr-2"></i> View <span><i class="fas fa-caret-down ml-2"></i></span></button>
 <div class="dropdown-content" id="viewDropdown"></div>
 </div>
 <div id="secondary-selectors"></div>
-<button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded" id="printBtn">📄 Download PDF</button>
+<button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded transition-colors shadow-sm" id="printBtn"><i class="fas fa-file-pdf mr-2"></i> Download PDF</button>
 </div>
 </header>
 <main class="p-4">
 <div class="flex items-center gap-2 mb-[-1px] no-print" id="college-tabs-container"></div>
 <div id="print-area">
-<div class="view-container active" id="main-timetable-view"><div class="bg-white p-4 rounded-lg shadow-lg"><img src="https://cdn.simtheory.ai/image/upload/v1763700203/ideogram_generated_1595_1763700202_wxa6ge.png" class="w-full h-32 object-cover rounded-lg mb-6 shadow-sm" alt="Timetable Banner"><h2 class="text-xl font-bold text-center mb-4" id="main-timetable-title"></h2><div class="timetable-grid-container"><div class="timetable-main-grid" id="main-timetable-grid"><div class="text-center p-10 col-span-6 text-gray-500">Load sample data or add your own to begin.</div></div></div></div></div>
+<div class="view-container active" id="main-timetable-view"><div class="bg-white p-4 rounded-lg shadow-lg"><h2 class="text-xl font-bold text-center mb-4" id="main-timetable-title"></h2><div class="timetable-grid-container"><div class="timetable-main-grid" id="main-timetable-grid"><div class="text-center p-10 col-span-6 text-gray-500">Load sample data or add your own to begin.</div></div></div></div></div>
 <div class="view-container" id="staff-summary-view"><div class="bg-white p-4 rounded-lg shadow-lg overflow-x-auto"><h2 class="text-xl font-bold text-center mb-4" id="staff-summary-title"></h2><div id="staff-summary-table"></div></div></div>
 <div class="view-container" id="dispute-log-view"></div>
 <div class="view-container" id="course-print-view"></div>
 <div class="view-container" id="teacher-print-view"></div>
-<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2">📋 Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn">+ Add New Task</button><div id="tasks-container"></div></div></div>
+<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2"><i class="fas fa-tasks mr-2"></i> Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn"><i class="fas fa-plus mr-2"></i> Add New Task</button><div id="tasks-container"></div></div></div>
 </div>
 </main>
 </div>
 <div class="context-menu" id="contextMenu"></div>
-<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><span>➕</span> Add</button><button class="close-btn" id="closeModalBtn">×</button></div></div><div id="modalContent"></div></div></div>
+<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><i class="fas fa-plus mr-1"></i> Add</button><button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button></div></div><div id="modalContent"></div></div></div>
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
@@ -954,7 +959,7 @@ function openManagementModal(title, data, fields) {
                 const deliveryMode = item.DeliveryMode || 'Face-to-Face';
                 const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold text-xs">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold text-xs">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">F2F</span>');
                 const originalIndex = data.indexOf(item);
-                contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('subjects', ${originalIndex})">Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('subjects', ${originalIndex})">Delete</button></div></td></tr>`;
+                contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('subjects', ${originalIndex})"><i class="fas fa-edit"></i> Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('subjects', ${originalIndex})"><i class="fas fa-trash"></i> Delete</button></div></td></tr>`;
             });
 
             contentHTML += `</tbody></table></div>`;
@@ -987,15 +992,13 @@ function openManagementModal(title, data, fields) {
             const form = document.getElementById('addForm');
             const cancelBtn = document.getElementById('cancelEditBtn');
 
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', () => {
-                    form.reset();
-                    form.querySelector('[name="editIndex"]').value = '';
-                    form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
-                    form.querySelector('button[type="submit"]').textContent = 'Add Subject';
-                    cancelBtn.style.display = 'none';
-                });
-            }
+            cancelBtn.addEventListener('click', () => {
+                form.reset();
+                form.querySelector('[name="editIndex"]').value = '';
+                form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
+                form.querySelector('button[type="submit"]').textContent = 'Add Subject';
+                cancelBtn.style.display = 'none';
+            });
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -1035,7 +1038,7 @@ function openManagementModal(title, data, fields) {
     let displayData = data;
     if (title === 'Teachers') {
         addItemBtn.style.display = 'block';
-        addItemBtn.innerHTML = '➕ Add Teacher';
+        addItemBtn.innerHTML = '<i class="fas fa-plus mr-1"></i> Add Teacher';
         addItemBtn.onclick = () => {
             document.getElementById('addTeacherModal').classList.add('active');
             document.getElementById('addTeacherForm').reset();
@@ -1056,7 +1059,7 @@ function openManagementModal(title, data, fields) {
         });
     } else if (title === 'Courses') {
         addItemBtn.style.display = 'block';
-        addItemBtn.innerHTML = '➕ Add Course';
+        addItemBtn.innerHTML = '<i class="fas fa-plus mr-1"></i> Add Course';
         addItemBtn.onclick = () => {
             const form = document.getElementById('addForm');
             if (form) {
@@ -1075,7 +1078,7 @@ function openManagementModal(title, data, fields) {
     displayData.forEach((item, index) => {
         const originalIndex = data.indexOf(item);
         const type = title.toLowerCase();
-        contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('${type}', ${originalIndex})">Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('${type}', ${originalIndex})">Delete</button></div></td></tr>`;
+        contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('${type}', ${originalIndex})"><i class="fas fa-edit"></i> Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('${type}', ${originalIndex})"><i class="fas fa-trash"></i> Delete</button></div></td></tr>`;
     });
     contentHTML += `</tbody></table></div>`;
 
@@ -1183,7 +1186,7 @@ secondarySelectorsContainer.innerHTML = '';
 if (selectedView === 'course-print') {
 if (semesterData.courses.length > 0) {
 const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn">📚 Course <span>▼</span></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn"><i class="fas fa-book mr-2"></i> Course <span><i class="fas fa-caret-down ml-2"></i></span></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('courseDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
@@ -1203,7 +1206,7 @@ const nameA = (a.Name || '').toLowerCase();
 const nameB = (b.Name || '').toLowerCase();
 return nameA.localeCompare(nameB);
 });
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn">👨‍🏫 Teacher <span>▼</span></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn"><i class="fas fa-chalkboard-teacher mr-2"></i> Teacher <span><i class="fas fa-caret-down ml-2"></i></span></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('teacherDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
@@ -1346,10 +1349,10 @@ e.preventDefault();
 e.stopPropagation();
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 let menuHTML = `
-<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})">📋 Duplicate to Same Day</div>
-<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})">📅 Duplicate to Another Day</div>
-<div class="context-menu-item" onclick="editSessionFromContext(${session.id})">✏️ Edit Session</div>
-<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})">🗑️ Delete Session</div>
+<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})"><i class="fas fa-copy mr-2"></i> Duplicate to Same Day</div>
+<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})"><i class="fas fa-calendar-plus mr-2"></i> Duplicate to Another Day</div>
+<div class="context-menu-item" onclick="editSessionFromContext(${session.id})"><i class="fas fa-edit mr-2"></i> Edit Session</div>
+<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})"><i class="fas fa-trash mr-2"></i> Delete Session</div>
 `;
 contextMenu.innerHTML = menuHTML;
 contextMenu.classList.add('active');
@@ -1892,106 +1895,6 @@ ${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" styl
 }
 
 const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
-
-container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode})</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
-
-const courseNotesTextarea = container.querySelector('.pdf-notes-content');
-if (courseNotesTextarea) {
-courseNotesTextarea.contentEditable = true;
-courseNotesTextarea.addEventListener('blur', (e) => {
-semesterData.courseNotes[courseCode] = e.target.textContent;
-saveData();
-});
-}
-}
-
-function renderTeacherPrintView(teacherInitials) {
-const container = document.getElementById('teacher-print-view');
-const semesterData = getCurrentSemesterData();
-
-if (!teacherInitials && semesterData.teachers.length > 0) {
-teacherInitials = semesterData.teachers[0].Initials;
-}
-
-if (!teacherInitials) {
-container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
-return;
-}
-
-const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
-
-const scheduleToFilter = semesterData.currentCollege === 'Master View'
-? semesterData.schedule
-: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
-
-let sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials || s.TeacherInitials2 === teacherInitials);
-sessions = sortSessionsChronologically(sessions);
-const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
-
-const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
-
-const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
-
-let gridHTML = `<table class="pdf-print-grid">
-<thead>
-<tr>
-<th class="pdf-print-grid"></th>
-${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
-</tr>
-</thead>
-<tbody>`;
-
-const periods = ['Morning', 'Afternoon'];
-if (hasNightSessions) periods.push('Night');
-
-periods.forEach(period => {
-gridHTML += `<tr>
-<td class="pdf-period-label">${period}</td>`;
-
-['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
-const daySessions = sessions.filter(s => {
-const start = timeToMinutes(s.ClassStart);
-return s.Day === day && (
-(period === 'Morning' && start < 720) ||
-(period === 'Afternoon' && start >= 720 && start < 1020) || 
-(period === 'Night' && start >= 1020)
-);
-});
-
-const sessionsHTML = daySessions.map(s => {
-const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
-const coTeacher = s.TeacherInitials === teacherInitials 
-? (s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null)
-: semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
-const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
-const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
-const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
-const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
-const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
-const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
-
-return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
-${collegeHTML}
-<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
-${compulsoryBadge}
-${deliveryBadge}
-${unitsHTML}
-<div style="margin-top: 3px; font-size: 11px;">${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
-${notesHTML}
-<div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
-</div>`;
-}).join('');
-
-gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
-});
-
-gridHTML += `</tr>`;
-});
-
-gridHTML += `</tbody></table>`;
 
 container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${title}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div></div>`;
 }

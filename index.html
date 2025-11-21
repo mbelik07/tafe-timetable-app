@@ -9,13 +9,9 @@
 <meta content="website" property="og:type"/>
 <link href="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762158838/u1103083350_img_64x64_ad306614_xji6gn.png" rel="icon"/>
 <title>TAFE Interactive Timetabling Application</title>
-<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- HTML2PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
 .sidebar { transition: transform 0.3s ease-in-out; }
@@ -424,126 +420,47 @@ tasks: [
 ]
 });
 
-openSidebarBtn.addEventListener('click', () => {
-sidebarOpen = !sidebarOpen;
-if (sidebarOpen) {
-sidebar.classList.add('sidebar-open');
-} else {
-sidebar.classList.remove('sidebar-open');
-}
-});
-
-closeSidebarBtn.addEventListener('click', () => {
-sidebarOpen = false;
-sidebar.classList.remove('sidebar-open');
-});
-
-document.getElementById('printBtn').addEventListener('click', () => {
-const pdfGen = new PDFGenerator(db, getCurrentSemesterData);
-pdfGen.generate();
-});
-
-document.getElementById('exportDataBtn').addEventListener('click', exportData);
-document.getElementById('importDataBtn').addEventListener('click', importData);
-document.getElementById('addTaskBtn').addEventListener('click', openTaskModal);
-document.getElementById('closeTaskModalBtn').addEventListener('click', () => taskModal.classList.remove('active'));
-document.getElementById('cancelTaskBtn').addEventListener('click', () => taskModal.classList.remove('active'));
-  document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
+function handleSessionFormSubmit(e) {
 e.preventDefault();
-const formData = new FormData(e.target);
-const editIndex = formData.get('editIndex');
+const id = document.getElementById('sessionId').value;
 const semesterData = getCurrentSemesterData();
 
-const teacherData = {
-Name: formData.get('Name'),
-Surname: formData.get('Surname'),
-Initials: formData.get('Initials'),
-Email: formData.get('Email'),
-HomeCollege: formData.get('HomeCollege'),
-EmploymentType: formData.get('EmploymentType'),
-TotalHours: parseFloat(formData.get('TotalHours')) || 0,
+const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges"]:checked')).map(cb => cb.value);
+
+const sessionData = {
+Day: document.getElementById('sessionDay').value,
+ClassStart: document.getElementById('sessionStartTime').value,
+ClassEnd: document.getElementById('sessionEndTime').value,
+CourseCode: document.getElementById('sessionCourse').value,
+Subject: document.getElementById('sessionSubject').value,
+TeacherInitials: document.getElementById('sessionTeacher').value || '',
+TeacherInitials2: document.getElementById('sessionTeacher2').value || '',
+Room: document.getElementById('sessionRoom').value,
+notes: document.getElementById('sessionNotes').value,
+colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
+dispute: null
 };
 
-if (editIndex) {
-semesterData.teachers[parseInt(editIndex, 10)] = teacherData;
+if (id) {
+const index = semesterData.schedule.findIndex(s => s.id == id);
+if (index !== -1) {
+semesterData.schedule[index] = { ...semesterData.schedule[index], ...sessionData };
+}
 } else {
-semesterData.teachers.push(teacherData);
+sessionData.id = Date.now();
+semesterData.schedule.push(sessionData);
+}
+document.getElementById('sessionModal').classList.remove('active');
+processAndRenderAll();
 }
 
-document.getElementById('addTeacherModal').classList.remove('active');
-openManagementModal('Teachers', semesterData.teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']);
+function handleDeleteSession() {
+const id = document.getElementById('sessionId').value;
+const semesterData = getCurrentSemesterData();
+semesterData.schedule = semesterData.schedule.filter(s => s.id != id);
+document.getElementById('sessionModal').classList.remove('active');
 processAndRenderAll();
-});
-
-// Auto-generate initials
-const nameInput = document.querySelector('#addTeacherForm input[name="Name"]');
-const surnameInput = document.querySelector('#addTeacherForm input[name="Surname"]');
-const initialsInput = document.querySelector('#addTeacherForm input[name="Initials"]');
-const updateInitials = () => {
-const firstInitial = nameInput.value.trim()[0]?.toUpperCase() || '';
-const secondInitial = surnameInput.value.trim()[0]?.toUpperCase() || '';
-initialsInput.value = `${firstInitial}${secondInitial}`;
-};
-nameInput.addEventListener('input', updateInitials);
-surnameInput.addEventListener('input', updateInitials);
-document.getElementById('deleteTaskBtn').addEventListener('click', deleteTask);
-taskForm.addEventListener('submit', saveTask);
-document.getElementById('closeModalBtn').addEventListener('click', () => managementModal.classList.remove('active'));
-document.getElementById('closeSemesterModalBtn').addEventListener('click', () => semesterModal.classList.remove('active'));
-document.getElementById('closeSessionModalBtn').addEventListener('click', () => document.getElementById('sessionModal').classList.remove('active'));
-document.getElementById('closeDuplicateDayModalBtn').addEventListener('click', () => duplicateDayModal.classList.remove('active'));
-  document.getElementById('closeAddTeacherModalBtn').addEventListener('click', () => document.getElementById('addTeacherModal').classList.remove('active'));
-document.getElementById('cancelAddTeacherBtn').addEventListener('click', () => document.getElementById('addTeacherModal').classList.remove('active'));
-document.getElementById('loadSampleDataBtn').addEventListener('click', () => {
-const currentData = getCurrentSemesterData();
-const sampleData = getSampleData();
-currentData.courses = sampleData.courses;
-currentData.teachers = sampleData.teachers;
-currentData.subjects = sampleData.subjects;
-currentData.schedule = sampleData.schedule;
-currentData.courseNotes = sampleData.courseNotes || {};
-currentData.tasks = sampleData.tasks || [];
-processAndRenderAll();
-alert(`Sample data loaded into ${db.currentSemester}!`);
-});
-
-document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterModal);
-document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
-document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
-document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
-sessionForm.addEventListener('submit', handleSessionFormSubmit);
-document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
-document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
-document.addEventListener('click', () => contextMenu.classList.remove('active'));
-
-const semesterDropdownBtn = document.getElementById('semesterDropdownBtn');
-const semesterDropdown = document.getElementById('semesterDropdown');
-const viewDropdownBtn = document.getElementById('viewDropdownBtn');
-const viewDropdown = document.getElementById('viewDropdown');
-
-semesterDropdownBtn.addEventListener('click', (e) => {
-e.stopPropagation();
-semesterDropdown.classList.toggle('show');
-viewDropdown.classList.remove('show');
-document.getElementById('courseDropdown')?.classList.remove('show');
-document.getElementById('teacherDropdown')?.classList.remove('show');
-});
-
-viewDropdownBtn.addEventListener('click', (e) => {
-e.stopPropagation();
-viewDropdown.classList.toggle('show');
-semesterDropdown.classList.remove('show');
-document.getElementById('courseDropdown')?.classList.remove('show');
-document.getElementById('teacherDropdown')?.classList.remove('show');
-});
-
-document.addEventListener('click', () => {
-semesterDropdown.classList.remove('show');
-viewDropdown.classList.remove('show');
-document.getElementById('courseDropdown')?.classList.remove('show');
-document.getElementById('teacherDropdown')?.classList.remove('show');
-});
-
+}
 
 function processAndRenderAll() {
 detectDisputes();
@@ -992,15 +909,13 @@ function openManagementModal(title, data, fields) {
             const form = document.getElementById('addForm');
             const cancelBtn = document.getElementById('cancelEditBtn');
 
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', () => {
-                    form.reset();
-                    form.querySelector('[name="editIndex"]').value = '';
-                    form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
-                    form.querySelector('button[type="submit"]').textContent = 'Add Subject';
-                    cancelBtn.style.display = 'none';
-                });
-            }
+            cancelBtn.addEventListener('click', () => {
+                form.reset();
+                form.querySelector('[name="editIndex"]').value = '';
+                form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
+                form.querySelector('button[type="submit"]').textContent = 'Add Subject';
+                cancelBtn.style.display = 'none';
+            });
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -1263,6 +1178,44 @@ gridHTML += `</tbody></table>`;
 
 container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${title}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div></div>`;
 }
+
+// Event Listeners Added AT THE END to ensure all functions are defined
+document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterModal);
+document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
+document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
+document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
+sessionForm.addEventListener('submit', handleSessionFormSubmit);
+document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
+document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
+document.addEventListener('click', () => contextMenu.classList.remove('active'));
+
+const semesterDropdownBtn = document.getElementById('semesterDropdownBtn');
+const semesterDropdown = document.getElementById('semesterDropdown');
+const viewDropdownBtn = document.getElementById('viewDropdownBtn');
+const viewDropdown = document.getElementById('viewDropdown');
+
+semesterDropdownBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+semesterDropdown.classList.toggle('show');
+viewDropdown.classList.remove('show');
+document.getElementById('courseDropdown')?.classList.remove('show');
+document.getElementById('teacherDropdown')?.classList.remove('show');
+});
+
+viewDropdownBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+viewDropdown.classList.toggle('show');
+semesterDropdown.classList.remove('show');
+document.getElementById('courseDropdown')?.classList.remove('show');
+document.getElementById('teacherDropdown')?.classList.remove('show');
+});
+
+document.addEventListener('click', () => {
+semesterDropdown.classList.remove('show');
+viewDropdown.classList.remove('show');
+document.getElementById('courseDropdown')?.classList.remove('show');
+document.getElementById('teacherDropdown')?.classList.remove('show');
+});
 
 loadData();
 processAndRenderAll();

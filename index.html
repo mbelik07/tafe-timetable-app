@@ -838,318 +838,322 @@ processAndRenderAll();
 }
 };
 
-function attachActionButtonListeners(title, data, fields) {
-const semesterData = getCurrentSemesterData();
-const modalContent = document.getElementById('modalContent');
-const buttons = modalContent.querySelectorAll('button[data-action]');
+// Management Configuration for global handlers
+const MANAGEMENT_FIELDS = {
+    'teachers': ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours'],
+    'courses': ['Code', 'Name'],
+    'subjects': ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']
+};
 
-buttons.forEach(btn => {
-btn.addEventListener('click', (e) => {
-e.preventDefault();
-e.stopPropagation();
-const { type, index, action } = btn.dataset;
-const dataCollection = semesterData[type];
+// Global Management Handlers
+window.handleManagementDelete = (type, index) => {
+    if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+        const semesterData = getCurrentSemesterData();
+        const dataCollection = semesterData[type];
+        dataCollection.splice(parseInt(index, 10), 1);
+        
+        const capitalType = type.charAt(0).toUpperCase() + type.slice(1);
+        const data = dataCollection;
+        const fields = MANAGEMENT_FIELDS[type];
 
-if (action === 'delete') {
-if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
-dataCollection.splice(parseInt(index, 10), 1);
-openManagementModal(title, dataCollection, fields);
-processAndRenderAll();
-}
-} else if (action === 'edit') {
-if (title === 'Teachers') {
-const item = dataCollection[parseInt(index, 10)];
-document.getElementById('addTeacherModal').classList.add('active');
-document.getElementById('addTeacherForm').reset();
-document.querySelector('#addTeacherForm input[name="Name"]').value = item.Name;
-document.querySelector('#addTeacherForm input[name="Surname"]').value = item.Surname;
-document.querySelector('#addTeacherForm input[name="Initials"]').value = item.Initials;
-document.querySelector('#addTeacherForm input[name="Email"]').value = item.Email;
-document.querySelector('#addTeacherForm select[name="HomeCollege"]').value = item.HomeCollege;
-document.querySelector('#addTeacherForm select[name="EmploymentType"]').value = item.EmploymentType;
-document.querySelector('#addTeacherForm input[name="TotalHours"]').value = item.TotalHours;
-document.querySelector('#addTeacherForm input[name="editIndex"]').value = index;
-} else {
-const item = dataCollection[parseInt(index, 10)];
-const form = document.getElementById('addForm');
-if (form) {
-for (const key in item) {
-const input = form.querySelector(`[name="${key}"]`);
-if (input) {
-if (input.type === 'checkbox') {
-input.checked = item[key];
-} else {
-input.value = Array.isArray(item[key]) ? item[key].join(', ') : item[key];
-}
-}
-}
-form.querySelector('[name="editIndex"]').value = index;
-form.querySelector('button[type="submit"]').textContent = `Update ${title.slice(0, -1)}`;
-const cancelBtn = document.getElementById('cancelEditBtn');
-if (cancelBtn) cancelBtn.style.display = 'block';
-}
-}
-}
-});
-});
-}
+        openManagementModal(capitalType, data, fields);
+        processAndRenderAll();
+    }
+};
+
+window.handleManagementEdit = (type, index) => {
+    const semesterData = getCurrentSemesterData();
+    const dataCollection = semesterData[type];
+    const item = dataCollection[parseInt(index, 10)];
+    const capitalType = type.charAt(0).toUpperCase() + type.slice(1);
+
+    if (type === 'teachers') {
+        document.getElementById('addTeacherModal').classList.add('active');
+        document.getElementById('addTeacherForm').reset();
+        document.querySelector('#addTeacherForm input[name="Name"]').value = item.Name;
+        document.querySelector('#addTeacherForm input[name="Surname"]').value = item.Surname;
+        document.querySelector('#addTeacherForm input[name="Initials"]').value = item.Initials;
+        document.querySelector('#addTeacherForm input[name="Email"]').value = item.Email;
+        document.querySelector('#addTeacherForm select[name="HomeCollege"]').value = item.HomeCollege;
+        document.querySelector('#addTeacherForm select[name="EmploymentType"]').value = item.EmploymentType;
+        document.querySelector('#addTeacherForm input[name="TotalHours"]').value = item.TotalHours;
+        document.querySelector('#addTeacherForm input[name="editIndex"]').value = index;
+    } else {
+        const form = document.getElementById('addForm');
+        if (form) {
+            for (const key in item) {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    if (input.type === 'checkbox') {
+                        input.checked = item[key];
+                    } else {
+                        input.value = Array.isArray(item[key]) ? item[key].join(', ') : item[key];
+                    }
+                }
+            }
+            form.querySelector('[name="editIndex"]').value = index;
+            form.querySelector('button[type="submit"]').textContent = `Update ${capitalType.slice(0, -1)}`;
+            const cancelBtn = document.getElementById('cancelEditBtn');
+            if (cancelBtn) cancelBtn.style.display = 'block';
+        }
+    }
+};
 
 function openManagementModal(title, data, fields) {
-document.getElementById('modalTitle').textContent = `Manage ${title}`;
-const addItemBtn = document.getElementById('addItemBtn');
+    document.getElementById('modalTitle').textContent = `Manage ${title}`;
+    const addItemBtn = document.getElementById('addItemBtn');
+    
+    // Reset addItemBtn handler to prevent stacking
+    addItemBtn.onclick = null;
 
-if (title === 'Subjects') {
-addItemBtn.style.display = 'none';
-const semesterData = getCurrentSemesterData();
-if (!selectedCourseForSubjects && semesterData.courses.length > 0) {
-selectedCourseForSubjects = semesterData.courses[0].Code;
-}
+    if (title === 'Subjects') {
+        addItemBtn.style.display = 'none';
+        const semesterData = getCurrentSemesterData();
+        if (!selectedCourseForSubjects && semesterData.courses.length > 0) {
+            selectedCourseForSubjects = semesterData.courses[0].Code;
+        }
 
-const renderSubjectsModal = () => {
-const filteredSubjects = data.filter(s => s.CourseCode === selectedCourseForSubjects);
-const sortedSubjects = [...filteredSubjects].sort((a, b) => {
-const subjectA = (a.Subject || '').toLowerCase();
-const subjectB = (b.Subject || '').toLowerCase();
-return subjectA.localeCompare(subjectB);
-});
+        const renderSubjectsModal = () => {
+            const filteredSubjects = data.filter(s => s.CourseCode === selectedCourseForSubjects);
+            const sortedSubjects = [...filteredSubjects].sort((a, b) => {
+                const subjectA = (a.Subject || '').toLowerCase();
+                const subjectB = (b.Subject || '').toLowerCase();
+                return subjectA.localeCompare(subjectB);
+            });
 
-let contentHTML = `<div style="display: flex; gap: 1.5rem;">`;
+            let contentHTML = `<div style="display: flex; gap: 1.5rem;">`;
+            contentHTML += `<div style="flex: 0 0 30%; background: #f9fafb; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
+            <h3 class="text-lg font-bold mb-3">Courses</h3>
+            <div class="space-y-2">`;
 
-contentHTML += `<div style="flex: 0 0 30%; background: #f9fafb; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
-<h3 class="text-lg font-bold mb-3">Courses</h3>
-<div class="space-y-2">`;
+            const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
+            sortedCourses.forEach(course => {
+                const isActive = course.Code === selectedCourseForSubjects;
+                contentHTML += `<div class="course-list-item ${isActive ? 'active' : ''}" data-course-code="${course.Code}">
+                <div class="font-bold">${course.Code}</div>
+                <div class="text-sm text-gray-600">${course.Name}</div>
+                </div>`;
+            });
 
-const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-sortedCourses.forEach(course => {
-const isActive = course.Code === selectedCourseForSubjects;
-contentHTML += `<div class="course-list-item ${isActive ? 'active' : ''}" data-course-code="${course.Code}">
-<div class="font-bold">${course.Code}</div>
-<div class="text-sm text-gray-600">${course.Name}</div>
-</div>`;
-});
+            contentHTML += `</div></div>`;
+            contentHTML += `<div style="flex: 1;">`;
+            contentHTML += `<div class="management-table-wrapper"><table class="management-table"><thead><tr><th>Subject</th><th>Color</th><th>Units</th><th>Compulsory</th><th>Delivery</th><th>Actions</th></tr></thead><tbody>`;
 
-contentHTML += `</div></div>`;
+            sortedSubjects.forEach((item) => {
+                const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold text-xs">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">No</span>';
+                const deliveryMode = item.DeliveryMode || 'Face-to-Face';
+                const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold text-xs">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold text-xs">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">F2F</span>');
+                const originalIndex = data.indexOf(item);
+                contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('subjects', ${originalIndex})">Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('subjects', ${originalIndex})">Delete</button></div></td></tr>`;
+            });
 
-contentHTML += `<div style="flex: 1;">`;
+            contentHTML += `</tbody></table></div>`;
 
-contentHTML += `<div class="management-table-wrapper"><table class="management-table"><thead><tr><th>Subject</th><th>Color</th><th>Units</th><th>Compulsory</th><th>Delivery</th><th>Actions</th></tr></thead><tbody>`;
+            const formHTML = `<div class="management-form-section">
+            <h3>Add / Edit Subject for ${selectedCourseForSubjects}</h3>
+            <form id="addForm" class="space-y-4">
+            <div class="form-grid">
+            <div class="form-group"><label>Subject</label><input type="text" name="Subject" required></div>
+            <div class="form-group"><label>Color</label><input type="color" name="Color" required></div>
+            <div class="form-group"><label>Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" required></div>
+            <div class="form-group"><label><input type="checkbox" name="Compulsory"> Mark as Compulsory</label></div>
+            <div class="form-group"><label>Delivery Mode</label><select name="DeliveryMode" required><option value="Face-to-Face">Face-to-Face</option><option value="Online">Online</option><option value="Blended">Blended</option></select></div>
+            </div>
+            <input type="hidden" name="editIndex">
+            <input type="hidden" name="CourseCode" value="${selectedCourseForSubjects}">
+            <div class="form-actions">
+            <button type="submit" class="form-btn form-btn-submit">Add Subject</button>
+            <button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;">Cancel Edit</button>
+            </div>
+            </form>
+            </div>`;
 
-sortedSubjects.forEach((item) => {
-const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold text-xs">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">No</span>';
-const deliveryMode = item.DeliveryMode || 'Face-to-Face';
-const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold text-xs">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold text-xs">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">F2F</span>');
-const originalIndex = data.indexOf(item);
-contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" data-type="subjects" data-index="${originalIndex}" data-action="edit">Edit</button><button class="action-btn delete-btn" data-type="subjects" data-index="${originalIndex}" data-action="delete">Delete</button></div></td></tr>`;
-});
+            contentHTML += formHTML;
+            contentHTML += `</div></div>`;
 
-contentHTML += `</tbody></table></div>`;
+            document.getElementById('modalContent').innerHTML = contentHTML;
+            managementModal.classList.add('active');
 
-const formHTML = `<div class="management-form-section">
-<h3>Add / Edit Subject for ${selectedCourseForSubjects}</h3>
-<form id="addForm" class="space-y-4">
-<div class="form-grid">
-<div class="form-group"><label>Subject</label><input type="text" name="Subject" required></div>
-<div class="form-group"><label>Color</label><input type="color" name="Color" required></div>
-<div class="form-group"><label>Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" required></div>
-<div class="form-group"><label><input type="checkbox" name="Compulsory"> Mark as Compulsory</label></div>
-<div class="form-group"><label>Delivery Mode</label><select name="DeliveryMode" required><option value="Face-to-Face">Face-to-Face</option><option value="Online">Online</option><option value="Blended">Blended</option></select></div>
-</div>
-<input type="hidden" name="editIndex">
-<input type="hidden" name="CourseCode" value="${selectedCourseForSubjects}">
-<div class="form-actions">
-<button type="submit" class="form-btn form-btn-submit">Add Subject</button>
-<button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;">Cancel Edit</button>
-</div>
-</form>
-</div>`;
+            const form = document.getElementById('addForm');
+            const cancelBtn = document.getElementById('cancelEditBtn');
 
-contentHTML += formHTML;
-contentHTML += `</div></div>`;
+            cancelBtn.addEventListener('click', () => {
+                form.reset();
+                form.querySelector('[name="editIndex"]').value = '';
+                form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
+                form.querySelector('button[type="submit"]').textContent = 'Add Subject';
+                cancelBtn.style.display = 'none';
+            });
 
-document.getElementById('modalContent').innerHTML = contentHTML;
-managementModal.classList.add('active');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const editIndex = formData.get('editIndex');
 
-const form = document.getElementById('addForm');
-const cancelBtn = document.getElementById('cancelEditBtn');
+                const subjectData = {
+                    Subject: formData.get('Subject'),
+                    CourseCode: selectedCourseForSubjects,
+                    Color: formData.get('Color'),
+                    Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
+                    Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on',
+                    DeliveryMode: formData.get('DeliveryMode') || 'Face-to-Face'
+                };
 
-cancelBtn.addEventListener('click', () => {
-form.reset();
-form.querySelector('[name="editIndex"]').value = '';
-form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
-form.querySelector('button[type="submit"]').textContent = 'Add Subject';
-cancelBtn.style.display = 'none';
-});
+                if (editIndex) {
+                    data[parseInt(editIndex, 10)] = subjectData;
+                } else {
+                    data.push(subjectData);
+                }
+                openManagementModal('Subjects', data, fields);
+                processAndRenderAll();
+            });
 
-form.addEventListener('submit', (e) => {
-e.preventDefault();
-const formData = new FormData(e.target);
-const editIndex = formData.get('editIndex');
+            document.querySelectorAll('.course-list-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    selectedCourseForSubjects = e.currentTarget.dataset.courseCode;
+                    renderSubjectsModal();
+                });
+            });
+        };
 
-const subjectData = {
-Subject: formData.get('Subject'),
-CourseCode: selectedCourseForSubjects,
-Color: formData.get('Color'),
-Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
-Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on',
-DeliveryMode: formData.get('DeliveryMode') || 'Face-to-Face'
-};
+        renderSubjectsModal();
+        return;
+    }
 
-if (editIndex) {
-data[parseInt(editIndex, 10)] = subjectData;
-} else {
-data.push(subjectData);
-}
-openManagementModal('Subjects', data, fields);
-processAndRenderAll();
-});
+    let displayData = data;
+    if (title === 'Teachers') {
+        addItemBtn.style.display = 'block';
+        addItemBtn.innerHTML = '➕ Add Teacher';
+        addItemBtn.onclick = () => {
+            document.getElementById('addTeacherModal').classList.add('active');
+            document.getElementById('addTeacherForm').reset();
+            document.querySelector('#addTeacherForm input[name="editIndex"]').value = '';
+            document.querySelector('#addTeacherForm input[name="Initials"]').value = '';
+        };
 
-document.querySelectorAll('.course-list-item').forEach(item => {
-item.addEventListener('click', (e) => {
-selectedCourseForSubjects = e.currentTarget.dataset.courseCode;
-renderSubjectsModal();
-});
-});
+        displayData = [...data].sort((a, b) => {
+            const surnameA = (a.Surname || '').toLowerCase();
+            const surnameB = (b.Surname || '').toLowerCase();
+            if (surnameA < surnameB) return -1;
+            if (surnameA > surnameB) return 1;
+            const nameA = (a.Name || '').toLowerCase();
+            const nameB = (b.Name || '').toLowerCase();
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        });
+    } else if (title === 'Courses') {
+        addItemBtn.style.display = 'block';
+        addItemBtn.innerHTML = '➕ Add Course';
+        addItemBtn.onclick = () => {
+            const form = document.getElementById('addForm');
+            if (form) {
+                form.reset();
+                form.querySelector('[name="editIndex"]').value = '';
+                form.querySelector('button[type="submit"]').textContent = 'Add Course';
+                const cancelBtn = document.getElementById('cancelEditBtn');
+                if (cancelBtn) cancelBtn.style.display = 'none';
+            }
+        };
+        displayData = [...data].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
+    }
 
-attachActionButtonListeners(title, data, fields);
-};
+    let contentHTML = `<div class="management-table-wrapper"><table class="management-table"><thead><tr>`;
+    contentHTML += fields.map(f => `<th>${f}</th>`).join('') + `<th>Actions</th></tr></thead><tbody>`;
+    displayData.forEach((item, index) => {
+        const originalIndex = data.indexOf(item);
+        const type = title.toLowerCase();
+        contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('${type}', ${originalIndex})">Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('${type}', ${originalIndex})">Delete</button></div></td></tr>`;
+    });
+    contentHTML += `</tbody></table></div>`;
 
-renderSubjectsModal();
-return;
-}
+    let formHTML = '';
+    if (title !== 'Teachers') {
+        formHTML = `<div class="management-form-section">
+        <h3>Add / Edit ${title.slice(0, -1)}</h3>
+        <form id="addForm" class="space-y-4">
+        <div class="form-grid">
+        ${fields.map(f => `<div class="form-group"><label>${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" required></div>`).join('')}
+        </div>
+        <input type="hidden" name="editIndex">
+        <div class="form-actions">
+        <button type="submit" class="form-btn form-btn-submit">Add ${title.slice(0, -1)}</button>
+        <button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;">Cancel Edit</button>
+        </div>
+        </form>
+        </div>`;
+    }
 
-let displayData = data;
-if (title === 'Teachers') {
-addItemBtn.style.display = 'block';
-addItemBtn.innerHTML = '➕ Add Teacher';
-addItemBtn.onclick = () => {
-document.getElementById('addTeacherModal').classList.add('active');
-document.getElementById('addTeacherForm').reset();
-document.querySelector('#addTeacherForm input[name="editIndex"]').value = '';
-document.querySelector('#addTeacherForm input[name="Initials"]').value = '';
-};
+    document.getElementById('modalContent').innerHTML = contentHTML + formHTML;
+    managementModal.classList.add('active');
 
-displayData = [...data].sort((a, b) => {
-const surnameA = (a.Surname || '').toLowerCase();
-const surnameB = (b.Surname || '').toLowerCase();
-if (surnameA < surnameB) return -1;
-if (surnameA > surnameB) return 1;
-const nameA = (a.Name || '').toLowerCase();
-const nameB = (b.Name || '').toLowerCase();
-if (nameA < nameB) return -1;
-if (nameA > nameB) return 1;
-return 0;
-});
-} else if (title === 'Courses') {
-addItemBtn.style.display = 'block';
-addItemBtn.innerHTML = '➕ Add Course';
-addItemBtn.onclick = () => {
-const form = document.getElementById('addForm');
-if (form) {
-form.reset();
-form.querySelector('[name="editIndex"]').value = '';
-form.querySelector('button[type="submit"]').textContent = 'Add Course';
-const cancelBtn = document.getElementById('cancelEditBtn');
-if (cancelBtn) cancelBtn.style.display = 'none';
-}
-};
-displayData = [...data].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-}
+    const form = document.getElementById('addForm');
+    const cancelBtn = document.getElementById('cancelEditBtn');
 
-let contentHTML = `<div class="management-table-wrapper"><table class="management-table"><thead><tr>`;
-contentHTML += fields.map(f => `<th>${f}</th>`).join('') + `<th>Actions</th></tr></thead><tbody>`;
-displayData.forEach((item, index) => {
-const originalIndex = data.indexOf(item);
-contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="edit">Edit</button><button class="action-btn delete-btn" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="delete">Delete</button></div></td></tr>`;
-});
-contentHTML += `</tbody></table></div>`;
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            form.reset();
+            form.querySelector('[name="editIndex"]').value = '';
+            form.querySelector('button[type="submit"]').textContent = `Add ${title.slice(0, -1)}`;
+            cancelBtn.style.display = 'none';
+            if (title === 'Teachers') {
+                const initialsInput = form.querySelector('input[name="Initials"]');
+                initialsInput.value = '';
+            }
+        });
+    }
 
-let formHTML = '';
-if (title !== 'Teachers') {
-formHTML = `<div class="management-form-section">
-<h3>Add / Edit ${title.slice(0, -1)}</h3>
-<form id="addForm" class="space-y-4">
-<div class="form-grid">
-${fields.map(f => `<div class="form-group"><label>${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" required></div>`).join('')}
-</div>
-<input type="hidden" name="editIndex">
-<div class="form-actions">
-<button type="submit" class="form-btn form-btn-submit">Add ${title.slice(0, -1)}</button>
-<button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;">Cancel Edit</button>
-</div>
-</form>
-</div>`;
-}
+    if (title === 'Teachers') {
+        const nameInput = form.querySelector('input[name="Name"]');
+        const surnameInput = form.querySelector('input[name="Surname"]');
+        const initialsInput = form.querySelector('input[name="Initials"]');
+        const updateInitials = () => {
+            const firstInitial = nameInput.value.trim()[0]?.toUpperCase() || '';
+            const secondInitial = surnameInput.value.trim()[0]?.toUpperCase() || '';
+            initialsInput.value = `${firstInitial}${secondInitial}`;
+        };
+        nameInput.addEventListener('input', updateInitials);
+        surnameInput.addEventListener('input', updateInitials);
+    }
 
-document.getElementById('modalContent').innerHTML = contentHTML + formHTML;
-managementModal.classList.add('active');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const editIndex = formData.get('editIndex');
+            const semesterData = getCurrentSemesterData();
 
-const form = document.getElementById('addForm');
-const cancelBtn = document.getElementById('cancelEditBtn');
-
-if (cancelBtn) {
-cancelBtn.addEventListener('click', () => {
-form.reset();
-form.querySelector('[name="editIndex"]').value = '';
-form.querySelector('button[type="submit"]').textContent = `Add ${title.slice(0, -1)}`;
-cancelBtn.style.display = 'none';
-if (title === 'Teachers') {
-const initialsInput = form.querySelector('input[name="Initials"]');
-initialsInput.value = '';
-}
-});
-}
-
-if (title === 'Teachers') {
-const nameInput = form.querySelector('input[name="Name"]');
-const surnameInput = form.querySelector('input[name="Surname"]');
-const initialsInput = form.querySelector('input[name="Initials"]');
-const updateInitials = () => {
-const firstInitial = nameInput.value.trim()[0]?.toUpperCase() || '';
-const secondInitial = surnameInput.value.trim()[0]?.toUpperCase() || '';
-initialsInput.value = `${firstInitial}${secondInitial}`;
-};
-nameInput.addEventListener('input', updateInitials);
-surnameInput.addEventListener('input', updateInitials);
-}
-
-form.addEventListener('submit', (e) => {
-e.preventDefault();
-const formData = new FormData(e.target);
-const editIndex = formData.get('editIndex');
-const semesterData = getCurrentSemesterData();
-
-if (title === 'Teachers') {
-const teacherData = {
-Name: formData.get('Name'),
-Surname: formData.get('Surname'),
-Initials: formData.get('Initials'),
-Email: formData.get('Email'),
-HomeCollege: formData.get('HomeCollege'),
-EmploymentType: formData.get('EmploymentType'),
-TotalHours: parseFloat(formData.get('TotalHours')) || 0,
-};
-if (editIndex) {
-semesterData.teachers[parseInt(editIndex, 10)] = teacherData;
-} else {
-semesterData.teachers.push(teacherData);
-}
-} else {
-const newItem = {};
-fields.forEach(f => {
-const value = formData.get(f)
-newItem[f] = f === 'Units' ? (value ? value.split(',').map(u => u.trim()).filter(Boolean) : []) : value
-});
-if (editIndex) {
-data[parseInt(editIndex, 10)] = newItem;
-} else {
-data.push(newItem);
-}
-}
-openManagementModal(title, data, fields);
-processAndRenderAll();
-});
-
-attachActionButtonListeners(title, data, fields);
+            if (title === 'Teachers') {
+                const teacherData = {
+                    Name: formData.get('Name'),
+                    Surname: formData.get('Surname'),
+                    Initials: formData.get('Initials'),
+                    Email: formData.get('Email'),
+                    HomeCollege: formData.get('HomeCollege'),
+                    EmploymentType: formData.get('EmploymentType'),
+                    TotalHours: parseFloat(formData.get('TotalHours')) || 0,
+                };
+                if (editIndex) {
+                    semesterData.teachers[parseInt(editIndex, 10)] = teacherData;
+                } else {
+                    semesterData.teachers.push(teacherData);
+                }
+            } else {
+                const newItem = {};
+                fields.forEach(f => {
+                    const value = formData.get(f)
+                    newItem[f] = f === 'Units' ? (value ? value.split(',').map(u => u.trim()).filter(Boolean) : []) : value
+                });
+                if (editIndex) {
+                    data[parseInt(editIndex, 10)] = newItem;
+                } else {
+                    data.push(newItem);
+                }
+            }
+            openManagementModal(title, data, fields);
+            processAndRenderAll();
+        });
+    }
 }
 
 const renderers = { 'main-timetable': renderMainTimetableView, 'staff-summary': renderStaffSummaryView, 'dispute-log': renderDisputeLogView, 'course-print': renderCoursePrintView, 'teacher-print': renderTeacherPrintView, 'tasks': renderTasksView };

@@ -19,7 +19,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .sidebar-open { transform: translateX(0) !important; }
 .view-container { display: none; }
 .view-container.active { display: block; }
-/* Updated College Tab Styles */
+/* Updated College Tab Styles to match Master View */
 .college-tab { padding: 10px 20px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 0.5rem; font-weight: 600; transition: all 0.2s; }
 .college-tab:hover { background: #e5e7eb; color: #1e3a8a; }
 .college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; color: #1e3a8a; box-shadow: 0 -2px 4px rgba(0,0,0,0.05); }
@@ -160,8 +160,6 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .task-edit-btn:hover { background: #2563eb; }
 .task-delete-btn { background: #ef4444; color: white; }
 .task-delete-btn:hover { background: #dc2626; }
-.task-done-btn { background: #10b981; color: white; }
-.task-done-btn:hover { background: #059669; }
 .dropdown-menu { position: relative; display: inline-block; }
 .dropdown-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 .dropdown-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
@@ -228,97 +226,17 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="view-container" id="dispute-log-view"></div>
 <div class="view-container" id="course-print-view"></div>
 <div class="view-container" id="teacher-print-view"></div>
-<div class="view-container" id="tasks-view">
-<div class="bg-white p-6 rounded-lg shadow-lg">
-<div class="flex justify-between items-center mb-4">
-    <div>
-        <h2 class="text-2xl font-bold text-blue-900"><i class="fa-solid fa-clipboard-list mr-2"></i> Task Management</h2>
-        <p class="text-gray-600 mt-1">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p>
-    </div>
-    <div class="flex items-center gap-4">
-        <label class="flex items-center gap-2 text-gray-700 cursor-pointer select-none font-medium">
-            <input type="checkbox" id="hideCompletedTasks" class="w-5 h-5"> Hide Completed
-        </label>
-        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="addTaskBtn"><i class="fa-solid fa-plus mr-2"></i> Add New Task</button>
-    </div>
-</div>
-<div id="tasks-container"></div>
-</div>
-</div>
+<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2"><i class="fa-solid fa-clipboard-list mr-2 text-blue-900"></i> Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn"><i class="fa-solid fa-plus mr-2"></i> Add New Task</button><div id="tasks-container"></div></div></div>
 </div>
 </main>
 </div>
 <div class="context-menu" id="contextMenu"></div>
 <div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><i class="fa-solid fa-plus"></i> Add</button><button class="close-btn" id="closeModalBtn">×</button></div></div><div id="modalContent"></div></div></div>
-
-<!-- Semester Wizard Modal -->
-<div class="modal-overlay" id="semesterWizardModal">
-    <div class="modal-container" style="max-width: 700px;">
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <h2 class="text-2xl font-bold text-blue-900"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> New Semester Setup</h2>
-            <button class="text-3xl font-bold text-gray-500 hover:text-gray-700" id="closeSemesterWizardBtn">×</button>
-        </div>
-        <form id="semesterWizardForm" class="space-y-6">
-            <!-- Name -->
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Semester Name</label>
-                <input type="text" name="wizardName" placeholder="e.g. Semester 2 2025" class="w-full border p-3 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
-            </div>
-
-            <!-- Data Source -->
-            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                <label class="block text-sm font-bold text-blue-900 mb-3">Data Source</label>
-                <div class="space-y-3">
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="radio" name="wizardSource" value="blank" class="w-5 h-5 text-blue-600" checked>
-                        <span>Start Fresh (Empty Timetable)</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="radio" name="wizardSource" value="copy" class="w-5 h-5 text-blue-600">
-                        <span>Copy Data from Existing Semester:</span>
-                    </label>
-                    <select name="wizardCopyFrom" class="w-full border p-2 rounded ml-8 mt-1" disabled>
-                        <option value="">-- Select Semester --</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- College Configuration -->
-            <div class="border p-4 rounded-lg">
-                <div class="flex justify-between items-center mb-3">
-                    <label class="block text-sm font-bold text-gray-700">College Configuration</label>
-                    <button type="button" id="addCollegeBtn" class="text-sm text-blue-600 font-bold hover:underline">+ Add College</button>
-                </div>
-                <div id="wizardCollegeList" class="space-y-2 max-h-40 overflow-y-auto">
-                    <!-- Dynamic list -->
-                </div>
-                <p class="text-xs text-gray-500 mt-2 italic">These colleges will be available for this semester only.</p>
-            </div>
-
-            <!-- Time Configuration -->
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Grid Start Hour</label>
-                    <input type="number" name="wizardStartHour" value="8" min="6" max="12" class="w-full border p-2 rounded">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Grid End Hour</label>
-                    <input type="number" name="wizardEndHour" value="18" min="13" max="23" class="w-full border p-2 rounded">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
-                <button type="button" class="px-6 py-2 rounded text-gray-600 font-bold hover:bg-gray-100" id="cancelWizardBtn">Cancel</button>
-                <button type="submit" class="px-6 py-2 rounded bg-green-600 text-white font-bold hover:bg-green-700 shadow-lg transform hover:-translate-y-0.5 transition-all">Create Semester</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="sessionModalCollegeCheckboxes"><!-- Dynamic --></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
+<div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
+<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
-<div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Add / Edit Teacher</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" id="teacherHomeCollegeSelect" class="w-full border p-2 rounded" required><!-- Dynamic --></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex items-center gap-2 border p-2 rounded bg-blue-50"><input type="checkbox" name="isHeadTeacher" id="isHeadTeacher" class="w-5 h-5 text-blue-600"><label for="isHeadTeacher" class="cursor-pointer font-medium text-blue-900">Head Teacher</label></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelAddTeacherBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Teacher</button></div></form></div></div>
-<div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
+<div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Add / Edit Teacher</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" class="w-full border p-2 rounded" required><option value="Moss Vale">Moss Vale</option><option value="Goulburn">Goulburn</option><option value="Queanbeyan">Queanbeyan</option></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelAddTeacherBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Teacher</button></div></form></div></div>
+  <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
 <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl border-2 border-blue-500">
 <div style="width: 60px; height: 60px; border: 4px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
@@ -339,8 +257,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 // Global State for persistence
 window.appState = {
     selectedCourse: null,
-    selectedTeacher: null,
-    hideCompletedTasks: false
+    selectedTeacher: null
 };
 
 let selectedCourseForSubjects = null;
@@ -348,51 +265,33 @@ let sidebarOpen = false;
 
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
-const defaultColleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
-const getNewSemesterData = (collegeList = defaultColleges, config = { startHour: 8, endHour: 18 }) => ({ 
-    courses: [], 
-    teachers: [], 
-    subjects: [], 
-    schedule: [], 
-    currentCollege: 'Master View', 
-    staffNotes: {}, 
-    tasks: [], 
-    colleges: [...collegeList],
-    config: config
-});
+const colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
+const getNewSemesterData = () => ({ courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale', staffNotes: {}, tasks: [] });
 
 const saveData = () => localStorage.setItem('timetableDataV2', JSON.stringify(db));
 const loadData = () => {
-    const savedData = localStorage.getItem('timetableDataV2');
-    if (savedData) {
-        db = JSON.parse(savedData);
-        Object.keys(db.semesters).forEach(semKey => {
-            // Migration: Ensure colleges list exists
-            if (!db.semesters[semKey].colleges) {
-                db.semesters[semKey].colleges = [...defaultColleges];
-            }
-            // Migration: Ensure config exists
-            if (!db.semesters[semKey].config) {
-                db.semesters[semKey].config = { startHour: 8, endHour: 18 };
-            }
-            if (db.semesters[semKey].subjects) {
-                db.semesters[semKey].subjects.forEach(subj => {
-                    if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
-                });
-            }
-            if (!db.semesters[semKey].staffNotes) {
-                db.semesters[semKey].staffNotes = {};
-            }
-            if (!db.semesters[semKey].tasks) {
-                db.semesters[semKey].tasks = [];
-            }
-        });
-    } else {
-        db = {
-            semesters: { 'Semester 1 2024': getNewSemesterData() },
-            currentSemester: 'Semester 1 2024'
-        };
-    }
+const savedData = localStorage.getItem('timetableDataV2');
+if (savedData) {
+db = JSON.parse(savedData);
+Object.keys(db.semesters).forEach(semKey => {
+if (db.semesters[semKey].subjects) {
+db.semesters[semKey].subjects.forEach(subj => {
+if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
+});
+}
+if (!db.semesters[semKey].staffNotes) {
+db.semesters[semKey].staffNotes = {};
+}
+if (!db.semesters[semKey].tasks) {
+db.semesters[semKey].tasks = [];
+}
+});
+} else {
+db = {
+semesters: { 'Semester 1 2024': getNewSemesterData(), 'Semester 2 2024': getNewSemesterData() },
+currentSemester: 'Semester 1 2024'
+};
+}
 };
 
 const exportData = () => {
@@ -428,21 +327,18 @@ throw new Error('Invalid data format. Missing semesters or currentSemester.');
 
 if (confirm('This will replace all your current data. Are you sure?')) {
 db = importedData;
-// Run migration on imported data
 Object.keys(db.semesters).forEach(semKey => {
-    if (!db.semesters[semKey].colleges) db.semesters[semKey].colleges = [...defaultColleges];
-    if (!db.semesters[semKey].config) db.semesters[semKey].config = { startHour: 8, endHour: 18 };
-    if (db.semesters[semKey].subjects) {
-        db.semesters[semKey].subjects.forEach(subj => {
-            if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
-        });
-    }
-    if (!db.semesters[semKey].staffNotes) {
-        db.semesters[semKey].staffNotes = {};
-    }
-    if (!db.semesters[semKey].tasks) {
-        db.semesters[semKey].tasks = [];
-    }
+if (db.semesters[semKey].subjects) {
+db.semesters[semKey].subjects.forEach(subj => {
+if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
+});
+}
+if (!db.semesters[semKey].staffNotes) {
+db.semesters[semKey].staffNotes = {};
+}
+if (!db.semesters[semKey].tasks) {
+db.semesters[semKey].tasks = [];
+}
 });
 saveData();
 processAndRenderAll();
@@ -470,16 +366,10 @@ db.currentSemester = 'Default Semester';
 return db.semesters[db.currentSemester];
 };
 
-// Get available colleges for the CURRENT semester
-const getCurrentColleges = () => {
-    return getCurrentSemesterData().colleges || defaultColleges;
-};
-
 const collegeTabsContainer = document.getElementById('college-tabs-container');
 const sessionForm = document.getElementById('sessionForm');
 const managementModal = document.getElementById('managementModal');
-// Removed old semesterModal logic, replaced with Wizard
-const semesterWizardModal = document.getElementById('semesterWizardModal');
+const semesterModal = document.getElementById('semesterModal');
 const contextMenu = document.getElementById('contextMenu');
 const duplicateDayModal = document.getElementById('duplicateDayModal');
 const taskModal = document.getElementById('taskModal');
@@ -488,6 +378,50 @@ const secondarySelectorsContainer = document.getElementById('secondary-selectors
 const sidebar = document.getElementById('sidebar');
 const openSidebarBtn = document.getElementById('openSidebarBtn');
 const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+const getSampleData = () => ({
+courses: [{ Code: 'FSK20119', Name: 'Cert II Skills for Work' }, { Code: '11225NAT', Name: 'Cert IV Tertiary Prep' }],
+teachers: [
+{ Name: 'Juan', Surname: 'Aburto', Initials: 'JA', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'juan.aburto@tafe.edu.au' },
+{ Name: 'Cary', Surname: 'Buecher', Initials: 'CB', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 8, Email: 'cary.buecher@tafe.edu.au' },
+{ Name: 'Miroslav', Surname: 'Belik', Initials: 'MB', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'miroslav.belik@tafe.edu.au' },
+{ Name: 'Carlie', Surname: 'Dally', Initials: 'CD', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'carlie.dally@tafe.edu.au' },
+{ Name: 'Bernadette', Surname: 'Flynn-Whitehall', Initials: 'BF', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4, Email: 'bernadette.flynn@tafe.edu.au' },
+{ Name: 'Cary', Surname: 'Buecher', Initials: 'CB2', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 8, Email: 'cary.buecher2@tafe.edu.au' },
+{ Name: 'Christopher', Surname: 'Worland', Initials: 'CW', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'christopher.worland@tafe.edu.au' },
+{ Name: 'David', Surname: 'Baird', Initials: 'DB', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'david.baird@tafe.edu.au' },
+{ Name: 'David', Surname: 'Cole', Initials: 'DC', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'david.cole@tafe.edu.au' },
+{ Name: 'Georgina', Surname: 'Templeton', Initials: 'GT', HomeCollege: 'Goulburn', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'georgina.templeton@tafe.edu.au' },
+{ Name: 'Ian', Surname: 'Willis', Initials: 'IW', HomeCollege: 'Goulburn', EmploymentType: 'Casual', TotalHours: 4, Email: 'ian.willis@tafe.edu.au' },
+{ Name: 'Karen', Surname: 'Gardner', Initials: 'KG', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'karen.gardner@tafe.edu.au' },
+{ Name: 'Kerri-Anne', Surname: 'Smith', Initials: 'KS', HomeCollege: 'Moss Vale', EmploymentType: 'Casual', TotalHours: 4, Email: 'kerri-anne.smith@tafe.edu.au' },
+{ Name: 'Rosalind', Surname: 'Phillips', Initials: 'RP', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4, Email: 'rosalind.phillips@tafe.edu.au' },
+{ Name: 'Rosalind', Surname: 'Tuohy', Initials: 'RT', HomeCollege: 'Moss Vale', EmploymentType: 'Full-Time', TotalHours: 10, Email: 'rosalind.tuohy@tafe.edu.au' },
+{ Name: 'Susan', Surname: 'Neild', Initials: 'SN', HomeCollege: 'Queanbeyan', EmploymentType: 'Casual', TotalHours: 4, Email: 'susan.neild@tafe.edu.au' },
+{ Name: 'Anna', Surname: 'Nikonova', Initials: 'AN', HomeCollege: 'Queanbeyan', EmploymentType: 'Full-Time', TotalHours: 20, Email: 'anna.nikonova@tafe.edu.au' }
+],
+subjects: [
+{ Subject: 'Health TPC', CourseCode: 'FSK20119', Color: '#ffa57d', Units: ['NAT11225026'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'Maths B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225020'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'History TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225017'], Compulsory: false, DeliveryMode: 'Online' },
+{ Subject: 'Film and Media TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225015'], Compulsory: false, DeliveryMode: 'Blended' },
+{ Subject: 'English B TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225002'], Compulsory: true, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'Maths B Calculus TPC', CourseCode: '11225NAT', Color: '#ffa57d', Units: ['NAT11225021'], Compulsory: false, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'Compulsory Dig Lit Units PFS', CourseCode: 'FSK20119', Color: '#ff4013', Units: ['NAT11224002', 'NAT11041009', 'NAT11039015', 'FSKDIG003'], Compulsory: true, DeliveryMode: 'Blended' },
+{ Subject: 'English A PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224001', 'NAT11225001'], Compulsory: true, DeliveryMode: 'Face-to-Face' },
+{ Subject: 'Human Rights PFS', CourseCode: '11225NAT', Color: '#00c7fc', Units: ['NAT11224007', 'NAT11224008'], Compulsory: false, DeliveryMode: 'Online' },
+{ Subject: 'Study Skills', CourseCode: '11225NAT', Color: '#90ee90', Units: ['NAT11225030'], Compulsory: true, DeliveryMode: 'Face-to-Face' }
+],
+schedule: [
+{ id: 1, Day: 'Monday', ClassStart: '09:00', ClassEnd: '13:00', TeacherInitials: 'JA', TeacherInitials2: '', CourseCode: 'FSK20119', Subject: 'Health TPC', Room: 'C1', colleges: ['Moss Vale'], notes: 'Face-to-Face', dispute: null },
+{ id: 2, Day: 'Monday', ClassStart: '09:00', ClassEnd: '12:00', TeacherInitials: 'CB', TeacherInitials2: '', CourseCode: '11225NAT', Subject: 'Maths B TPC', Room: 'C4', colleges: ['Goulburn'], notes: 'Blended Delivery', dispute: null },
+],
+courseNotes: {},
+tasks: [
+{ id: 1, title: 'Prepare materials for FSK20119', description: 'Photocopy worksheets and prepare online resources.', teacher: 'JA', course: 'FSK20119', colleges: ['Moss Vale'], priority: 'high', status: 'todo', dueDate: '2024-08-01' },
+{ id: 2, title: 'Mark mid-term exams', description: '', teacher: 'MB', course: '11225NAT', colleges: ['Moss Vale'], priority: 'medium', status: 'inprogress', dueDate: '2024-08-15' },
+]
+});
 
 openSidebarBtn.addEventListener('click', () => {
 sidebarOpen = !sidebarOpen;
@@ -513,13 +447,7 @@ document.getElementById('importDataBtn').addEventListener('click', importData);
 document.getElementById('addTaskBtn').addEventListener('click', openTaskModal);
 document.getElementById('closeTaskModalBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('cancelTaskBtn').addEventListener('click', () => taskModal.classList.remove('active'));
-// Tasks Filter
-document.getElementById('hideCompletedTasks').addEventListener('change', (e) => {
-    window.appState.hideCompletedTasks = e.target.checked;
-    renderTasksView();
-});
-
-document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
+  document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
 e.preventDefault();
 const formData = new FormData(e.target);
 const editIndex = formData.get('editIndex');
@@ -533,7 +461,6 @@ Email: formData.get('Email'),
 HomeCollege: formData.get('HomeCollege'),
 EmploymentType: formData.get('EmploymentType'),
 TotalHours: parseFloat(formData.get('TotalHours')) || 0,
-isHeadTeacher: document.getElementById('isHeadTeacher').checked // Capture Head Teacher status
 };
 
 if (editIndex) {
@@ -561,21 +488,25 @@ surnameInput.addEventListener('input', updateInitials);
 document.getElementById('deleteTaskBtn').addEventListener('click', deleteTask);
 taskForm.addEventListener('submit', saveTask);
 document.getElementById('closeModalBtn').addEventListener('click', () => managementModal.classList.remove('active'));
+document.getElementById('closeSemesterModalBtn').addEventListener('click', () => semesterModal.classList.remove('active'));
 document.getElementById('closeSessionModalBtn').addEventListener('click', () => document.getElementById('sessionModal').classList.remove('active'));
 document.getElementById('closeDuplicateDayModalBtn').addEventListener('click', () => duplicateDayModal.classList.remove('active'));
-document.getElementById('closeAddTeacherModalBtn').addEventListener('click', () => document.getElementById('addTeacherModal').classList.remove('active'));
+  document.getElementById('closeAddTeacherModalBtn').addEventListener('click', () => document.getElementById('addTeacherModal').classList.remove('active'));
 document.getElementById('cancelAddTeacherBtn').addEventListener('click', () => document.getElementById('addTeacherModal').classList.remove('active'));
 document.getElementById('loadSampleDataBtn').addEventListener('click', () => {
-// Sample loader logic can remain simple or be updated to use current colleges
-// For simplicity, we'll load data into current context
 const currentData = getCurrentSemesterData();
-// ... (Keep existing simple sample loading for now)
-alert(`Sample data loaded!`);
+const sampleData = getSampleData();
+currentData.courses = sampleData.courses;
+currentData.teachers = sampleData.teachers;
+currentData.subjects = sampleData.subjects;
+currentData.schedule = sampleData.schedule;
+currentData.courseNotes = sampleData.courseNotes || {};
+currentData.tasks = sampleData.tasks || [];
+processAndRenderAll();
+alert(`Sample data loaded into ${db.currentSemester}!`);
 });
 
-// Updated: openSemesterModal now opens the Wizard
-document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterWizard);
-
+document.getElementById('manageSemestersBtn').addEventListener('click', openSemesterModal);
 document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
 document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
@@ -583,120 +514,6 @@ sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
 document.addEventListener('click', () => contextMenu.classList.remove('active'));
-
-// Semester Wizard Logic
-const wizardModal = document.getElementById('semesterWizardModal');
-const wizardForm = document.getElementById('semesterWizardForm');
-const wizardSourceRadios = document.getElementsByName('wizardSource');
-const wizardCopySelect = document.querySelector('select[name="wizardCopyFrom"]');
-const wizardCollegeList = document.getElementById('wizardCollegeList');
-const addCollegeBtn = document.getElementById('addCollegeBtn');
-
-// Set up Wizard Event Listeners
-document.getElementById('closeSemesterWizardBtn').addEventListener('click', () => wizardModal.classList.remove('active'));
-document.getElementById('cancelWizardBtn').addEventListener('click', () => wizardModal.classList.remove('active'));
-
-// Toggle Copy Dropdown
-wizardSourceRadios.forEach(radio => {
-    radio.addEventListener('change', (e) => {
-        wizardCopySelect.disabled = e.target.value !== 'copy';
-    });
-});
-
-// Add College Button in Wizard
-addCollegeBtn.addEventListener('click', () => {
-    const newName = prompt("Enter college name (e.g. 'North Campus'):");
-    if (newName && newName.trim() !== "") {
-        addCollegeToWizardList(newName.trim());
-    }
-});
-
-function addCollegeToWizardList(name) {
-    const div = document.createElement('div');
-    div.className = 'flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200';
-    div.innerHTML = `
-        <span class="font-medium text-gray-700">${name}</span>
-        <input type="hidden" name="wizardColleges" value="${name}">
-        <button type="button" class="text-red-500 hover:text-red-700 px-2" onclick="this.parentElement.remove()">
-            <i class="fa-solid fa-trash"></i>
-        </button>
-    `;
-    wizardCollegeList.appendChild(div);
-}
-
-function openSemesterWizard() {
-    // Populate Copy Dropdown
-    wizardCopySelect.innerHTML = '<option value="">-- Select Semester --</option>';
-    Object.keys(db.semesters).sort().forEach(sem => {
-        wizardCopySelect.innerHTML += `<option value="${sem}">${sem}</option>`;
-    });
-
-    // Populate Colleges (Clone from current semester)
-    wizardCollegeList.innerHTML = '';
-    const currentCols = getCurrentColleges();
-    currentCols.forEach(col => addCollegeToWizardList(col));
-
-    // Populate Time Config
-    const currentConfig = getCurrentSemesterData().config || { startHour: 8, endHour: 18 };
-    document.querySelector('input[name="wizardStartHour"]').value = currentConfig.startHour;
-    document.querySelector('input[name="wizardEndHour"]').value = currentConfig.endHour;
-
-    // Reset Form state
-    wizardForm.reset();
-    wizardSourceRadios[0].checked = true; // Default to Blank
-    wizardCopySelect.disabled = true;
-
-    wizardModal.classList.add('active');
-}
-
-wizardForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const newName = formData.get('wizardName').trim();
-    const source = formData.get('wizardSource');
-    const copyFrom = formData.get('wizardCopyFrom');
-    
-    // Get colleges
-    const newColleges = Array.from(wizardForm.querySelectorAll('input[name="wizardColleges"]')).map(i => i.value);
-    if (newColleges.length === 0) {
-        alert("You must have at least one college.");
-        return;
-    }
-
-    const newConfig = {
-        startHour: parseInt(formData.get('wizardStartHour')),
-        endHour: parseInt(formData.get('wizardEndHour'))
-    };
-
-    if (!newName) { alert("Please enter a semester name."); return; }
-    if (db.semesters[newName]) { alert("A semester with this name already exists."); return; }
-
-    let newData;
-
-    if (source === 'copy' && copyFrom && db.semesters[copyFrom]) {
-        // Deep Clone
-        const sourceData = db.semesters[copyFrom];
-        newData = JSON.parse(JSON.stringify(sourceData));
-        // Override with new configs
-        newData.colleges = newColleges;
-        newData.config = newConfig;
-        // Reset currentCollege if it's invalid in new list
-        if (!newColleges.includes(newData.currentCollege) && newData.currentCollege !== 'Master View') {
-            newData.currentCollege = 'Master View';
-        }
-    } else {
-        // Start Blank
-        newData = getNewSemesterData(newColleges, newConfig);
-    }
-
-    db.semesters[newName] = newData;
-    db.currentSemester = newName;
-    
-    wizardModal.classList.remove('active');
-    processAndRenderAll();
-    alert(`Semester "${newName}" created successfully!`);
-});
-
 
 const semesterDropdownBtn = document.getElementById('semesterDropdownBtn');
 const semesterDropdown = document.getElementById('semesterDropdown');
@@ -785,7 +602,7 @@ let html = '';
 semesterNames.forEach(name => {
 html += `<div class="dropdown-item ${db.currentSemester === name ? 'font-bold text-purple-600' : ''}" onclick="changeSemester('${name}')">${name}</div>`;
 });
-semesterDropdown.innerHTML = html + '<div class="border-t my-1"></div><div class="dropdown-item text-blue-600 font-bold" onclick="openSemesterWizard()"><i class="fa-solid fa-plus mr-2"></i> CREATE NEW</div>';
+semesterDropdown.innerHTML = html;
 }
 
 function renderViewDropdown() {
@@ -824,8 +641,6 @@ viewDropdown.classList.remove('show');
 
 function renderCollegeTabs() {
 const currentData = getCurrentSemesterData();
-// Use dynamic colleges
-const colleges = getCurrentColleges();
 let tabsHTML = `<button class="college-tab ${currentData.currentCollege === 'Master View' ? 'active' : ''}" data-college="Master View"><i class="fa-solid fa-globe"></i> Master View</button>`;
 tabsHTML += colleges.map(c => `<button class="college-tab ${currentData.currentCollege === c ? 'active' : ''}" data-college="${c}"><i class="fa-solid fa-school"></i> ${c}</button>`).join('');
 collegeTabsContainer.innerHTML = tabsHTML;
@@ -833,6 +648,56 @@ collegeTabsContainer.querySelectorAll('.college-tab').forEach(tab => tab.addEven
 getCurrentSemesterData().currentCollege = e.currentTarget.dataset.college;
 processAndRenderAll();
 }));
+}
+
+function openSemesterModal() {
+const contentEl = document.getElementById('semesterModalContent');
+let contentHTML = `<h3 class="text-lg font-bold mb-2">Existing Semesters</h3><div class="space-y-2 mb-6 border p-2 rounded bg-gray-50 max-h-48 overflow-y-auto">`;
+
+const semesterNames = Object.keys(db.semesters).sort();
+semesterNames.forEach(name => {
+contentHTML += `<div class="flex justify-between items-center p-2 border-b"><span>${name}</span>
+<button class="text-red-500 hover:text-red-700 ${semesterNames.length <= 1 ? 'opacity-50 cursor-not-allowed' : ''}" data-action="delete-semester" data-name="${name}" ${semesterNames.length <= 1 ? 'disabled' : ''}><i class="fa-solid fa-trash"></i> Delete</button></div>`;
+});
+contentHTML += `</div>`;
+
+contentHTML += `<form id="addSemesterForm" class="border-t pt-4">
+<h3 class="text-lg font-bold mb-2">Create New Semester</h3>
+<div class="flex gap-2">
+<input type="text" name="semesterName" placeholder="e.g., Semester 2 2024" class="flex-grow border p-2 rounded" required>
+<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create</button>
+</div>
+</form>`;
+
+contentEl.innerHTML = contentHTML;
+semesterModal.classList.add('active');
+
+contentEl.querySelector('#addSemesterForm').addEventListener('submit', e => {
+e.preventDefault();
+const newName = e.target.elements.semesterName.value.trim();
+if (newName && !db.semesters[newName]) {
+db.semesters[newName] = getNewSemesterData();
+db.currentSemester = newName;
+semesterModal.classList.remove('active');
+processAndRenderAll();
+} else {
+alert('Semester name is empty or already exists.');
+}
+});
+
+contentEl.querySelectorAll('[data-action="delete-semester"]').forEach(btn => {
+btn.addEventListener('click', e => {
+const nameToDelete = e.target.dataset.name;
+if (confirm(`Are you sure you want to delete "${nameToDelete}"? This action cannot be undone.`)) {
+delete db.semesters[nameToDelete];
+if (db.currentSemester === nameToDelete) {
+db.currentSemester = Object.keys(db.semesters)[0];
+}
+openSemesterModal();
+processAndRenderAll();
+}
+});
+});
 }
 
 function openTaskModal(taskId = null) {
@@ -864,8 +729,7 @@ return nameA.localeCompare(nameB);
 });
 
 const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-// Use Dynamic Colleges
-const sortedColleges = getCurrentColleges().sort();
+const sortedColleges = [...colleges].sort();
 
 teacherSelect.innerHTML = '<option value="">-- None --</option>' + sortedTeachers.map(t => `<option value="${t.Initials}">${t.Name} ${t.Surname}</option>`).join('');
 courseSelect.innerHTML = '<option value="">-- None --</option>' + sortedCourses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('');
@@ -927,31 +791,16 @@ processAndRenderAll();
 }
 }
 
-// QUICK ACTION: Mark as Done
-window.markTaskDone = (taskId) => {
-    const semesterData = getCurrentSemesterData();
-    const task = semesterData.tasks.find(t => t.id === taskId);
-    if (task) {
-        task.status = 'done';
-        processAndRenderAll();
-    }
-};
-
 function renderTasksView() {
 const container = document.getElementById('tasks-container');
 const semesterLabel = document.getElementById('tasksSemesterLabel');
 const semesterData = getCurrentSemesterData();
-let tasks = semesterData.tasks || [];
+const tasks = semesterData.tasks || [];
 
 semesterLabel.textContent = db.currentSemester;
 
-// FILTER: Hide Completed
-if (window.appState.hideCompletedTasks) {
-    tasks = tasks.filter(t => t.status !== 'done');
-}
-
 if (tasks.length === 0) {
-container.innerHTML = '<p class="text-center text-gray-500 py-8">No tasks found.</p>';
+container.innerHTML = '<p class="text-center text-gray-500 py-8">No tasks yet. Click "Add New Task" to create one.</p>';
 return;
 }
 
@@ -965,11 +814,6 @@ const collegeDisplay = task.colleges && task.colleges.length > 0 ? task.colleges
 const statusClass = `task-status-${task.status}`;
 const statusText = task.status === 'inprogress' ? 'In Progress' : (task.status === 'todo' ? 'To Do' : (task.status === 'done' ? 'Done' : 'Blocked'));
 const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';
-
-// Add Done Button Logic
-const doneButton = task.status !== 'done' 
-    ? `<button class="task-done-btn" onclick="window.markTaskDone(${task.id})" title="Mark Completed"><i class="fa-solid fa-check"></i> Done</button>` 
-    : '';
 
 html += `
 <div class="task-card ${task.priority}">
@@ -986,7 +830,6 @@ html += `
 </div>
 ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
 <div class="task-actions">
-${doneButton}
 <button class="task-edit-btn" onclick="window.editTask(${task.id})"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
 <button class="task-delete-btn" onclick="window.deleteTaskFromList(${task.id})"><i class="fa-solid fa-trash"></i> Delete</button>
 </div>
@@ -1045,16 +888,10 @@ window.handleManagementEdit = (type, index) => {
         document.querySelector('#addTeacherForm input[name="Surname"]').value = item.Surname;
         document.querySelector('#addTeacherForm input[name="Initials"]').value = item.Initials;
         document.querySelector('#addTeacherForm input[name="Email"]').value = item.Email;
-        
-        // Populate dynamic colleges BEFORE setting value
-        const homeCollegeSelect = document.querySelector('#addTeacherForm select[name="HomeCollege"]');
-        homeCollegeSelect.innerHTML = getCurrentColleges().map(c => `<option value="${c}">${c}</option>`).join('');
-        homeCollegeSelect.value = item.HomeCollege;
-
+        document.querySelector('#addTeacherForm select[name="HomeCollege"]').value = item.HomeCollege;
         document.querySelector('#addTeacherForm select[name="EmploymentType"]').value = item.EmploymentType;
         document.querySelector('#addTeacherForm input[name="TotalHours"]').value = item.TotalHours;
         document.querySelector('#addTeacherForm input[name="editIndex"]').value = index;
-        document.getElementById('isHeadTeacher').checked = item.isHeadTeacher || false; // Set Checkbox
     } else {
         const form = document.getElementById('addForm');
         if (form) {
@@ -1206,10 +1043,6 @@ function openManagementModal(title, data, fields) {
             document.getElementById('addTeacherForm').reset();
             document.querySelector('#addTeacherForm input[name="editIndex"]').value = '';
             document.querySelector('#addTeacherForm input[name="Initials"]').value = '';
-            document.getElementById('isHeadTeacher').checked = false;
-            // Populate Dynamic Colleges for New Teacher
-            const homeCollegeSelect = document.querySelector('#addTeacherForm select[name="HomeCollege"]');
-            homeCollegeSelect.innerHTML = getCurrentColleges().map(c => `<option value="${c}">${c}</option>`).join('');
         };
 
         displayData = [...data].sort((a, b) => {
@@ -1305,7 +1138,20 @@ function openManagementModal(title, data, fields) {
             const semesterData = getCurrentSemesterData();
 
             if (title === 'Teachers') {
-                // Handled by addTeacherForm listener
+                const teacherData = {
+                    Name: formData.get('Name'),
+                    Surname: formData.get('Surname'),
+                    Initials: formData.get('Initials'),
+                    Email: formData.get('Email'),
+                    HomeCollege: formData.get('HomeCollege'),
+                    EmploymentType: formData.get('EmploymentType'),
+                    TotalHours: parseFloat(formData.get('TotalHours')) || 0,
+                };
+                if (editIndex) {
+                    semesterData.teachers[parseInt(editIndex, 10)] = teacherData;
+                } else {
+                    semesterData.teachers.push(teacherData);
+                }
             } else {
                 const newItem = {};
                 fields.forEach(f => {
@@ -1428,12 +1274,9 @@ function renderMainTimetableView() {
 const grid = document.getElementById('main-timetable-grid');
 const titleEl = document.getElementById('main-timetable-title');
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const startTime = 8, endTime = 18, slotHeight = 30;
+const totalRows = (endTime - startTime) * 2;
 const semesterData = getCurrentSemesterData();
-const config = semesterData.config || { startHour: 8, endHour: 18 };
-const startTime = config.startHour;
-const endTime = config.endHour;
-const slotHeight = 30;
-const totalRows = (endTime - startTime) * 2; // 30 min slots
 
 titleEl.textContent = `${semesterData.currentCollege} Timetable - ${db.currentSemester}`;
 
@@ -1502,6 +1345,219 @@ arrangeOverlappingSessions(dayCol, sessionsByDay[day]);
 addSlotSelectionListeners();
 }
 
+function showContextMenu(e, session) {
+e.preventDefault();
+e.stopPropagation();
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+let menuHTML = `
+<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})"><i class="fa-solid fa-copy"></i> Duplicate to Same Day</div>
+<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})"><i class="fa-solid fa-calendar-plus"></i> Duplicate to Another Day</div>
+<div class="context-menu-item" onclick="editSessionFromContext(${session.id})"><i class="fa-solid fa-pen-to-square"></i> Edit Session</div>
+<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})"><i class="fa-solid fa-trash"></i> Delete Session</div>
+`;
+contextMenu.innerHTML = menuHTML;
+contextMenu.classList.add('active');
+contextMenu.style.left = e.clientX + 'px';
+contextMenu.style.top = e.clientY + 'px';
+}
+
+window.duplicateSessionSameDay = (sessionId) => {
+const semesterData = getCurrentSemesterData();
+const session = semesterData.schedule.find(s => s.id === sessionId);
+if (session) {
+const newSession = { ...session, id: Date.now() };
+semesterData.schedule.push(newSession);
+processAndRenderAll();
+}
+contextMenu.classList.remove('active');
+};
+
+window.openDuplicateDayModal = (sessionId) => {
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const semesterData = getCurrentSemesterData();
+const session = semesterData.schedule.find(s => s.id === sessionId);
+if (!session) return;
+
+let contentHTML = '<h3 class="text-lg font-bold mb-4">Select a day to duplicate to:</h3><div class="space-y-2">';
+days.forEach(day => {
+contentHTML += `<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" onclick="duplicateSessionToDay(${sessionId}, '${day}')">${day}</button>`;
+});
+contentHTML += '</div>';
+document.getElementById('duplicateDayContent').innerHTML = contentHTML;
+duplicateDayModal.classList.add('active');
+contextMenu.classList.remove('active');
+};
+
+window.duplicateSessionToDay = (sessionId, newDay) => {
+const semesterData = getCurrentSemesterData();
+const session = semesterData.schedule.find(s => s.id === sessionId);
+if (session) {
+const newSession = { ...session, id: Date.now(), Day: newDay };
+semesterData.schedule.push(newSession);
+processAndRenderAll();
+}
+duplicateDayModal.classList.remove('active');
+};
+
+window.editSessionFromContext = (sessionId) => {
+const semesterData = getCurrentSemesterData();
+const session = semesterData.schedule.find(s => s.id === sessionId);
+if (session) {
+openSessionModal(session);
+}
+contextMenu.classList.remove('active');
+};
+
+window.deleteSessionFromContext = (sessionId) => {
+if (confirm('Are you sure you want to delete this session?')) {
+const semesterData = getCurrentSemesterData();
+semesterData.schedule = semesterData.schedule.filter(s => s.id !== sessionId);
+processAndRenderAll();
+}
+contextMenu.classList.remove('active');
+};
+
+function addSlotSelectionListeners() {
+if (getCurrentSemesterData().currentCollege === 'Master View') return;
+let isSelecting = false, startSlot = null, dayOfSelection = null;
+const grid = document.getElementById('main-timetable-grid');
+
+grid.addEventListener('mousedown', (e) => {
+const slot = e.target.closest('.time-slot');
+if (!slot || e.target.closest('.session-block')) return;
+isSelecting = true;
+dayOfSelection = slot.dataset.day;
+startSlot = slot;
+clearSlotSelection();
+slot.classList.add('slot-selected');
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseUp);
+});
+
+function onMouseMove(e) {
+if (!isSelecting) return;
+const slot = e.target.closest('.time-slot');
+if (!slot || slot.dataset.day !== dayOfSelection) return;
+clearSlotSelection();
+const startIndex = parseInt(startSlot.dataset.slotIndex, 10);
+const currentIndex = parseInt(slot.dataset.slotIndex, 10);
+const [minIndex, maxIndex] = [Math.min(startIndex, currentIndex), Math.max(startIndex, currentIndex)];
+const dayColumn = grid.querySelector(`.day-column[data-day="${dayOfSelection}"]`);
+const slotsInDay = dayColumn.querySelectorAll('.time-slot');
+for (let i = minIndex; i <= maxIndex; i++) {
+if (slotsInDay[i]) slotsInDay[i].classList.add('slot-selected');
+}
+}
+
+function onMouseUp() {
+if (!isSelecting) return;
+isSelecting = false;
+document.removeEventListener('mousemove', onMouseMove);
+document.removeEventListener('mouseup', onMouseUp);
+const selected = grid.querySelectorAll('.slot-selected');
+if (selected.length > 0) {
+const day = selected[0].dataset.day, startTime = selected[0].dataset.time;
+const lastSlotIndex = parseInt(selected[selected.length - 1].dataset.slotIndex, 10);
+const endMinutes = (8 * 60) + ((lastSlotIndex + 1) * 30);
+const endTime = `${Math.floor(endMinutes / 60).toString().padStart(2, '0')}:${(endMinutes % 60).toString().padStart(2, '0')}`;
+openSessionModal(null, day, startTime, endTime);
+}
+}
+const clearSlotSelection = () => grid.querySelectorAll('.slot-selected').forEach(s => s.classList.remove('slot-selected'));
+}
+
+function makeDraggable(element, session, grid) {
+let clone, offsetX, offsetY;
+let isDragging = false;
+let startX, startY;
+
+const onMouseDown = (e) => {
+if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
+
+isDragging = false;
+startX = e.clientX;
+startY = e.clientY;
+
+e.stopPropagation();
+
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseUp);
+};
+
+const onMouseMove = (e) => {
+if (!isDragging && (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5)) {
+isDragging = true;
+e.preventDefault();
+
+if (grid) grid.classList.add('dragging');
+
+clone = element.cloneNode(true);
+Object.assign(clone.style, { position: 'absolute', zIndex: '1000', opacity: '0.7', pointerEvents: 'none' });
+document.body.appendChild(clone);
+const rect = element.getBoundingClientRect();
+offsetX = startX - rect.left;
+offsetY = startY - rect.top;
+clone.style.left = `${startX - offsetX}px`;
+clone.style.top = `${startY - offsetY}px`;
+element.style.visibility = 'hidden';
+}
+
+if (isDragging) {
+e.preventDefault();
+clone.style.left = `${e.clientX - offsetX}px`;
+clone.style.top = `${e.clientY - offsetY}px`;
+}
+};
+
+const onMouseUp = (e) => {
+document.removeEventListener('mousemove', onMouseMove);
+document.removeEventListener('mouseup', onMouseUp);
+
+if (isDragging) {
+if (grid) grid.classList.remove('dragging');
+
+clone.style.visibility = 'hidden';
+const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+const timeSlot = dropTarget?.closest('.time-slot');
+
+if (timeSlot) {
+const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
+const startMins = (8 * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
+const endMins = startMins + duration;
+const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
+session.Day = timeSlot.dataset.day;
+session.ClassStart = format(startMins);
+session.ClassEnd = format(endMins);
+}
+document.body.removeChild(clone);
+processAndRenderAll(); 
+}
+element.style.visibility = 'visible';
+};
+
+element.addEventListener('mousedown', onMouseDown);
+}
+
+function makeResizable(element, session) {
+const handle = element.querySelector('.resize-handle');
+handle.addEventListener('mousedown', (e) => {
+e.stopPropagation();
+const startY = e.clientY, startHeight = element.offsetHeight, slotHeight = 30;
+const onMouseMove = (e) => { element.style.height = `${Math.max(slotHeight, startHeight + (e.clientY - startY))}px`; };
+const onMouseUp = () => {
+document.removeEventListener('mousemove', onMouseMove);
+document.removeEventListener('mouseup', onMouseUp);
+const finalHeight = Math.round(element.offsetHeight / slotHeight) * slotHeight;
+const duration = (finalHeight / slotHeight) * 30;
+const endMins = timeToMinutes(session.ClassStart) + duration;
+session.ClassEnd = `${Math.floor(endMins / 60).toString().padStart(2, '0')}:${(endMins % 60).toString().padStart(2, '0')}`;
+processAndRenderAll();
+};
+document.addEventListener('mousemove', onMouseMove);
+document.addEventListener('mouseup', onMouseUp);
+});
+}
+
 function openSessionModal(session, day = null, startTime = null, endTime = null) {
 sessionForm.reset();
 const semesterData = getCurrentSemesterData();
@@ -1546,41 +1602,166 @@ return 0;
 teacherSelect.innerHTML = '<option value="">-- Unassigned --</option>' + sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
 teacher2Select.innerHTML = `<option value="">-- None --</option>` + sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials2 === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
 
-// Populate Dynamic Colleges
-const collegeCheckboxesContainer = document.getElementById('sessionModalCollegeCheckboxes');
-let checkboxesHTML = '';
-const currentColleges = getCurrentColleges();
-currentColleges.forEach(col => {
-    const isChecked = session?.colleges?.includes(col) ? 'checked' : (col === semesterData.currentCollege ? 'checked' : '');
-    checkboxesHTML += `<label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="${col}" class="w-4 h-4" ${isChecked}> ${col}</label>`;
+const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
+collegeCheckboxes.forEach(cb => {
+cb.checked = session?.colleges?.includes(cb.value) || (!session && cb.value === semesterData.currentCollege);
 });
-collegeCheckboxesContainer.className = "flex gap-4 flex-wrap";
-collegeCheckboxesContainer.innerHTML = checkboxesHTML;
 
 document.getElementById('sessionModal').classList.add('active');
 }
 
-// Rest of functions: handleSessionFormSubmit, etc needs updates?
-// handleSessionFormSubmit reads name="colleges" which is dynamic so it just works.
+function handleSessionFormSubmit(e) {
+e.preventDefault();
+const id = document.getElementById('sessionId').value;
+const semesterData = getCurrentSemesterData();
+
+const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges"]:checked')).map(cb => cb.value);
+
+const sessionData = {
+Day: document.getElementById('sessionDay').value,
+ClassStart: document.getElementById('sessionStartTime').value,
+ClassEnd: document.getElementById('sessionEndTime').value,
+CourseCode: document.getElementById('sessionCourse').value,
+Subject: document.getElementById('sessionSubject').value,
+TeacherInitials: document.getElementById('sessionTeacher').value || '',
+TeacherInitials2: document.getElementById('sessionTeacher2').value || '',
+Room: document.getElementById('sessionRoom').value,
+notes: document.getElementById('sessionNotes').value,
+colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
+dispute: null
+};
+
+if (id) {
+const index = semesterData.schedule.findIndex(s => s.id == id);
+if (index !== -1) {
+semesterData.schedule[index] = { ...semesterData.schedule[index], ...sessionData };
+}
+} else {
+sessionData.id = Date.now();
+semesterData.schedule.push(sessionData);
+}
+document.getElementById('sessionModal').classList.remove('active');
+processAndRenderAll();
+}
+
+function handleDeleteSession() {
+const id = document.getElementById('sessionId').value;
+const semesterData = getCurrentSemesterData();
+semesterData.schedule = semesterData.schedule.filter(s => s.id != id);
+document.getElementById('sessionModal').classList.remove('active');
+processAndRenderAll();
+}
+
+function renderStaffSummaryView() {
+const container = document.getElementById('staff-summary-table');
+const titleEl = document.getElementById('staff-summary-title');
+const semesterData = getCurrentSemesterData();
+const scheduleToView = semesterData.currentCollege === 'Master View'
+? semesterData.schedule
+: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+
+if (!semesterData.teachers?.length) { container.innerHTML = `<p class="text-center text-gray-500">No teacher data.</p>`; return; }
+
+titleEl.textContent = `Teaching Program Summary - ${semesterData.currentCollege} (${db.currentSemester})`;
+
+const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
+const surnameA = (a.Surname || '').toLowerCase();
+const surnameB = (b.Surname || '').toLowerCase();
+if (surnameA < surnameB) return -1;
+if (surnameA > surnameB) return 1;
+return 0;
+});
+
+const headers = ['Initials', 'Name', 'Surname', ...semesterData.courses.map(c => c.Code), 'Direct Teaching', 'Total Hours', 'Remaining Hours', 'Notes'];
+let tableHTML = `<table class="w-full text-sm border-collapse"><thead><tr class="bg-blue-900 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
+
+sortedTeachers.forEach(teacher => {
+tableHTML += `<tr class="border-b hover:bg-gray-100"><td class="border p-2 font-bold">${teacher.Initials}</td><td class="border p-2">${teacher.Name}</td><td class="border p-2">${teacher.Surname}</td>`;
+let directTeachingHours = 0;
+semesterData.courses.forEach(course => {
+const hours = scheduleToView.filter(s => (s.TeacherInitials === teacher.Initials || s.TeacherInitials2 === teacher.Initials) && s.CourseCode === course.Code).reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+tableHTML += `<td class="border p-2 text-center">${hours ? hours.toFixed(2) : ''}</td>`;
+directTeachingHours += hours;
+});
+const totalHours = teacher.TotalHours || 0;
+const remainingHours = totalHours - directTeachingHours;
+const remainingHoursClass = remainingHours < 0 ? 'text-red-600 font-bold' : '';
+const teacherNote = semesterData.staffNotes[teacher.Initials] || '';
+
+tableHTML += `<td class="border p-2 text-center font-bold bg-cyan-100">${directTeachingHours.toFixed(2)}</td>`;
+tableHTML += `<td class="border p-2 text-center font-bold bg-yellow-100">${totalHours.toFixed(2)}</td>`;
+tableHTML += `<td class="border p-2 text-center font-bold bg-green-100 ${remainingHoursClass}">${remainingHours.toFixed(2)}</td>`;
+tableHTML += `<td class="border p-2"><input type="text" class="staff-notes-input" data-teacher="${teacher.Initials}" value="${teacherNote}" placeholder="Add notes..."></td></tr>`;
+});
+container.innerHTML = tableHTML + `</tbody></table>`;
+
+container.querySelectorAll('.staff-notes-input').forEach(input => {
+input.addEventListener('change', (e) => {
+const teacherInitials = e.target.dataset.teacher;
+semesterData.staffNotes[teacherInitials] = e.target.value;
+saveData();
+});
+});
+}
+
+function renderDisputeLogView() {
+const container = document.getElementById('dispute-log-view');
+const semesterData = getCurrentSemesterData();
+const disputedSessions = semesterData.schedule.filter(s => s.dispute);
+
+let contentHTML = `<div class="bg-white p-4 rounded-lg shadow-lg overflow-x-auto">
+<h2 class="text-xl font-bold text-center mb-4">Dispute Log - ${semesterData.currentCollege} (${db.currentSemester})</h2>`;
+
+if (disputedSessions.length === 0) {
+contentHTML += `<p class="text-center text-gray-500">No disputes found in this view.</p>`;
+} else {
+const headers = ['Day', 'Time', 'Course', 'Subject', 'Teacher', 'Room', 'Colleges', 'Reason for Dispute'];
+contentHTML += `<table class="w-full text-sm border-collapse"><thead><tr class="bg-red-800 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
+disputedSessions.forEach(session => {
+const teachers = [session.TeacherInitials, session.TeacherInitials2].filter(Boolean).join(', ') || 'Unassigned';
+contentHTML += `<tr class="border-b hover:bg-red-50">
+<td class="border p-2">${session.Day}</td>
+<td class="border p-2">${session.ClassStart} - ${session.ClassEnd}</td>
+<td class="border p-2">${session.CourseCode}</td>
+<td class="border p-2">${session.Subject}</td>
+<td class="border p-2">${teachers}</td>
+<td class="border p-2">Room ${session.Room}</td>
+<td class="border p-2">${session.colleges?.join(', ') || ''}</td>
+<td class="border p-2 font-bold text-red-600">${session.dispute.reason}</td>
+</tr>`;
+});
+contentHTML += `</tbody></table>`;
+}
+contentHTML += `</div>`;
+container.innerHTML = contentHTML;
+}
 
 function renderCoursePrintView(courseCode) {
     const container = document.getElementById('course-print-view');
     const semesterData = getCurrentSemesterData();
 
+    // Use stored course code if available and no explicit code provided
     if (!courseCode && window.appState.selectedCourse) {
+        // verify it exists in current semester data
         const exists = semesterData.courses.some(c => c.Code === window.appState.selectedCourse);
-        if (exists) courseCode = window.appState.selectedCourse;
+        if (exists) {
+            courseCode = window.appState.selectedCourse;
+        }
     }
 
     if (!courseCode && semesterData.courses.length > 0) {
         courseCode = semesterData.courses[0].Code;
     }
 
+    // Retrieve teacher state if available to ensure persistence across views too if needed
+    // but Course Print View is course-centric.
+
     if (!courseCode) {
         container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
         return;
     }
 
+    // Update global state
     window.appState.selectedCourse = courseCode;
 
     const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
@@ -1592,23 +1773,38 @@ function renderCoursePrintView(courseCode) {
     sessions = sortSessionsChronologically(sessions);
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+    // Group by Start Time only
     const startTimes = new Set();
     sessions.forEach(s => startTimes.add(s.ClassStart));
     const sortedStartTimes = Array.from(startTimes).sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
 
     let gridHTML = `<table class="pdf-print-grid">
-    <thead><tr><th class="pdf-print-grid">Time</th>${days.map(d => `<th class="pdf-day-header">${d}</th>`).join('')}</tr></thead>
+    <thead>
+    <tr>
+    <th class="pdf-print-grid">Time</th>
+    ${days.map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
+    </tr>
+    </thead>
     <tbody>`;
 
     sortedStartTimes.forEach(startTime => {
+        // Calculate max end time for this row's sessions to creating a label
         let lateEndTime = startTime;
         sessions.filter(s => s.ClassStart === startTime).forEach(s => {
-             if (timeToMinutes(s.ClassEnd) > timeToMinutes(lateEndTime)) lateEndTime = s.ClassEnd;
+             if (timeToMinutes(s.ClassEnd) > timeToMinutes(lateEndTime)) {
+                 lateEndTime = s.ClassEnd;
+             }
         });
+        
         const rowLabel = `${startTime} - ${lateEndTime}`;
-        gridHTML += `<tr><td class="pdf-period-label">${rowLabel}</td>`;
+
+        gridHTML += `<tr>
+        <td class="pdf-period-label">${rowLabel}</td>`;
+
         days.forEach(day => {
             const daySessions = sessions.filter(s => s.ClassStart === startTime && s.Day === day);
+
             if (daySessions.length === 0) {
                 gridHTML += `<td class="pdf-cell" style="background-color: #f9f9f9;"></td>`;
             } else {
@@ -1616,69 +1812,207 @@ function renderCoursePrintView(courseCode) {
                     const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
                     const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
                     const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
-                    const teacherDisplay = s.TeacherInitials ? (teacher2Info ? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}` : (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials)) : 'UNASSIGNED';
+                    const teacherDisplay = s.TeacherInitials
+                    ? (teacher2Info
+                    ? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}`
+                    : (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials))
+                    : 'UNASSIGNED';
                     const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
                     const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
                     const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
-                    return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${(subjectInfo?.DeliveryMode === 'Online' ? 'online' : (subjectInfo?.DeliveryMode === 'Blended' ? 'blended' : ''))}" style="background-color:${subjectInfo?.Color || '#eee'}">${collegeHTML}<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>${subjectInfo?.Compulsory ? '<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>' : ''}<div style="margin-top: 3px; font-size: 11px;">${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>${notesHTML}<div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div></div>`;
+                    const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+                    const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
+                    const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+                    const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
+                    const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
+
+                    return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+                    ${collegeHTML}
+                    <div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+                    ${compulsoryBadge}
+                    ${deliveryBadge}
+                    ${unitsHTML}
+                    <div style="margin-top: 3px; font-size: 11px;">${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}${teacher2Info ? ' & ' + teacher2Info.Name : ''}</div>
+                    ${notesHTML}
+                    <div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
+                    </div>`;
                 }).join('');
+
                 gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
             }
         });
+
         gridHTML += `</tr>`;
     });
+
     gridHTML += `</tbody></table>`;
 
     const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+
     if (!semesterData.courseNotes) semesterData.courseNotes = {};
     const courseNotes = semesterData.courseNotes[courseCode] || '';
 
     const uniqueTeacherInitials = new Set();
-    sessions.forEach(s => { if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials); if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2); });
-    const courseTeachers = Array.from(uniqueTeacherInitials).map(i => semesterData.teachers.find(t => t.Initials === i)).filter(t => t).sort((a, b) => a.Name.localeCompare(b.Name));
+    sessions.forEach(s => {
+    if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials);
+    if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2);
+    });
+    const courseTeachers = Array.from(uniqueTeacherInitials)
+    .map(initials => semesterData.teachers.find(t => t.Initials === initials))
+    .filter(t => t)
+    .sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
 
-    // NEW: Filter ALL Head Teachers for this Semester (to display at bottom)
-    const headTeachers = semesterData.teachers.filter(t => t.isHeadTeacher).sort((a, b) => a.Name.localeCompare(b.Name));
+    const teacherContactHTML = courseTeachers.length > 0 ? `
+    <div class="pdf-teacher-info">
+    <h4>Teacher Contact:</h4>
+    <div class="pdf-teacher-info-content">
+    ${courseTeachers.map(t => `
+    <div class="pdf-teacher-info-item">
+    <span>${t.Name} ${t.Surname}:</span>
+    ${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}
+    </div>
+    `).join('')}
+    </div>
+    </div>
+    ` : '';
 
-    let teacherContactHTML = '';
-    if (courseTeachers.length > 0 || headTeachers.length > 0) {
-        teacherContactHTML = `<div class="pdf-teacher-info"><h4>Teacher Contact:</h4><div class="pdf-teacher-info-content">`;
-        
-        // Regular Teachers
-        if (courseTeachers.length > 0) {
-            courseTeachers.forEach(t => {
-                teacherContactHTML += `<div class="pdf-teacher-info-item"><span>${t.Name} ${t.Surname}:</span>${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}</div>`;
-            });
-        }
+    const notesSection = `
+    <div class="pdf-notes-section">
+    <h4>Course Notes:</h4>
+    <div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div>
+    </div>
+    `;
 
-        // Head Teachers Section
-        if (headTeachers.length > 0) {
-            teacherContactHTML += `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ccc;"><strong>Head Teachers:</strong></div>`;
-            headTeachers.forEach(ht => {
-                // Only show HT if not already listed above as a regular teacher for this course
-                if (!courseTeachers.find(t => t.Initials === ht.Initials)) {
-                     teacherContactHTML += `<div class="pdf-teacher-info-item"><span>${ht.Name} ${ht.Surname}:</span>${ht.Email ? `<a href="mailto:${ht.Email}">${ht.Email}</a>` : ''}</div>`;
-                }
-            });
-        }
-        teacherContactHTML += `</div></div>`;
-    }
-
-    // Legend logic remains same...
     const hasCompulsory = sessions.some(s => semesterData.subjects.find(sub => sub.Subject === s.Subject)?.Compulsory);
     const hasOnline = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Online'));
     const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Blended'));
+
     let legendHTML = '';
     if (hasCompulsory || hasOnline || hasBlended) {
-    legendHTML = `<div class="pdf-legend-section"><h4>Legend:</h4>${hasCompulsory ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}${hasOnline ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}</div>`;
+    legendHTML = `
+    <div class="pdf-legend-section">
+    <h4>Legend:</h4>
+    ${hasCompulsory ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
+    ${hasOnline ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
+    ${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
+    </div>
+    `;
     }
 
-    const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}<div class="pdf-notes-section"><h4>Course Notes:</h4><div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div></div>${legendHTML}</div>`;
+    const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
+
     container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode})</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
-    
-    // Re-attach listeners
-    const noteBox = container.querySelector('.pdf-notes-content');
-    if (noteBox) { noteBox.contentEditable = true; noteBox.addEventListener('blur', (e) => { semesterData.courseNotes[courseCode] = e.target.textContent; saveData(); }); }
+
+    const courseNotesTextarea = container.querySelector('.pdf-notes-content');
+    if (courseNotesTextarea) {
+    courseNotesTextarea.contentEditable = true;
+    courseNotesTextarea.addEventListener('blur', (e) => {
+    semesterData.courseNotes[courseCode] = e.target.textContent;
+    saveData();
+    });
+    }
+}
+
+function renderTeacherPrintView(teacherInitials) {
+const container = document.getElementById('teacher-print-view');
+const semesterData = getCurrentSemesterData();
+
+// Use persistent teacher state if available
+if (!teacherInitials && window.appState.selectedTeacher) {
+    const exists = semesterData.teachers.some(t => t.Initials === window.appState.selectedTeacher);
+    if (exists) {
+        teacherInitials = window.appState.selectedTeacher;
+    }
+}
+
+if (!teacherInitials && semesterData.teachers.length > 0) {
+teacherInitials = semesterData.teachers[0].Initials;
+}
+
+if (!teacherInitials) {
+container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
+return;
+}
+
+// Update State
+window.appState.selectedTeacher = teacherInitials;
+
+const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
+
+const scheduleToFilter = semesterData.currentCollege === 'Master View'
+? semesterData.schedule
+: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+
+let sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials || s.TeacherInitials2 === teacherInitials);
+sessions = sortSessionsChronologically(sessions);
+const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+
+const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
+
+const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
+
+let gridHTML = `<table class="pdf-print-grid">
+<thead>
+<tr>
+<th class="pdf-print-grid"></th>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
+</tr>
+</thead>
+<tbody>`;
+
+const periods = ['Morning', 'Afternoon'];
+if (hasNightSessions) periods.push('Night');
+
+periods.forEach(period => {
+gridHTML += `<tr>
+<td class="pdf-period-label">${period}</td>`;
+
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+const daySessions = sessions.filter(s => {
+const start = timeToMinutes(s.ClassStart);
+return s.Day === day && (
+(period === 'Morning' && start < 720) ||
+(period === 'Afternoon' && start >= 720 && start < 1020) || 
+(period === 'Night' && start >= 1020)
+);
+});
+
+const sessionsHTML = daySessions.map(s => {
+const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+const coTeacher = s.TeacherInitials === teacherInitials 
+? (s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null)
+: semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
+const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
+
+return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+${collegeHTML}
+<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+${compulsoryBadge}
+${deliveryBadge}
+${unitsHTML}
+<div style="margin-top: 3px; font-size: 11px;">${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
+${notesHTML}
+<div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
+</div>`;
+}).join('');
+
+gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
+});
+
+gridHTML += `</tr>`;
+});
+
+gridHTML += `</tbody></table>`;
+
+container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${title}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div></div>`;
 }
 
 loadData();

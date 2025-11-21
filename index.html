@@ -185,10 +185,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
 <div class="p-4 space-y-3 no-print">
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Management</h3>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn"><i class="fa-solid fa-calendar-days mr-2"></i> Manage Semesters</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn"><i class="fa-solid fa-chalkboard-user mr-2"></i> Manage Teachers</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn"><i class="fa-solid fa-book mr-2"></i> Manage Courses</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn"><i class="fa-solid fa-palette mr-2"></i> Manage Subjects</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn"><i class="fa-solid fa-calendar-days mr-2 text-blue-800"></i> Manage Semesters</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn"><i class="fa-solid fa-chalkboard-user mr-2 text-blue-800"></i> Manage Teachers</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn"><i class="fa-solid fa-book mr-2 text-blue-800"></i> Manage Courses</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn"><i class="fa-solid fa-palette mr-2 text-blue-800"></i> Manage Subjects</button>
 <hr class="my-4"/>
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
 <button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="exportDataBtn"><i class="fa-solid fa-file-export mr-2"></i> Export Data</button>
@@ -222,7 +222,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="view-container" id="dispute-log-view"></div>
 <div class="view-container" id="course-print-view"></div>
 <div class="view-container" id="teacher-print-view"></div>
-<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2"><i class="fa-solid fa-clipboard-list mr-2"></i> Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn"><i class="fa-solid fa-plus mr-2"></i> Add New Task</button><div id="tasks-container"></div></div></div>
+<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2"><i class="fa-solid fa-clipboard-list mr-2 text-blue-900"></i> Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn"><i class="fa-solid fa-plus mr-2"></i> Add New Task</button><div id="tasks-container"></div></div></div>
 </div>
 </main>
 </div>
@@ -812,11 +812,11 @@ html += `
 <span class="task-status-badge ${statusClass}">${statusText}</span>
 </div>
 <div class="task-meta">
-<span><i class="fa-solid fa-user mr-1"></i> ${teacherDisplay}</span>
-<span><i class="fa-solid fa-book mr-1"></i> ${courseDisplay}</span>
-<span><i class="fa-solid fa-school mr-1"></i> ${collegeDisplay}</span>
-<span><i class="fa-solid fa-calendar-days mr-1"></i> ${dueDate}</span>
-<span><i class="fa-solid fa-bullseye mr-1"></i> ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+<span><i class="fa-solid fa-user mr-1 text-slate-500"></i> ${teacherDisplay}</span>
+<span><i class="fa-solid fa-book mr-1 text-slate-500"></i> ${courseDisplay}</span>
+<span><i class="fa-solid fa-school mr-1 text-slate-500"></i> ${collegeDisplay}</span>
+<span><i class="fa-solid fa-calendar-days mr-1 text-slate-500"></i> ${dueDate}</span>
+<span><i class="fa-solid fa-bullseye mr-1 text-slate-500"></i> ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
 </div>
 ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
 <div class="task-actions">
@@ -1725,176 +1725,165 @@ container.innerHTML = contentHTML;
 }
 
 function renderCoursePrintView(courseCode) {
-const container = document.getElementById('course-print-view');
-const semesterData = getCurrentSemesterData();
+    const container = document.getElementById('course-print-view');
+    const semesterData = getCurrentSemesterData();
 
-if (!courseCode && semesterData.courses.length > 0) {
-courseCode = semesterData.courses[0].Code;
-}
+    if (!courseCode && semesterData.courses.length > 0) {
+        courseCode = semesterData.courses[0].Code;
+    }
 
-if (!courseCode) {
-container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
-return;
-}
+    if (!courseCode) {
+        container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
+        return;
+    }
 
-const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
-const scheduleToFilter = semesterData.currentCollege === 'Master View'
-? semesterData.schedule
-: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+    const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
+    const scheduleToFilter = semesterData.currentCollege === 'Master View'
+        ? semesterData.schedule
+        : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
-let sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
-sessions = sortSessionsChronologically(sessions);
+    let sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
+    sessions = sortSessionsChronologically(sessions);
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-const timeSlots = new Set();
-sessions.forEach(s => {
-timeSlots.add(`${s.ClassStart}-${s.ClassEnd}`);
-});
+    // Group by Start Time only
+    const startTimes = new Set();
+    sessions.forEach(s => startTimes.add(s.ClassStart));
+    const sortedStartTimes = Array.from(startTimes).sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
 
-const sortedTimeSlots = Array.from(timeSlots).sort((a, b) => {
-const startA = timeToMinutes(a.split('-')[0]);
-const startB = timeToMinutes(b.split('-')[0]);
-return startA - startB;
-});
+    let gridHTML = `<table class="pdf-print-grid">
+    <thead>
+    <tr>
+    <th class="pdf-print-grid">Time</th>
+    ${days.map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
+    </tr>
+    </thead>
+    <tbody>`;
 
-const grid = {};
-sortedTimeSlots.forEach(slot => {
-grid[slot] = {};
-days.forEach(day => {
-grid[slot][day] = [];
-});
-});
+    sortedStartTimes.forEach(startTime => {
+        // Calculate max end time for this row's sessions to creating a label
+        let lateEndTime = startTime;
+        sessions.filter(s => s.ClassStart === startTime).forEach(s => {
+             if (timeToMinutes(s.ClassEnd) > timeToMinutes(lateEndTime)) {
+                 lateEndTime = s.ClassEnd;
+             }
+        });
+        
+        const rowLabel = `${startTime} - ${lateEndTime}`;
 
-sessions.forEach(s => {
-const slot = `${s.ClassStart}-${s.ClassEnd}`;
-if (grid[slot] && grid[slot][s.Day]) {
-grid[slot][s.Day].push(s);
-}
-});
+        gridHTML += `<tr>
+        <td class="pdf-period-label">${rowLabel}</td>`;
 
-let gridHTML = `<table class="pdf-print-grid">
-<thead>
-<tr>
-<th class="pdf-print-grid">Time</th>
-${days.map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
-</tr>
-</thead>
-<tbody>`;
+        days.forEach(day => {
+            const daySessions = sessions.filter(s => s.ClassStart === startTime && s.Day === day);
 
-sortedTimeSlots.forEach(timeSlot => {
-gridHTML += `<tr>
-<td class="pdf-period-label">${timeSlot}</td>`;
+            if (daySessions.length === 0) {
+                gridHTML += `<td class="pdf-cell" style="background-color: #f9f9f9;"></td>`;
+            } else {
+                const sessionsHTML = daySessions.map(s => {
+                    const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+                    const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+                    const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
+                    const teacherDisplay = s.TeacherInitials
+                    ? (teacher2Info
+                    ? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}`
+                    : (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials))
+                    : 'UNASSIGNED';
+                    const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+                    const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
+                    const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
+                    const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+                    const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
+                    const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+                    const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
+                    const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
-days.forEach(day => {
-const daySessions = grid[timeSlot][day] || [];
+                    return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+                    ${collegeHTML}
+                    <div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+                    ${compulsoryBadge}
+                    ${deliveryBadge}
+                    ${unitsHTML}
+                    <div style="margin-top: 3px; font-size: 11px;">${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}${teacher2Info ? ' & ' + teacher2Info.Name : ''}</div>
+                    ${notesHTML}
+                    <div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
+                    </div>`;
+                }).join('');
 
-if (daySessions.length === 0) {
-gridHTML += `<td class="pdf-cell" style="background-color: #f9f9f9;"></td>`;
-} else {
-const sessionsHTML = daySessions.map(s => {
-const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
-const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
-const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
-const teacherDisplay = s.TeacherInitials
-? (teacher2Info
-? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}`
-: (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials))
-: 'UNASSIGNED';
-const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
-const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
-const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
-const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
-const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
+                gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
+            }
+        });
 
-return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
-${collegeHTML}
-<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
-${compulsoryBadge}
-${deliveryBadge}
-${unitsHTML}
-<div style="margin-top: 3px; font-size: 11px;">${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
-${notesHTML}
-<div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
-</div>`;
-}).join('');
+        gridHTML += `</tr>`;
+    });
 
-gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
-}
-});
+    gridHTML += `</tbody></table>`;
 
-gridHTML += `</tr>`;
-});
+    const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
 
-gridHTML += `</tbody></table>`;
+    if (!semesterData.courseNotes) semesterData.courseNotes = {};
+    const courseNotes = semesterData.courseNotes[courseCode] || '';
 
-const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+    const uniqueTeacherInitials = new Set();
+    sessions.forEach(s => {
+    if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials);
+    if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2);
+    });
+    const courseTeachers = Array.from(uniqueTeacherInitials)
+    .map(initials => semesterData.teachers.find(t => t.Initials === initials))
+    .filter(t => t)
+    .sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
 
-if (!semesterData.courseNotes) semesterData.courseNotes = {};
-const courseNotes = semesterData.courseNotes[courseCode] || '';
+    const teacherContactHTML = courseTeachers.length > 0 ? `
+    <div class="pdf-teacher-info">
+    <h4>Teacher Contact:</h4>
+    <div class="pdf-teacher-info-content">
+    ${courseTeachers.map(t => `
+    <div class="pdf-teacher-info-item">
+    <span>${t.Name} ${t.Surname}:</span>
+    ${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}
+    </div>
+    `).join('')}
+    </div>
+    </div>
+    ` : '';
 
-const uniqueTeacherInitials = new Set();
-sessions.forEach(s => {
-if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials);
-if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2);
-});
-const courseTeachers = Array.from(uniqueTeacherInitials)
-.map(initials => semesterData.teachers.find(t => t.Initials === initials))
-.filter(t => t)
-.sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
+    const notesSection = `
+    <div class="pdf-notes-section">
+    <h4>Course Notes:</h4>
+    <div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div>
+    </div>
+    `;
 
-const teacherContactHTML = courseTeachers.length > 0 ? `
-<div class="pdf-teacher-info">
-<h4>Teacher Contact:</h4>
-<div class="pdf-teacher-info-content">
-${courseTeachers.map(t => `
-<div class="pdf-teacher-info-item">
-<span>${t.Name} ${t.Surname}:</span>
-${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}
-</div>
-`).join('')}
-</div>
-</div>
-` : '';
+    const hasCompulsory = sessions.some(s => semesterData.subjects.find(sub => sub.Subject === s.Subject)?.Compulsory);
+    const hasOnline = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Online'));
+    const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Blended'));
 
-const notesSection = `
-<div class="pdf-notes-section">
-<h4>Course Notes:</h4>
-<div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div>
-</div>
-`;
+    let legendHTML = '';
+    if (hasCompulsory || hasOnline || hasBlended) {
+    legendHTML = `
+    <div class="pdf-legend-section">
+    <h4>Legend:</h4>
+    ${hasCompulsory ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
+    ${hasOnline ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
+    ${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
+    </div>
+    `;
+    }
 
-const hasCompulsory = sessions.some(s => semesterData.subjects.find(sub => sub.Subject === s.Subject)?.Compulsory);
-const hasOnline = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Online'));
-const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Blended'));
+    const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
 
-let legendHTML = '';
-if (hasCompulsory || hasOnline || hasBlended) {
-legendHTML = `
-<div class="pdf-legend-section">
-<h4>Legend:</h4>
-${hasCompulsory ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
-${hasOnline ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
-${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
-</div>
-`;
-}
+    container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode})</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
 
-const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
-
-container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode})</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
-
-const courseNotesTextarea = container.querySelector('.pdf-notes-content');
-if (courseNotesTextarea) {
-courseNotesTextarea.contentEditable = true;
-courseNotesTextarea.addEventListener('blur', (e) => {
-semesterData.courseNotes[courseCode] = e.target.textContent;
-saveData();
-});
-}
+    const courseNotesTextarea = container.querySelector('.pdf-notes-content');
+    if (courseNotesTextarea) {
+    courseNotesTextarea.contentEditable = true;
+    courseNotesTextarea.addEventListener('blur', (e) => {
+    semesterData.courseNotes[courseCode] = e.target.textContent;
+    saveData();
+    });
+    }
 }
 
 function renderTeacherPrintView(teacherInitials) {

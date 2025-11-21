@@ -19,8 +19,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .sidebar-open { transform: translateX(0) !important; }
 .view-container { display: none; }
 .view-container.active { display: block; }
-.college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 0.5rem; }
-.college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
+/* Updated College Tab Styles to match Master View */
+.college-tab { padding: 10px 20px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 0.5rem; font-weight: 600; transition: all 0.2s; }
+.college-tab:hover { background: #e5e7eb; color: #1e3a8a; }
+.college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; color: #1e3a8a; box-shadow: 0 -2px 4px rgba(0,0,0,0.05); }
+.college-tab i { font-size: 1.1em; }
+
 .timetable-main-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(200px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
 .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
 .time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
@@ -164,7 +168,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .dropdown-item { color: #1f2937; padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #e5e7eb; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
 .dropdown-item:last-child { border-bottom: none; }
 .dropdown-item:hover { background: #f3f4f6; color: #667eea; font-weight: 500; }
-.dropdown-item i { width: 20px; text-align: center; }
+.dropdown-item i { width: 20px; text-align: center; color: #1e3a8a; }
 .college-checkboxes { display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap; }
 .college-checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500; }
 .college-checkbox-label input { cursor: pointer; width: 18px; height: 18px; }
@@ -185,10 +189,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
 <div class="p-4 space-y-3 no-print">
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Management</h3>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn"><i class="fa-solid fa-calendar-days mr-2 text-blue-800"></i> Manage Semesters</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn"><i class="fa-solid fa-chalkboard-user mr-2 text-blue-800"></i> Manage Teachers</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn"><i class="fa-solid fa-book mr-2 text-blue-800"></i> Manage Courses</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn"><i class="fa-solid fa-palette mr-2 text-blue-800"></i> Manage Subjects</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn"><i class="fa-solid fa-calendar-days mr-2 text-blue-900"></i> Manage Semesters</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn"><i class="fa-solid fa-chalkboard-user mr-2 text-blue-900"></i> Manage Teachers</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn"><i class="fa-solid fa-book mr-2 text-blue-900"></i> Manage Courses</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn"><i class="fa-solid fa-palette mr-2 text-blue-900"></i> Manage Subjects</button>
 <hr class="my-4"/>
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
 <button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="exportDataBtn"><i class="fa-solid fa-file-export mr-2"></i> Export Data</button>
@@ -201,13 +205,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <header class="bg-white shadow-md p-4 flex justify-between items-center no-print">
 <div class="flex items-center gap-4"><img alt="TAFE Logo" src="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762673524/ci_1595_1762673524_TAFE_logo_ecudtj.png" style="height: 50px;"/><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
 <div class="flex items-center gap-3">
-<button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn">Open Menu</button>
+<button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn"><i class="fa-solid fa-bars mr-2"></i> Open Menu</button>
 <div class="dropdown-menu">
-<button class="dropdown-btn" id="semesterDropdownBtn"><i class="fa-solid fa-calendar-days"></i> Semester <span>▼</span></button>
+<button class="dropdown-btn" id="semesterDropdownBtn"><i class="fa-solid fa-calendar-days"></i> Semester <i class="fa-solid fa-caret-down ml-1"></i></button>
 <div class="dropdown-content" id="semesterDropdown"></div>
 </div>
 <div class="dropdown-menu">
-<button class="dropdown-btn" id="viewDropdownBtn"><i class="fa-solid fa-eye"></i> View <span>▼</span></button>
+<button class="dropdown-btn" id="viewDropdownBtn"><i class="fa-solid fa-eye"></i> View <i class="fa-solid fa-caret-down ml-1"></i></button>
 <div class="dropdown-content" id="viewDropdown"></div>
 </div>
 <div id="secondary-selectors"></div>
@@ -250,6 +254,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <script src="pdf-generator.js"></script>
 
 <script>
+// Global State for persistence
+window.appState = {
+    selectedCourse: null,
+    selectedTeacher: null
+};
+
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
 
@@ -607,7 +617,7 @@ const views = [
 
 let html = '';
 views.forEach(view => {
-html += `<div class="dropdown-item" onclick="changeView('${view.value}')"><i class="fa-solid ${view.icon} mr-2"></i> ${view.label}</div>`;
+html += `<div class="dropdown-item" onclick="changeView('${view.value}')"><i class="fa-solid ${view.icon} mr-2 text-blue-900"></i> ${view.label}</div>`;
 });
 viewDropdown.innerHTML = html;
 }
@@ -812,11 +822,11 @@ html += `
 <span class="task-status-badge ${statusClass}">${statusText}</span>
 </div>
 <div class="task-meta">
-<span><i class="fa-solid fa-user mr-1 text-slate-500"></i> ${teacherDisplay}</span>
-<span><i class="fa-solid fa-book mr-1 text-slate-500"></i> ${courseDisplay}</span>
-<span><i class="fa-solid fa-school mr-1 text-slate-500"></i> ${collegeDisplay}</span>
-<span><i class="fa-solid fa-calendar-days mr-1 text-slate-500"></i> ${dueDate}</span>
-<span><i class="fa-solid fa-bullseye mr-1 text-slate-500"></i> ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+<span><i class="fa-solid fa-user mr-1 text-blue-900"></i> ${teacherDisplay}</span>
+<span><i class="fa-solid fa-book mr-1 text-blue-900"></i> ${courseDisplay}</span>
+<span><i class="fa-solid fa-school mr-1 text-blue-900"></i> ${collegeDisplay}</span>
+<span><i class="fa-solid fa-calendar-days mr-1 text-blue-900"></i> ${dueDate}</span>
+<span><i class="fa-solid fa-bullseye mr-1 text-blue-900"></i> ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
 </div>
 ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
 <div class="task-actions">
@@ -1175,7 +1185,7 @@ secondarySelectorsContainer.innerHTML = '';
 if (selectedView === 'course-print') {
 if (semesterData.courses.length > 0) {
 const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn"><i class="fa-solid fa-book"></i> Course <span>▼</span></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn"><i class="fa-solid fa-book mr-2"></i> Course <i class="fa-solid fa-caret-down ml-1"></i></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('courseDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
@@ -1195,7 +1205,7 @@ const nameA = (a.Name || '').toLowerCase();
 const nameB = (b.Name || '').toLowerCase();
 return nameA.localeCompare(nameB);
 });
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn"><i class="fa-solid fa-chalkboard-user"></i> Teacher <span>▼</span></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn"><i class="fa-solid fa-chalkboard-user mr-2"></i> Teacher <i class="fa-solid fa-caret-down ml-1"></i></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('teacherDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
@@ -1209,11 +1219,13 @@ document.getElementById('teacherDropdown').classList.toggle('show');
 }
   
 window.selectCourse = (courseCode) => {
+window.appState.selectedCourse = courseCode;
 renderCoursePrintView(courseCode);
 document.getElementById('courseDropdown').classList.remove('show');
 };
 
 window.selectTeacher = (teacherInitials) => {
+window.appState.selectedTeacher = teacherInitials;
 renderTeacherPrintView(teacherInitials);
 document.getElementById('teacherDropdown').classList.remove('show');
 };
@@ -1728,14 +1740,29 @@ function renderCoursePrintView(courseCode) {
     const container = document.getElementById('course-print-view');
     const semesterData = getCurrentSemesterData();
 
+    // Use stored course code if available and no explicit code provided
+    if (!courseCode && window.appState.selectedCourse) {
+        // verify it exists in current semester data
+        const exists = semesterData.courses.some(c => c.Code === window.appState.selectedCourse);
+        if (exists) {
+            courseCode = window.appState.selectedCourse;
+        }
+    }
+
     if (!courseCode && semesterData.courses.length > 0) {
         courseCode = semesterData.courses[0].Code;
     }
+
+    // Retrieve teacher state if available to ensure persistence across views too if needed
+    // but Course Print View is course-centric.
 
     if (!courseCode) {
         container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
         return;
     }
+
+    // Update global state
+    window.appState.selectedCourse = courseCode;
 
     const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
     const scheduleToFilter = semesterData.currentCollege === 'Master View'
@@ -1890,6 +1917,14 @@ function renderTeacherPrintView(teacherInitials) {
 const container = document.getElementById('teacher-print-view');
 const semesterData = getCurrentSemesterData();
 
+// Use persistent teacher state if available
+if (!teacherInitials && window.appState.selectedTeacher) {
+    const exists = semesterData.teachers.some(t => t.Initials === window.appState.selectedTeacher);
+    if (exists) {
+        teacherInitials = window.appState.selectedTeacher;
+    }
+}
+
 if (!teacherInitials && semesterData.teachers.length > 0) {
 teacherInitials = semesterData.teachers[0].Initials;
 }
@@ -1898,6 +1933,9 @@ if (!teacherInitials) {
 container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
 return;
 }
+
+// Update State
+window.appState.selectedTeacher = teacherInitials;
 
 const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
 

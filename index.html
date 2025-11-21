@@ -250,12 +250,14 @@ let selectedCourseForSubjects = null;
 let sidebarOpen = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+try {
 let db = {};
 const colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
 const getNewSemesterData = () => ({ courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale', staffNotes: {}, tasks: [] });
 
 const saveData = () => localStorage.setItem('timetableDataV2', JSON.stringify(db));
 const loadData = () => {
+try {
 const savedData = localStorage.getItem('timetableDataV2');
 if (savedData) {
 db = JSON.parse(savedData);
@@ -273,6 +275,14 @@ db.semesters[semKey].tasks = [];
 }
 });
 } else {
+db = {
+semesters: { 'Semester 1 2024': getNewSemesterData(), 'Semester 2 2024': getNewSemesterData() },
+currentSemester: 'Semester 1 2024'
+};
+}
+} catch(err) {
+console.error("Data loading error:", err);
+alert("Error loading data. Resetting to default.");
 db = {
 semesters: { 'Semester 1 2024': getNewSemesterData(), 'Semester 2 2024': getNewSemesterData() },
 currentSemester: 'Semester 1 2024'
@@ -977,13 +987,15 @@ function openManagementModal(title, data, fields) {
             const form = document.getElementById('addForm');
             const cancelBtn = document.getElementById('cancelEditBtn');
 
-            cancelBtn.addEventListener('click', () => {
-                form.reset();
-                form.querySelector('[name="editIndex"]').value = '';
-                form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
-                form.querySelector('button[type="submit"]').textContent = 'Add Subject';
-                cancelBtn.style.display = 'none';
-            });
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    form.reset();
+                    form.querySelector('[name="editIndex"]').value = '';
+                    form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
+                    form.querySelector('button[type="submit"]').textContent = 'Add Subject';
+                    cancelBtn.style.display = 'none';
+                });
+            }
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -1881,11 +1893,115 @@ ${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" styl
 
 const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
 
+container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode})</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
+
+const courseNotesTextarea = container.querySelector('.pdf-notes-content');
+if (courseNotesTextarea) {
+courseNotesTextarea.contentEditable = true;
+courseNotesTextarea.addEventListener('blur', (e) => {
+semesterData.courseNotes[courseCode] = e.target.textContent;
+saveData();
+});
+}
+}
+
+function renderTeacherPrintView(teacherInitials) {
+const container = document.getElementById('teacher-print-view');
+const semesterData = getCurrentSemesterData();
+
+if (!teacherInitials && semesterData.teachers.length > 0) {
+teacherInitials = semesterData.teachers[0].Initials;
+}
+
+if (!teacherInitials) {
+container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
+return;
+}
+
+const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
+
+const scheduleToFilter = semesterData.currentCollege === 'Master View'
+? semesterData.schedule
+: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+
+let sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials || s.TeacherInitials2 === teacherInitials);
+sessions = sortSessionsChronologically(sessions);
+const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+
+const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
+
+const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
+
+let gridHTML = `<table class="pdf-print-grid">
+<thead>
+<tr>
+<th class="pdf-print-grid"></th>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
+</tr>
+</thead>
+<tbody>`;
+
+const periods = ['Morning', 'Afternoon'];
+if (hasNightSessions) periods.push('Night');
+
+periods.forEach(period => {
+gridHTML += `<tr>
+<td class="pdf-period-label">${period}</td>`;
+
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+const daySessions = sessions.filter(s => {
+const start = timeToMinutes(s.ClassStart);
+return s.Day === day && (
+(period === 'Morning' && start < 720) ||
+(period === 'Afternoon' && start >= 720 && start < 1020) || 
+(period === 'Night' && start >= 1020)
+);
+});
+
+const sessionsHTML = daySessions.map(s => {
+const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+const coTeacher = s.TeacherInitials === teacherInitials 
+? (s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null)
+: semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
+const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
+
+return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+${collegeHTML}
+<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+${compulsoryBadge}
+${deliveryBadge}
+${unitsHTML}
+<div style="margin-top: 3px; font-size: 11px;">${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
+${notesHTML}
+<div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
+</div>`;
+}).join('');
+
+gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
+});
+
+gridHTML += `</tr>`;
+});
+
+gridHTML += `</tbody></table>`;
+
 container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${title}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div></div>`;
 }
 
 loadData();
 processAndRenderAll();
+} catch (err) {
+    console.error("Main Application Error:", err);
+    alert("Critical Error: " + err.message);
+}
 });
 </script>
 </body>

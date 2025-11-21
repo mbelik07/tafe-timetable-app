@@ -45,8 +45,51 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .context-menu-item:last-child { border-bottom: none; }
 .context-menu-item:hover { background: #4a5568; }
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
-.modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; z-index: 101; }
+.modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; z-index: 101; }
 .modal-overlay.active { display: block; }
+
+/* Management Modal Improvements */
+.management-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; }
+.management-modal-title { font-size: 1.875rem; font-weight: bold; color: #1e3a8a; margin: 0; }
+.management-modal-actions { display: flex; gap: 0.75rem; }
+.add-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: bold; padding: 0.625rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.add-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.close-btn { background: none; border: none; font-size: 1.875rem; font-weight: bold; color: #6b7280; cursor: pointer; padding: 0; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 0.375rem; transition: all 0.2s; }
+.close-btn:hover { background: #f3f4f6; color: #1f2937; }
+
+/* Compact Table Styling */
+.management-table-wrapper { overflow-x: auto; border-radius: 0.5rem; border: 1px solid #e5e7eb; }
+.management-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.management-table thead { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; position: sticky; top: 0; }
+.management-table th { padding: 0.875rem; text-align: left; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); }
+.management-table th:last-child { border-right: none; }
+.management-table tbody tr { border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s; }
+.management-table tbody tr:hover { background-color: #f9fafb; }
+.management-table td { padding: 0.875rem; }
+.management-table td:first-child { font-weight: 600; color: #1f2937; }
+
+/* Action Buttons - Compact */
+.action-buttons { display: flex; gap: 0.5rem; justify-content: center; }
+.action-btn { padding: 0.375rem 0.75rem; border: none; border-radius: 0.25rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.edit-btn { background: #3b82f6; color: white; }
+.edit-btn:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); }
+.delete-btn { background: #ef4444; color: white; }
+.delete-btn:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3); }
+
+/* Form Section */
+.management-form-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #e5e7eb; }
+.management-form-section h3 { font-size: 1.125rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.375rem; }
+.form-group input, .form-group select { padding: 0.625rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; transition: border-color 0.2s; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+.form-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem; }
+.form-btn { padding: 0.625rem 1.25rem; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.form-btn-submit { background: #10b981; color: white; }
+.form-btn-submit:hover { background: #059669; transform: translateY(-1px); }
+.form-btn-cancel { background: #9ca3af; color: white; }
+.form-btn-cancel:hover { background: #6b7280; transform: translateY(-1px); }
 
 /* PDF Print Styles */
 .pdf-print-grid { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: fixed; }
@@ -180,7 +223,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 </main>
 </div>
 <div class="context-menu" id="contextMenu"></div>
-<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="modalTitle">Manage</h2><button class="text-3xl font-bold" id="closeModalBtn">×</button></div><div class="space-y-4" id="modalContent"></div></div></div>
+<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><span>➕</span> Add</button><button class="close-btn" id="closeModalBtn">×</button></div></div><div id="modalContent"></div></div></div>
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
@@ -797,8 +840,10 @@ processAndRenderAll();
 
 function openManagementModal(title, data, fields) {
 document.getElementById('modalTitle').textContent = `Manage ${title}`;
+const addItemBtn = document.getElementById('addItemBtn');
 
 if (title === 'Subjects') {
+addItemBtn.style.display = 'none';
 const semesterData = getCurrentSemesterData();
 if (!selectedCourseForSubjects && semesterData.courses.length > 0) {
 selectedCourseForSubjects = semesterData.courses[0].Code;
@@ -831,33 +876,36 @@ contentHTML += `</div></div>`;
 
 contentHTML += `<div style="flex: 1;">`;
 
-contentHTML += `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">`;
-contentHTML += `<th class="p-2 text-left">Subject</th><th class="p-2 text-left">Color</th><th class="p-2 text-left">Units</th><th class="p-2 text-left">Compulsory</th><th class="p-2 text-left">Delivery</th><th class="p-2">Actions</th></tr></thead><tbody>`;
+contentHTML += `<div class="management-table-wrapper"><table class="management-table"><thead><tr><th>Subject</th><th>Color</th><th>Units</th><th>Compulsory</th><th>Delivery</th><th>Actions</th></tr></thead><tbody>`;
 
 sortedSubjects.forEach((item) => {
-const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">No</span>';
+const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold text-xs">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">No</span>';
 const deliveryMode = item.DeliveryMode || 'Face-to-Face';
-const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded">F2F</span>');
+const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold text-xs">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold text-xs">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">F2F</span>');
 const originalIndex = data.indexOf(item);
-contentHTML += `<tr class="border-b"><td class="p-2"><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td class="p-2">${item.Color}</td><td class="p-2">${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td class="p-2">${compulsoryBadge}</td><td class="p-2">${deliveryBadge}</td><td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="subjects" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="subjects" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
+contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" data-type="subjects" data-index="${originalIndex}" data-action="edit">Edit</button><button class="action-btn delete-btn" data-type="subjects" data-index="${originalIndex}" data-action="delete">Delete</button></div></td></tr>`;
 });
 
 contentHTML += `</tbody></table></div>`;
 
-const formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 gap-4 border-t pt-4">
-<h3 class="text-lg font-bold col-span-full mb-2">Add / Edit Subject for ${selectedCourseForSubjects}</h3>
-<div><label class="block text-sm font-medium">Subject</label><input type="text" name="Subject" class="w-full border p-2 rounded" required></div>
-<div><label class="block text-sm font-medium">Color</label><input type="color" name="Color" class="w-full border p-2 rounded" required></div>
-<div class="col-span-full"><label class="block text-sm font-medium">Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" class="w-full border p-2 rounded" required></div>
-<div><label class="flex items-center gap-2"><input type="checkbox" name="Compulsory" class="w-4 h-4"> <span class="text-sm font-medium">Mark as Compulsory</span></label></div>
-<div><label class="block text-sm font-medium">Delivery Mode</label><select name="DeliveryMode" class="w-full border p-2 rounded" required><option value="Face-to-Face">Face-to-Face</option><option value="Online">Online</option><option value="Blended">Blended</option></select></div>
+const formHTML = `<div class="management-form-section">
+<h3>Add / Edit Subject for ${selectedCourseForSubjects}</h3>
+<form id="addForm" class="space-y-4">
+<div class="form-grid">
+<div class="form-group"><label>Subject</label><input type="text" name="Subject" required></div>
+<div class="form-group"><label>Color</label><input type="color" name="Color" required></div>
+<div class="form-group"><label>Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" required></div>
+<div class="form-group"><label><input type="checkbox" name="Compulsory"> Mark as Compulsory</label></div>
+<div class="form-group"><label>Delivery Mode</label><select name="DeliveryMode" required><option value="Face-to-Face">Face-to-Face</option><option value="Online">Online</option><option value="Blended">Blended</option></select></div>
+</div>
 <input type="hidden" name="editIndex">
 <input type="hidden" name="CourseCode" value="${selectedCourseForSubjects}">
-<div class="col-span-full flex items-center gap-4">
-<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Subject</button>
-<button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
+<div class="form-actions">
+<button type="submit" class="form-btn form-btn-submit">Add Subject</button>
+<button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;">Cancel Edit</button>
 </div>
-</form>`;
+</form>
+</div>`;
 
 contentHTML += formHTML;
 contentHTML += `</div></div>`;
@@ -873,7 +921,7 @@ form.reset();
 form.querySelector('[name="editIndex"]').value = '';
 form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
 form.querySelector('button[type="submit"]').textContent = 'Add Subject';
-cancelBtn.classList.add('hidden');
+cancelBtn.style.display = 'none';
 });
 
 form.addEventListener('submit', (e) => {
@@ -947,7 +995,7 @@ input.value = Array.isArray(item[key]) ? item[key].join(', ') : item[key];
 form.querySelector('[name="editIndex"]').value = index;
 form.querySelector('button[type="submit"]').textContent = `Update ${title.slice(0, -1)}`;
 const cancelBtn = document.getElementById('cancelEditBtn');
-if (cancelBtn) cancelBtn.classList.remove('hidden');
+if (cancelBtn) cancelBtn.style.display = 'block';
 }
 }
 }
@@ -962,6 +1010,15 @@ return;
 
 let displayData = data;
 if (title === 'Teachers') {
+addItemBtn.style.display = 'block';
+addItemBtn.innerHTML = '➕ Add Teacher';
+addItemBtn.onclick = () => {
+document.getElementById('addTeacherModal').classList.add('active');
+document.getElementById('addTeacherForm').reset();
+document.querySelector('#addTeacherForm input[name="editIndex"]').value = '';
+document.querySelector('#addTeacherForm input[name="Initials"]').value = '';
+};
+
 displayData = [...data].sort((a, b) => {
 const surnameA = (a.Surname || '').toLowerCase();
 const surnameB = (b.Surname || '').toLowerCase();
@@ -973,50 +1030,45 @@ if (nameA < nameB) return -1;
 if (nameA > nameB) return 1;
 return 0;
 });
-
-// Add + button to modal header
-setTimeout(() => {
-const modalHeader = document.querySelector('#managementModal .flex.justify-between');
-const existingAddBtn = modalHeader?.querySelector('[data-action="add-teacher"]');
-if (modalHeader && !existingAddBtn) {
-const closeBtn = modalHeader.querySelector('button');
-const addBtn = document.createElement('button');
-addBtn.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2 mr-3';
-addBtn.innerHTML = '➕ Add Teacher';
-addBtn.type = 'button';
-addBtn.setAttribute('data-action', 'add-teacher');
-addBtn.addEventListener('click', () => {
-document.getElementById('addTeacherModal').classList.add('active');
-document.getElementById('addTeacherForm').reset();
-document.querySelector('#addTeacherForm input[name="editIndex"]').value = '';
-document.querySelector('#addTeacherForm input[name="Initials"]').value = '';
-});
-modalHeader.insertBefore(addBtn, closeBtn);
-}
-}, 100);
 } else if (title === 'Courses') {
+addItemBtn.style.display = 'block';
+addItemBtn.innerHTML = '➕ Add Course';
+addItemBtn.onclick = () => {
+const form = document.getElementById('addForm');
+if (form) {
+form.reset();
+form.querySelector('[name="editIndex"]').value = '';
+form.querySelector('button[type="submit"]').textContent = 'Add Course';
+const cancelBtn = document.getElementById('cancelEditBtn');
+if (cancelBtn) cancelBtn.style.display = 'none';
+}
+};
 displayData = [...data].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
 }
 
-let contentHTML = `<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="bg-gray-200">`;
-contentHTML += fields.map(f => `<th class="p-2 text-left">${f}</th>`).join('') + `<th class="p-2">Actions</th></tr></thead><tbody>`;
+let contentHTML = `<div class="management-table-wrapper"><table class="management-table"><thead><tr>`;
+contentHTML += fields.map(f => `<th>${f}</th>`).join('') + `<th>Actions</th></tr></thead><tbody>`;
 displayData.forEach((item, index) => {
 const originalIndex = data.indexOf(item);
-contentHTML += `<tr class="border-b">${fields.map(f => `<td class="p-2">${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td class="p-2"><button class="text-blue-600 hover:text-blue-800 font-semibold mr-3" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="edit">Edit</button><button class="text-red-600 hover:text-red-800 font-semibold" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="delete">Delete</button></td></tr>`;
+contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="edit">Edit</button><button class="action-btn delete-btn" data-type="${title.toLowerCase()}" data-index="${originalIndex}" data-action="delete">Delete</button></div></td></tr>`;
 });
 contentHTML += `</tbody></table></div>`;
 
 let formHTML = '';
 if (title !== 'Teachers') {
-formHTML = `<form id="addForm" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 border-t pt-4">
-<h3 class="text-lg font-bold col-span-full mb-2">Add / Edit ${title.slice(0, -1)}</h3>
-${fields.map(f => `<div><label class="block text-sm font-medium">${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" class="w-full border p-2 rounded" required></div>`).join('')}
-<input type="hidden" name="editIndex">
-<div class="col-span-full flex items-center gap-4">
-<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add ${title.slice(0, -1)}</button>
-<button type="button" id="cancelEditBtn" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 hidden">Cancel Edit</button>
+formHTML = `<div class="management-form-section">
+<h3>Add / Edit ${title.slice(0, -1)}</h3>
+<form id="addForm" class="space-y-4">
+<div class="form-grid">
+${fields.map(f => `<div class="form-group"><label>${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" required></div>`).join('')}
 </div>
-</form>`;
+<input type="hidden" name="editIndex">
+<div class="form-actions">
+<button type="submit" class="form-btn form-btn-submit">Add ${title.slice(0, -1)}</button>
+<button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;">Cancel Edit</button>
+</div>
+</form>
+</div>`;
 }
 
 document.getElementById('modalContent').innerHTML = contentHTML + formHTML;
@@ -1025,16 +1077,18 @@ managementModal.classList.add('active');
 const form = document.getElementById('addForm');
 const cancelBtn = document.getElementById('cancelEditBtn');
 
+if (cancelBtn) {
 cancelBtn.addEventListener('click', () => {
 form.reset();
 form.querySelector('[name="editIndex"]').value = '';
 form.querySelector('button[type="submit"]').textContent = `Add ${title.slice(0, -1)}`;
-cancelBtn.classList.add('hidden');
+cancelBtn.style.display = 'none';
 if (title === 'Teachers') {
 const initialsInput = form.querySelector('input[name="Initials"]');
 initialsInput.value = '';
 }
 });
+}
 
 if (title === 'Teachers') {
 const nameInput = form.querySelector('input[name="Name"]');
@@ -1125,7 +1179,7 @@ input.value = Array.isArray(item[key]) ? item[key].join(', ') : item[key];
 }
 form.querySelector('[name="editIndex"]').value = index;
 form.querySelector('button[type="submit"]').textContent = `Update ${title.slice(0, -1)}`;
-cancelBtn.classList.remove('hidden');
+if (cancelBtn) cancelBtn.style.display = 'block';
 }
 }
 }));

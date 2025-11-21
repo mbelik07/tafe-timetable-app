@@ -11,13 +11,15 @@
 <title>TAFE Interactive Timetabling Application</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
 .sidebar { transition: transform 0.3s ease-in-out; }
 .sidebar-open { transform: translateX(0) !important; }
 .view-container { display: none; }
 .view-container.active { display: block; }
-.college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; }
+.college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 0.5rem; }
 .college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
 .timetable-main-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(200px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
 .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
@@ -39,11 +41,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
 @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
-.context-menu { position: fixed; background: #2d3748; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; min-width: 200px; display: none; }
+.context-menu { position: fixed; background: #2d3748; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; min-width: 220px; display: none; }
 .context-menu.active { display: block; }
-.context-menu-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #4a5568; }
+.context-menu-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #4a5568; display: flex; align-items: center; gap: 0.5rem; }
 .context-menu-item:last-child { border-bottom: none; }
 .context-menu-item:hover { background: #4a5568; }
+.context-menu-item i { width: 20px; text-align: center; }
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
 .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; z-index: 101; }
 .modal-overlay.active { display: block; }
@@ -70,7 +73,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 
 /* Action Buttons - Compact */
 .action-buttons { display: flex; gap: 0.5rem; justify-content: center; }
-.action-btn { padding: 0.375rem 0.75rem; border: none; border-radius: 0.25rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.action-btn { padding: 0.375rem 0.75rem; border: none; border-radius: 0.25rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 0.25rem; }
 .edit-btn { background: #3b82f6; color: white; }
 .edit-btn:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); }
 .delete-btn { background: #ef4444; color: white; }
@@ -145,7 +148,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .task-status-inprogress { background: #dbeafe; color: #1e40af; }
 .task-status-done { background: #dcfce7; color: #166534; }
 .task-status-blocked { background: #fee2e2; color: #991b1b; }
-.task-meta { display: flex; gap: 1rem; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; flex-wrap: wrap; }
+.task-meta { display: flex; gap: 1rem; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; flex-wrap: wrap; align-items: center; }
 .task-description { color: #4b5563; margin-bottom: 0.75rem; }
 .task-actions { display: flex; gap: 0.5rem; }
 .task-actions button { padding: 0.25rem 0.75rem; font-size: 0.875rem; border-radius: 0.375rem; border: none; cursor: pointer; }
@@ -158,9 +161,10 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .dropdown-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 .dropdown-content { position: absolute; background: white; min-width: 250px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 0.375rem; z-index: 1; top: 100%; left: 0; margin-top: 0.5rem; display: none; border: 2px solid #667eea; max-height: 400px; overflow-y: auto; }
 .dropdown-content.show { display: block; }
-.dropdown-item { color: #1f2937; padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #e5e7eb; transition: all 0.2s; }
+.dropdown-item { color: #1f2937; padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #e5e7eb; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
 .dropdown-item:last-child { border-bottom: none; }
 .dropdown-item:hover { background: #f3f4f6; color: #667eea; font-weight: 500; }
+.dropdown-item i { width: 20px; text-align: center; }
 .college-checkboxes { display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap; }
 .college-checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500; }
 .college-checkbox-label input { cursor: pointer; width: 18px; height: 18px; }
@@ -181,15 +185,15 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
 <div class="p-4 space-y-3 no-print">
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Management</h3>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn">🗓️ Manage Semesters</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn">👨‍🏫 Manage Teachers</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn">📚 Manage Courses</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn">🎨 Manage Subjects</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn"><i class="fa-solid fa-calendar-days mr-2"></i> Manage Semesters</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn"><i class="fa-solid fa-chalkboard-user mr-2"></i> Manage Teachers</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn"><i class="fa-solid fa-book mr-2"></i> Manage Courses</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn"><i class="fa-solid fa-palette mr-2"></i> Manage Subjects</button>
 <hr class="my-4"/>
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
-<button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="exportDataBtn">💾 Export Data</button>
-<button class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" id="importDataBtn">📂 Import Data</button>
-<button class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" id="loadSampleDataBtn">🔄 Load Sample Data</button>
+<button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="exportDataBtn"><i class="fa-solid fa-file-export mr-2"></i> Export Data</button>
+<button class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" id="importDataBtn"><i class="fa-solid fa-file-import mr-2"></i> Import Data</button>
+<button class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" id="loadSampleDataBtn"><i class="fa-solid fa-rotate mr-2"></i> Load Sample Data</button>
 <input type="file" id="importFileInput" accept=".json" style="display: none;"/>
 </div>
 </div>
@@ -199,15 +203,15 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="flex items-center gap-3">
 <button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn">Open Menu</button>
 <div class="dropdown-menu">
-<button class="dropdown-btn" id="semesterDropdownBtn">📅 Semester <span>▼</span></button>
+<button class="dropdown-btn" id="semesterDropdownBtn"><i class="fa-solid fa-calendar-days"></i> Semester <span>▼</span></button>
 <div class="dropdown-content" id="semesterDropdown"></div>
 </div>
 <div class="dropdown-menu">
-<button class="dropdown-btn" id="viewDropdownBtn">👁️ View <span>▼</span></button>
+<button class="dropdown-btn" id="viewDropdownBtn"><i class="fa-solid fa-eye"></i> View <span>▼</span></button>
 <div class="dropdown-content" id="viewDropdown"></div>
 </div>
 <div id="secondary-selectors"></div>
-<button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded" id="printBtn">📄 Download PDF</button>
+<button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded" id="printBtn"><i class="fa-solid fa-file-pdf mr-2"></i> Download PDF</button>
 </div>
 </header>
 <main class="p-4">
@@ -218,12 +222,12 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="view-container" id="dispute-log-view"></div>
 <div class="view-container" id="course-print-view"></div>
 <div class="view-container" id="teacher-print-view"></div>
-<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2">📋 Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn">+ Add New Task</button><div id="tasks-container"></div></div></div>
+<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2"><i class="fa-solid fa-clipboard-list mr-2"></i> Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn"><i class="fa-solid fa-plus mr-2"></i> Add New Task</button><div id="tasks-container"></div></div></div>
 </div>
 </main>
 </div>
 <div class="context-menu" id="contextMenu"></div>
-<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><span>➕</span> Add</button><button class="close-btn" id="closeModalBtn">×</button></div></div><div id="modalContent"></div></div></div>
+<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><i class="fa-solid fa-plus"></i> Add</button><button class="close-btn" id="closeModalBtn">×</button></div></div><div id="modalContent"></div></div></div>
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
 <div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
@@ -291,7 +295,7 @@ document.body.appendChild(link);
 link.click();
 document.body.removeChild(link);
 URL.revokeObjectURL(url);
-alert('✅ Data exported successfully!');
+alert('Data exported successfully!');
 };
 
 const importData = () => {
@@ -311,7 +315,7 @@ if (!importedData.semesters || !importedData.currentSemester) {
 throw new Error('Invalid data format. Missing semesters or currentSemester.');
 }
 
-if (confirm('⚠️ This will replace all your current data. Are you sure?')) {
+if (confirm('This will replace all your current data. Are you sure?')) {
 db = importedData;
 Object.keys(db.semesters).forEach(semKey => {
 if (db.semesters[semKey].subjects) {
@@ -328,10 +332,10 @@ db.semesters[semKey].tasks = [];
 });
 saveData();
 processAndRenderAll();
-alert('✅ Data imported successfully!');
+alert('Data imported successfully!');
 }
 } catch (error) {
-alert(`❌ Error importing data: ${error.message}`);
+alert(`Error importing data: ${error.message}`);
 }
 };
 reader.readAsText(file);
@@ -593,17 +597,17 @@ semesterDropdown.innerHTML = html;
 
 function renderViewDropdown() {
 const views = [
-{ value: 'main-timetable', label: '📊 Main Timetable' },
-{ value: 'staff-summary', label: '👥 Staff Summary' },
-{ value: 'dispute-log', label: '⚠️ Dispute Log' },
-{ value: 'course-print', label: '📚 Course Print' },
-{ value: 'teacher-print', label: '👨‍🏫 Teacher Print' },
-{ value: 'tasks', label: '📋 Tasks' }
+{ value: 'main-timetable', label: 'Main Timetable', icon: 'fa-table-columns' },
+{ value: 'staff-summary', label: 'Staff Summary', icon: 'fa-users' },
+{ value: 'dispute-log', label: 'Dispute Log', icon: 'fa-triangle-exclamation' },
+{ value: 'course-print', label: 'Course Print', icon: 'fa-book' },
+{ value: 'teacher-print', label: 'Teacher Print', icon: 'fa-chalkboard-user' },
+{ value: 'tasks', label: 'Tasks', icon: 'fa-clipboard-list' }
 ];
 
 let html = '';
 views.forEach(view => {
-html += `<div class="dropdown-item" onclick="changeView('${view.value}')">${view.label}</div>`;
+html += `<div class="dropdown-item" onclick="changeView('${view.value}')"><i class="fa-solid ${view.icon} mr-2"></i> ${view.label}</div>`;
 });
 viewDropdown.innerHTML = html;
 }
@@ -627,11 +631,11 @@ viewDropdown.classList.remove('show');
 
 function renderCollegeTabs() {
 const currentData = getCurrentSemesterData();
-let tabsHTML = `<button class="college-tab ${currentData.currentCollege === 'Master View' ? 'active' : ''}" data-college="Master View">Master View</button>`;
-tabsHTML += colleges.map(c => `<button class="college-tab ${currentData.currentCollege === c ? 'active' : ''}" data-college="${c}">${c}</button>`).join('');
+let tabsHTML = `<button class="college-tab ${currentData.currentCollege === 'Master View' ? 'active' : ''}" data-college="Master View"><i class="fa-solid fa-globe"></i> Master View</button>`;
+tabsHTML += colleges.map(c => `<button class="college-tab ${currentData.currentCollege === c ? 'active' : ''}" data-college="${c}"><i class="fa-solid fa-school"></i> ${c}</button>`).join('');
 collegeTabsContainer.innerHTML = tabsHTML;
 collegeTabsContainer.querySelectorAll('.college-tab').forEach(tab => tab.addEventListener('click', (e) => {
-getCurrentSemesterData().currentCollege = e.target.dataset.college;
+getCurrentSemesterData().currentCollege = e.currentTarget.dataset.college;
 processAndRenderAll();
 }));
 }
@@ -643,7 +647,7 @@ let contentHTML = `<h3 class="text-lg font-bold mb-2">Existing Semesters</h3><di
 const semesterNames = Object.keys(db.semesters).sort();
 semesterNames.forEach(name => {
 contentHTML += `<div class="flex justify-between items-center p-2 border-b"><span>${name}</span>
-<button class="text-red-500 hover:text-red-700 ${semesterNames.length <= 1 ? 'opacity-50 cursor-not-allowed' : ''}" data-action="delete-semester" data-name="${name}" ${semesterNames.length <= 1 ? 'disabled' : ''}>Delete</button></div>`;
+<button class="text-red-500 hover:text-red-700 ${semesterNames.length <= 1 ? 'opacity-50 cursor-not-allowed' : ''}" data-action="delete-semester" data-name="${name}" ${semesterNames.length <= 1 ? 'disabled' : ''}><i class="fa-solid fa-trash"></i> Delete</button></div>`;
 });
 contentHTML += `</div>`;
 
@@ -808,16 +812,16 @@ html += `
 <span class="task-status-badge ${statusClass}">${statusText}</span>
 </div>
 <div class="task-meta">
-<span>👤 ${teacherDisplay}</span>
-<span>📚 ${courseDisplay}</span>
-<span>🏫 ${collegeDisplay}</span>
-<span>📅 ${dueDate}</span>
-<span>🎯 ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+<span><i class="fa-solid fa-user mr-1"></i> ${teacherDisplay}</span>
+<span><i class="fa-solid fa-book mr-1"></i> ${courseDisplay}</span>
+<span><i class="fa-solid fa-school mr-1"></i> ${collegeDisplay}</span>
+<span><i class="fa-solid fa-calendar-days mr-1"></i> ${dueDate}</span>
+<span><i class="fa-solid fa-bullseye mr-1"></i> ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
 </div>
 ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
 <div class="task-actions">
-<button class="task-edit-btn" onclick="window.editTask(${task.id})">Edit</button>
-<button class="task-delete-btn" onclick="window.deleteTaskFromList(${task.id})">Delete</button>
+<button class="task-edit-btn" onclick="window.editTask(${task.id})"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+<button class="task-delete-btn" onclick="window.deleteTaskFromList(${task.id})"><i class="fa-solid fa-trash"></i> Delete</button>
 </div>
 </div>
 `;
@@ -944,7 +948,7 @@ function openManagementModal(title, data, fields) {
                 const deliveryMode = item.DeliveryMode || 'Face-to-Face';
                 const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold text-xs">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold text-xs">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">F2F</span>');
                 const originalIndex = data.indexOf(item);
-                contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('subjects', ${originalIndex})">Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('subjects', ${originalIndex})">Delete</button></div></td></tr>`;
+                contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('subjects', ${originalIndex})"><i class="fa-solid fa-pen-to-square"></i> Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('subjects', ${originalIndex})"><i class="fa-solid fa-trash"></i> Delete</button></div></td></tr>`;
             });
 
             contentHTML += `</tbody></table></div>`;
@@ -1022,8 +1026,8 @@ function openManagementModal(title, data, fields) {
 
     let displayData = data;
     if (title === 'Teachers') {
-        addItemBtn.style.display = 'block';
-        addItemBtn.innerHTML = '➕ Add Teacher';
+        addItemBtn.style.display = 'flex';
+        addItemBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Teacher';
         addItemBtn.onclick = () => {
             document.getElementById('addTeacherModal').classList.add('active');
             document.getElementById('addTeacherForm').reset();
@@ -1043,8 +1047,8 @@ function openManagementModal(title, data, fields) {
             return 0;
         });
     } else if (title === 'Courses') {
-        addItemBtn.style.display = 'block';
-        addItemBtn.innerHTML = '➕ Add Course';
+        addItemBtn.style.display = 'flex';
+        addItemBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Course';
         addItemBtn.onclick = () => {
             const form = document.getElementById('addForm');
             if (form) {
@@ -1063,7 +1067,7 @@ function openManagementModal(title, data, fields) {
     displayData.forEach((item, index) => {
         const originalIndex = data.indexOf(item);
         const type = title.toLowerCase();
-        contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('${type}', ${originalIndex})">Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('${type}', ${originalIndex})">Delete</button></div></td></tr>`;
+        contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('${type}', ${originalIndex})"><i class="fa-solid fa-pen-to-square"></i> Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('${type}', ${originalIndex})"><i class="fa-solid fa-trash"></i> Delete</button></div></td></tr>`;
     });
     contentHTML += `</tbody></table></div>`;
 
@@ -1171,7 +1175,7 @@ secondarySelectorsContainer.innerHTML = '';
 if (selectedView === 'course-print') {
 if (semesterData.courses.length > 0) {
 const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn">📚 Course <span>▼</span></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn"><i class="fa-solid fa-book"></i> Course <span>▼</span></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('courseDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
@@ -1191,7 +1195,7 @@ const nameA = (a.Name || '').toLowerCase();
 const nameB = (b.Name || '').toLowerCase();
 return nameA.localeCompare(nameB);
 });
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn">👨‍🏫 Teacher <span>▼</span></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn"><i class="fa-solid fa-chalkboard-user"></i> Teacher <span>▼</span></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('teacherDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
@@ -1334,10 +1338,10 @@ e.preventDefault();
 e.stopPropagation();
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 let menuHTML = `
-<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})">📋 Duplicate to Same Day</div>
-<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})">📅 Duplicate to Another Day</div>
-<div class="context-menu-item" onclick="editSessionFromContext(${session.id})">✏️ Edit Session</div>
-<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})">🗑️ Delete Session</div>
+<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})"><i class="fa-solid fa-copy"></i> Duplicate to Same Day</div>
+<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})"><i class="fa-solid fa-calendar-plus"></i> Duplicate to Another Day</div>
+<div class="context-menu-item" onclick="editSessionFromContext(${session.id})"><i class="fa-solid fa-pen-to-square"></i> Edit Session</div>
+<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})"><i class="fa-solid fa-trash"></i> Delete Session</div>
 `;
 contextMenu.innerHTML = menuHTML;
 contextMenu.classList.add('active');

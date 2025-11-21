@@ -13,7 +13,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- HTML2PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<!-- Font Awesome for Professional Icons -->
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
@@ -992,13 +992,15 @@ function openManagementModal(title, data, fields) {
             const form = document.getElementById('addForm');
             const cancelBtn = document.getElementById('cancelEditBtn');
 
-            cancelBtn.addEventListener('click', () => {
-                form.reset();
-                form.querySelector('[name="editIndex"]').value = '';
-                form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
-                form.querySelector('button[type="submit"]').textContent = 'Add Subject';
-                cancelBtn.style.display = 'none';
-            });
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    form.reset();
+                    form.querySelector('[name="editIndex"]').value = '';
+                    form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
+                    form.querySelector('button[type="submit"]').textContent = 'Add Subject';
+                    cancelBtn.style.display = 'none';
+                });
+            }
 
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -1171,647 +1173,65 @@ function openManagementModal(title, data, fields) {
     }
 }
 
-const renderers = { 'main-timetable': renderMainTimetableView, 'staff-summary': renderStaffSummaryView, 'dispute-log': renderDisputeLogView, 'course-print': renderCoursePrintView, 'teacher-print': renderTeacherPrintView, 'tasks': renderTasksView };
-function handleViewChange(viewName) {
-const selectedView = viewName || window.currentView || 'main-timetable';
-document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
-document.getElementById(`${selectedView}-view`).classList.add('active');
-populateSelectors(selectedView);
-renderers[selectedView]?.();
-}
-
-function populateSelectors(selectedView) {
-const semesterData = getCurrentSemesterData();
-secondarySelectorsContainer.innerHTML = '';
-if (selectedView === 'course-print') {
-if (semesterData.courses.length > 0) {
-const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn"><i class="fas fa-book mr-2"></i> Course <span><i class="fas fa-caret-down ml-2"></i></span></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
-secondarySelectorsContainer.innerHTML = selector;
-document.getElementById('courseDropdownBtn').addEventListener('click', (e) => {
-e.stopPropagation();
-semesterDropdown.classList.remove('show');
-viewDropdown.classList.remove('show');
-document.getElementById('teacherDropdown')?.classList.remove('show');
-document.getElementById('courseDropdown').classList.toggle('show');
-});
-}
-} else if (selectedView === 'teacher-print') {
-if (semesterData.teachers.length > 0) {
-const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
-const surnameA = (a.Surname || '').toLowerCase();
-const surnameB = (b.Surname || '').toLowerCase();
-if (surnameA !== surnameB) return surnameA.localeCompare(surnameB);
-const nameA = (a.Name || '').toLowerCase();
-const nameB = (b.Name || '').toLowerCase();
-return nameA.localeCompare(nameB);
-});
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn"><i class="fas fa-chalkboard-teacher mr-2"></i> Teacher <span><i class="fas fa-caret-down ml-2"></i></span></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
-secondarySelectorsContainer.innerHTML = selector;
-document.getElementById('teacherDropdownBtn').addEventListener('click', (e) => {
-e.stopPropagation();
-semesterDropdown.classList.remove('show');
-viewDropdown.classList.remove('show');
-document.getElementById('courseDropdown')?.classList.remove('show');
-document.getElementById('teacherDropdown').classList.toggle('show');
-});
-}
-}
-}
-  
-window.selectCourse = (courseCode) => {
-renderCoursePrintView(courseCode);
-document.getElementById('courseDropdown').classList.remove('show');
-};
-
-window.selectTeacher = (teacherInitials) => {
-renderTeacherPrintView(teacherInitials);
-document.getElementById('teacherDropdown').classList.remove('show');
-};
-
-function arrangeOverlappingSessions(dayCol, sessions) {
-const groups = [];
-sessions.forEach(session => {
-let addedToGroup = false;
-for (let group of groups) {
-const overlaps = group.some(s => {
-const s1Start = timeToMinutes(session.ClassStart);
-const s1End = timeToMinutes(session.ClassEnd);
-const s2Start = timeToMinutes(s.ClassStart);
-const s2End = timeToMinutes(s.ClassEnd);
-return s1Start < s2End && s2Start < s1End;
-});
-if (overlaps) {
-group.push(session);
-addedToGroup = true;
-break;
-}
-}
-if (!addedToGroup) {
-groups.push([session]);
-}
-});
-
-groups.forEach(group => {
-const count = group.length;
-if (count > 1) {
-group.forEach((session, index) => {
-const block = dayCol.querySelector(`[data-session-id="${session.id}"]`);
-if (block) {
-const widthPercent = (100 / count);
-const leftPercent = (100 / count) * index;
-block.style.left = `${leftPercent}%`;
-block.style.right = `${100 - leftPercent - widthPercent}%`;
-block.style.width = 'auto';
-}
-});
-}
-});
-}
-
-function renderMainTimetableView() {
-const grid = document.getElementById('main-timetable-grid');
-const titleEl = document.getElementById('main-timetable-title');
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const startTime = 8, endTime = 18, slotHeight = 30;
-const totalRows = (endTime - startTime) * 2;
+function renderTeacherPrintView(teacherInitials) {
+const container = document.getElementById('teacher-print-view');
 const semesterData = getCurrentSemesterData();
 
-titleEl.textContent = `${semesterData.currentCollege} Timetable - ${db.currentSemester}`;
-
-let gridHTML = `<div style="grid-row: 1; grid-column: 1;"></div>` + days.map((day, i) => `<div class="timetable-header" style="grid-column: ${i + 2};">${day}</div>`).join('');
-gridHTML += `<div class="time-labels">${Array.from({length: totalRows}, (_, i) => `<div class="time-label">${(i % 2 === 0) ? `<strong>${startTime + i/2}:00</strong>` : ''}</div>`).join('')}</div>`;
-gridHTML += days.map((day, i) => {
-let dayColHTML = `<div class="day-column" data-day="${day}" style="grid-column: ${i + 2}; height: ${totalRows * slotHeight}px">`;
-for (let j = 0; j < totalRows; j++) {
-const time = startTime + j * 0.5;
-const timeString = `${Math.floor(time).toString().padStart(2, '0')}:${((time % 1) * 60).toString().padStart(2, '0')}`;
-dayColHTML += `<div class="time-slot" data-day="${day}" data-time="${timeString}" data-slot-index="${j}"></div>`;
-}
-return dayColHTML + `</div>`;
-}).join('');
-grid.innerHTML = gridHTML;
-
-const scheduleToRender = semesterData.currentCollege === 'Master View' 
-? semesterData.schedule 
-: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
-
-const sessionsByDay = {};
-days.forEach(day => sessionsByDay[day] = []);
-
-scheduleToRender.forEach(session => {
-const dayCol = grid.querySelector(`.day-column[data-day="${session.Day}"]`);
-if (!dayCol) return;
-
-sessionsByDay[session.Day].push(session);
-
-const start = timeToMinutes(session.ClassStart) / 30 - startTime * 2;
-const height = (timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart)) / 30 * slotHeight;
-const subjectInfo = semesterData.subjects.find(s => s.Subject === session.Subject);
-const teacher1Info = semesterData.teachers.find(t => t.Initials === session.TeacherInitials);
-const teacher2Info = session.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === session.TeacherInitials2) : null;
-const teacherDisplay = session.TeacherInitials 
-? (teacher2Info 
-? `${teacher1Info?.Name || session.TeacherInitials} & ${teacher2Info.Name}` 
-: (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : session.TeacherInitials))
-: '<span class="unassigned-badge">UNASSIGNED</span>';
-const notesHTML = session.notes ? `<div class="text-xs italic text-gray-600 truncate" title="${session.notes}">${session.notes}</div>` : '';
-const collegeInfo = semesterData.currentCollege === 'Master View' ? `<div class="font-bold text-indigo-600 text-xs">${session.colleges?.join(', ') || ''}</div>` : '';
-const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div class="session-units">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-const compulsoryBadge = subjectInfo?.Compulsory ? `<div class="font-bold text-red-600 text-xs">COMPULSORY</div>` : '';
-const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
-const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
-
-const sessionBlock = document.createElement('div');
-sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}`;
-sessionBlock.setAttribute('data-session-id', session.id);
-Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
-sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
-sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
-sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
-dayCol.appendChild(sessionBlock);
-makeDraggable(sessionBlock, session, grid);
-makeResizable(sessionBlock, session);
-});
-
-days.forEach(day => {
-const dayCol = grid.querySelector(`.day-column[data-day="${day}"]`);
-if (dayCol && sessionsByDay[day].length > 0) {
-arrangeOverlappingSessions(dayCol, sessionsByDay[day]);
-}
-});
-
-addSlotSelectionListeners();
+if (!teacherInitials && semesterData.teachers.length > 0) {
+teacherInitials = semesterData.teachers[0].Initials;
 }
 
-function showContextMenu(e, session) {
-e.preventDefault();
-e.stopPropagation();
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-let menuHTML = `
-<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})"><i class="fas fa-copy mr-2"></i> Duplicate to Same Day</div>
-<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})"><i class="fas fa-calendar-plus mr-2"></i> Duplicate to Another Day</div>
-<div class="context-menu-item" onclick="editSessionFromContext(${session.id})"><i class="fas fa-edit mr-2"></i> Edit Session</div>
-<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})"><i class="fas fa-trash mr-2"></i> Delete Session</div>
-`;
-contextMenu.innerHTML = menuHTML;
-contextMenu.classList.add('active');
-contextMenu.style.left = e.clientX + 'px';
-contextMenu.style.top = e.clientY + 'px';
-}
-
-window.duplicateSessionSameDay = (sessionId) => {
-const semesterData = getCurrentSemesterData();
-const session = semesterData.schedule.find(s => s.id === sessionId);
-if (session) {
-const newSession = { ...session, id: Date.now() };
-semesterData.schedule.push(newSession);
-processAndRenderAll();
-}
-contextMenu.classList.remove('active');
-};
-
-window.openDuplicateDayModal = (sessionId) => {
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const semesterData = getCurrentSemesterData();
-const session = semesterData.schedule.find(s => s.id === sessionId);
-if (!session) return;
-
-let contentHTML = '<h3 class="text-lg font-bold mb-4">Select a day to duplicate to:</h3><div class="space-y-2">';
-days.forEach(day => {
-contentHTML += `<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" onclick="duplicateSessionToDay(${sessionId}, '${day}')">${day}</button>`;
-});
-contentHTML += '</div>';
-document.getElementById('duplicateDayContent').innerHTML = contentHTML;
-duplicateDayModal.classList.add('active');
-contextMenu.classList.remove('active');
-};
-
-window.duplicateSessionToDay = (sessionId, newDay) => {
-const semesterData = getCurrentSemesterData();
-const session = semesterData.schedule.find(s => s.id === sessionId);
-if (session) {
-const newSession = { ...session, id: Date.now(), Day: newDay };
-semesterData.schedule.push(newSession);
-processAndRenderAll();
-}
-duplicateDayModal.classList.remove('active');
-};
-
-window.editSessionFromContext = (sessionId) => {
-const semesterData = getCurrentSemesterData();
-const session = semesterData.schedule.find(s => s.id === sessionId);
-if (session) {
-openSessionModal(session);
-}
-contextMenu.classList.remove('active');
-};
-
-window.deleteSessionFromContext = (sessionId) => {
-if (confirm('Are you sure you want to delete this session?')) {
-const semesterData = getCurrentSemesterData();
-semesterData.schedule = semesterData.schedule.filter(s => s.id !== sessionId);
-processAndRenderAll();
-}
-contextMenu.classList.remove('active');
-};
-
-function addSlotSelectionListeners() {
-if (getCurrentSemesterData().currentCollege === 'Master View') return;
-let isSelecting = false, startSlot = null, dayOfSelection = null;
-const grid = document.getElementById('main-timetable-grid');
-
-grid.addEventListener('mousedown', (e) => {
-const slot = e.target.closest('.time-slot');
-if (!slot || e.target.closest('.session-block')) return;
-isSelecting = true;
-dayOfSelection = slot.dataset.day;
-startSlot = slot;
-clearSlotSelection();
-slot.classList.add('slot-selected');
-document.addEventListener('mousemove', onMouseMove);
-document.addEventListener('mouseup', onMouseUp);
-});
-
-function onMouseMove(e) {
-if (!isSelecting) return;
-const slot = e.target.closest('.time-slot');
-if (!slot || slot.dataset.day !== dayOfSelection) return;
-clearSlotSelection();
-const startIndex = parseInt(startSlot.dataset.slotIndex, 10);
-const currentIndex = parseInt(slot.dataset.slotIndex, 10);
-const [minIndex, maxIndex] = [Math.min(startIndex, currentIndex), Math.max(startIndex, currentIndex)];
-const dayColumn = grid.querySelector(`.day-column[data-day="${dayOfSelection}"]`);
-const slotsInDay = dayColumn.querySelectorAll('.time-slot');
-for (let i = minIndex; i <= maxIndex; i++) {
-if (slotsInDay[i]) slotsInDay[i].classList.add('slot-selected');
-}
-}
-
-function onMouseUp() {
-if (!isSelecting) return;
-isSelecting = false;
-document.removeEventListener('mousemove', onMouseMove);
-document.removeEventListener('mouseup', onMouseUp);
-const selected = grid.querySelectorAll('.slot-selected');
-if (selected.length > 0) {
-const day = selected[0].dataset.day, startTime = selected[0].dataset.time;
-const lastSlotIndex = parseInt(selected[selected.length - 1].dataset.slotIndex, 10);
-const endMinutes = (8 * 60) + ((lastSlotIndex + 1) * 30);
-const endTime = `${Math.floor(endMinutes / 60).toString().padStart(2, '0')}:${(endMinutes % 60).toString().padStart(2, '0')}`;
-openSessionModal(null, day, startTime, endTime);
-}
-}
-const clearSlotSelection = () => grid.querySelectorAll('.slot-selected').forEach(s => s.classList.remove('slot-selected'));
-}
-
-function makeDraggable(element, session, grid) {
-let clone, offsetX, offsetY;
-let isDragging = false;
-let startX, startY;
-
-const onMouseDown = (e) => {
-if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
-
-isDragging = false;
-startX = e.clientX;
-startY = e.clientY;
-
-e.stopPropagation();
-
-document.addEventListener('mousemove', onMouseMove);
-document.addEventListener('mouseup', onMouseUp);
-};
-
-const onMouseMove = (e) => {
-if (!isDragging && (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5)) {
-isDragging = true;
-e.preventDefault();
-
-if (grid) grid.classList.add('dragging');
-
-clone = element.cloneNode(true);
-Object.assign(clone.style, { position: 'absolute', zIndex: '1000', opacity: '0.7', pointerEvents: 'none' });
-document.body.appendChild(clone);
-const rect = element.getBoundingClientRect();
-offsetX = startX - rect.left;
-offsetY = startY - rect.top;
-clone.style.left = `${startX - offsetX}px`;
-clone.style.top = `${startY - offsetY}px`;
-element.style.visibility = 'hidden';
-}
-
-if (isDragging) {
-e.preventDefault();
-clone.style.left = `${e.clientX - offsetX}px`;
-clone.style.top = `${e.clientY - offsetY}px`;
-}
-};
-
-const onMouseUp = (e) => {
-document.removeEventListener('mousemove', onMouseMove);
-document.removeEventListener('mouseup', onMouseUp);
-
-if (isDragging) {
-if (grid) grid.classList.remove('dragging');
-
-clone.style.visibility = 'hidden';
-const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
-const timeSlot = dropTarget?.closest('.time-slot');
-
-if (timeSlot) {
-const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
-const startMins = (8 * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
-const endMins = startMins + duration;
-const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
-session.Day = timeSlot.dataset.day;
-session.ClassStart = format(startMins);
-session.ClassEnd = format(endMins);
-}
-document.body.removeChild(clone);
-processAndRenderAll(); 
-}
-element.style.visibility = 'visible';
-};
-
-element.addEventListener('mousedown', onMouseDown);
-}
-
-function makeResizable(element, session) {
-const handle = element.querySelector('.resize-handle');
-handle.addEventListener('mousedown', (e) => {
-e.stopPropagation();
-const startY = e.clientY, startHeight = element.offsetHeight, slotHeight = 30;
-const onMouseMove = (e) => { element.style.height = `${Math.max(slotHeight, startHeight + (e.clientY - startY))}px`; };
-const onMouseUp = () => {
-document.removeEventListener('mousemove', onMouseMove);
-document.removeEventListener('mouseup', onMouseUp);
-const finalHeight = Math.round(element.offsetHeight / slotHeight) * slotHeight;
-const duration = (finalHeight / slotHeight) * 30;
-const endMins = timeToMinutes(session.ClassStart) + duration;
-session.ClassEnd = `${Math.floor(endMins / 60).toString().padStart(2, '0')}:${(endMins % 60).toString().padStart(2, '0')}`;
-processAndRenderAll();
-};
-document.addEventListener('mousemove', onMouseMove);
-document.addEventListener('mouseup', onMouseUp);
-});
-}
-
-function openSessionModal(session, day = null, startTime = null, endTime = null) {
-sessionForm.reset();
-const semesterData = getCurrentSemesterData();
-document.getElementById('sessionModalTitle').textContent = session ? 'Edit Session' : 'Add New Session';
-document.getElementById('sessionId').value = session?.id || '';
-document.getElementById('sessionDay').value = session?.Day || day;
-document.getElementById('sessionStartTime').value = session?.ClassStart || startTime;
-document.getElementById('sessionEndTime').value = session?.ClassEnd || endTime || '';
-document.getElementById('sessionRoom').value = session?.Room || '';
-document.getElementById('sessionNotes').value = session?.notes || '';
-document.getElementById('deleteSessionBtn').style.display = session ? 'block' : 'none';
-
-const courseSelect = document.getElementById('sessionCourse');
-const subjectSelect = document.getElementById('sessionSubject');
-const teacherSelect = document.getElementById('sessionTeacher');
-const teacher2Select = document.getElementById('sessionTeacher2');
-
-courseSelect.innerHTML = semesterData.courses.map(c => `<option value="${c.Code}" ${session?.CourseCode === c.Code ? 'selected' : ''}>${c.Name}</option>`).join('');
-
-const updateSubjects = () => {
-const selectedCourseCode = courseSelect.value;
-const filteredSubjects = semesterData.subjects.filter(s => s.CourseCode === selectedCourseCode);
-subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>' + filteredSubjects.map(s => `<option value="${s.Subject}" ${session?.Subject === s.Subject ? 'selected' : ''}>${s.Subject}</option>`).join('');
-};
-
-updateSubjects();
-courseSelect.addEventListener('change', updateSubjects);
-
-const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
-const surnameA = (a.Surname || '').toLowerCase();
-const surnameB = (b.Surname || '').toLowerCase();
-if (surnameA < surnameB) return -1;
-if (surnameA > surnameB) return 1;
-
-const nameA = (a.Name || '').toLowerCase();
-const nameB = (b.Name || '').toLowerCase();
-if (nameA < nameB) return -1;
-if (nameA > nameB) return 1;
-return 0;
-});
-
-teacherSelect.innerHTML = '<option value="">-- Unassigned --</option>' + sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
-teacher2Select.innerHTML = `<option value="">-- None --</option>` + sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials2 === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
-
-const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
-collegeCheckboxes.forEach(cb => {
-cb.checked = session?.colleges?.includes(cb.value) || (!session && cb.value === semesterData.currentCollege);
-});
-
-document.getElementById('sessionModal').classList.add('active');
-}
-
-function handleSessionFormSubmit(e) {
-e.preventDefault();
-const id = document.getElementById('sessionId').value;
-const semesterData = getCurrentSemesterData();
-
-const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges"]:checked')).map(cb => cb.value);
-
-const sessionData = {
-Day: document.getElementById('sessionDay').value,
-ClassStart: document.getElementById('sessionStartTime').value,
-ClassEnd: document.getElementById('sessionEndTime').value,
-CourseCode: document.getElementById('sessionCourse').value,
-Subject: document.getElementById('sessionSubject').value,
-TeacherInitials: document.getElementById('sessionTeacher').value || '',
-TeacherInitials2: document.getElementById('sessionTeacher2').value || '',
-Room: document.getElementById('sessionRoom').value,
-notes: document.getElementById('sessionNotes').value,
-colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
-dispute: null
-};
-
-if (id) {
-const index = semesterData.schedule.findIndex(s => s.id == id);
-if (index !== -1) {
-semesterData.schedule[index] = { ...semesterData.schedule[index], ...sessionData };
-}
-} else {
-sessionData.id = Date.now();
-semesterData.schedule.push(sessionData);
-}
-document.getElementById('sessionModal').classList.remove('active');
-processAndRenderAll();
-}
-
-function handleDeleteSession() {
-const id = document.getElementById('sessionId').value;
-const semesterData = getCurrentSemesterData();
-semesterData.schedule = semesterData.schedule.filter(s => s.id != id);
-document.getElementById('sessionModal').classList.remove('active');
-processAndRenderAll();
-}
-
-function renderStaffSummaryView() {
-const container = document.getElementById('staff-summary-table');
-const titleEl = document.getElementById('staff-summary-title');
-const semesterData = getCurrentSemesterData();
-const scheduleToView = semesterData.currentCollege === 'Master View'
-? semesterData.schedule
-: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
-
-if (!semesterData.teachers?.length) { container.innerHTML = `<p class="text-center text-gray-500">No teacher data.</p>`; return; }
-
-titleEl.textContent = `Teaching Program Summary - ${semesterData.currentCollege} (${db.currentSemester})`;
-
-const sortedTeachers = [...semesterData.teachers].sort((a, b) => {
-const surnameA = (a.Surname || '').toLowerCase();
-const surnameB = (b.Surname || '').toLowerCase();
-if (surnameA < surnameB) return -1;
-if (surnameA > surnameB) return 1;
-return 0;
-});
-
-const headers = ['Initials', 'Name', 'Surname', ...semesterData.courses.map(c => c.Code), 'Direct Teaching', 'Total Hours', 'Remaining Hours', 'Notes'];
-let tableHTML = `<table class="w-full text-sm border-collapse"><thead><tr class="bg-blue-900 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
-
-sortedTeachers.forEach(teacher => {
-tableHTML += `<tr class="border-b hover:bg-gray-100"><td class="border p-2 font-bold">${teacher.Initials}</td><td class="border p-2">${teacher.Name}</td><td class="border p-2">${teacher.Surname}</td>`;
-let directTeachingHours = 0;
-semesterData.courses.forEach(course => {
-const hours = scheduleToView.filter(s => (s.TeacherInitials === teacher.Initials || s.TeacherInitials2 === teacher.Initials) && s.CourseCode === course.Code).reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
-tableHTML += `<td class="border p-2 text-center">${hours ? hours.toFixed(2) : ''}</td>`;
-directTeachingHours += hours;
-});
-const totalHours = teacher.TotalHours || 0;
-const remainingHours = totalHours - directTeachingHours;
-const remainingHoursClass = remainingHours < 0 ? 'text-red-600 font-bold' : '';
-const teacherNote = semesterData.staffNotes[teacher.Initials] || '';
-
-tableHTML += `<td class="border p-2 text-center font-bold bg-cyan-100">${directTeachingHours.toFixed(2)}</td>`;
-tableHTML += `<td class="border p-2 text-center font-bold bg-yellow-100">${totalHours.toFixed(2)}</td>`;
-tableHTML += `<td class="border p-2 text-center font-bold bg-green-100 ${remainingHoursClass}">${remainingHours.toFixed(2)}</td>`;
-tableHTML += `<td class="border p-2"><input type="text" class="staff-notes-input" data-teacher="${teacher.Initials}" value="${teacherNote}" placeholder="Add notes..."></td></tr>`;
-});
-container.innerHTML = tableHTML + `</tbody></table>`;
-
-container.querySelectorAll('.staff-notes-input').forEach(input => {
-input.addEventListener('change', (e) => {
-const teacherInitials = e.target.dataset.teacher;
-semesterData.staffNotes[teacherInitials] = e.target.value;
-saveData();
-});
-});
-}
-
-function renderDisputeLogView() {
-const container = document.getElementById('dispute-log-view');
-const semesterData = getCurrentSemesterData();
-const disputedSessions = semesterData.schedule.filter(s => s.dispute);
-
-let contentHTML = `<div class="bg-white p-4 rounded-lg shadow-lg overflow-x-auto">
-<h2 class="text-xl font-bold text-center mb-4">Dispute Log - ${semesterData.currentCollege} (${db.currentSemester})</h2>`;
-
-if (disputedSessions.length === 0) {
-contentHTML += `<p class="text-center text-gray-500">No disputes found in this view.</p>`;
-} else {
-const headers = ['Day', 'Time', 'Course', 'Subject', 'Teacher', 'Room', 'Colleges', 'Reason for Dispute'];
-contentHTML += `<table class="w-full text-sm border-collapse"><thead><tr class="bg-red-800 text-white">${headers.map(h => `<th class="border p-2">${h}</th>`).join('')}</tr></thead><tbody>`;
-disputedSessions.forEach(session => {
-const teachers = [session.TeacherInitials, session.TeacherInitials2].filter(Boolean).join(', ') || 'Unassigned';
-contentHTML += `<tr class="border-b hover:bg-red-50">
-<td class="border p-2">${session.Day}</td>
-<td class="border p-2">${session.ClassStart} - ${session.ClassEnd}</td>
-<td class="border p-2">${session.CourseCode}</td>
-<td class="border p-2">${session.Subject}</td>
-<td class="border p-2">${teachers}</td>
-<td class="border p-2">Room ${session.Room}</td>
-<td class="border p-2">${session.colleges?.join(', ') || ''}</td>
-<td class="border p-2 font-bold text-red-600">${session.dispute.reason}</td>
-</tr>`;
-});
-contentHTML += `</tbody></table>`;
-}
-contentHTML += `</div>`;
-container.innerHTML = contentHTML;
-}
-
-function renderCoursePrintView(courseCode) {
-const container = document.getElementById('course-print-view');
-const semesterData = getCurrentSemesterData();
-
-if (!courseCode && semesterData.courses.length > 0) {
-courseCode = semesterData.courses[0].Code;
-}
-
-if (!courseCode) {
-container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
+if (!teacherInitials) {
+container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
 return;
 }
 
-const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
+const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
+
 const scheduleToFilter = semesterData.currentCollege === 'Master View'
 ? semesterData.schedule
 : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
-let sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
+let sessions = scheduleToFilter.filter(s => s.TeacherInitials === teacherInitials || s.TeacherInitials2 === teacherInitials);
 sessions = sortSessionsChronologically(sessions);
+const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const title = `${teacherInfo.Name} ${teacherInfo.Surname} - ${semesterData.currentCollege}`;
 
-const timeSlots = new Set();
-sessions.forEach(s => {
-timeSlots.add(`${s.ClassStart}-${s.ClassEnd}`);
-});
-
-const sortedTimeSlots = Array.from(timeSlots).sort((a, b) => {
-const startA = timeToMinutes(a.split('-')[0]);
-const startB = timeToMinutes(b.split('-')[0]);
-return startA - startB;
-});
-
-const grid = {};
-sortedTimeSlots.forEach(slot => {
-grid[slot] = {};
-days.forEach(day => {
-grid[slot][day] = [];
-});
-});
-
-sessions.forEach(s => {
-const slot = `${s.ClassStart}-${s.ClassEnd}`;
-if (grid[slot] && grid[slot][s.Day]) {
-grid[slot][s.Day].push(s);
-}
-});
+const hasNightSessions = sessions.some(s => timeToMinutes(s.ClassStart) >= 1020);
 
 let gridHTML = `<table class="pdf-print-grid">
 <thead>
 <tr>
-<th class="pdf-print-grid">Time</th>
-${days.map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
+<th class="pdf-print-grid"></th>
+${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
 </tr>
 </thead>
 <tbody>`;
 
-sortedTimeSlots.forEach(timeSlot => {
+const periods = ['Morning', 'Afternoon'];
+if (hasNightSessions) periods.push('Night');
+
+periods.forEach(period => {
 gridHTML += `<tr>
-<td class="pdf-period-label">${timeSlot}</td>`;
+<td class="pdf-period-label">${period}</td>`;
 
-days.forEach(day => {
-const daySessions = grid[timeSlot][day] || [];
+['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].forEach(day => {
+const daySessions = sessions.filter(s => {
+const start = timeToMinutes(s.ClassStart);
+return s.Day === day && (
+(period === 'Morning' && start < 720) ||
+(period === 'Afternoon' && start >= 720 && start < 1020) || 
+(period === 'Night' && start >= 1020)
+);
+});
 
-if (daySessions.length === 0) {
-gridHTML += `<td class="pdf-cell" style="background-color: #f9f9f9;"></td>`;
-} else {
 const sessionsHTML = daySessions.map(s => {
 const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
-const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
-const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
-const teacherDisplay = s.TeacherInitials
-? (teacher2Info
-? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}`
-: (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials))
-: 'UNASSIGNED';
+const coTeacher = s.TeacherInitials === teacherInitials 
+? (s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null)
+: semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+const coTeacherDisplay = coTeacher ? ` & ${coTeacher.Name}` : '';
 const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
 const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
 const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
@@ -1827,74 +1247,19 @@ ${collegeHTML}
 ${compulsoryBadge}
 ${deliveryBadge}
 ${unitsHTML}
-<div style="margin-top: 3px; font-size: 11px;">${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
+<div style="margin-top: 3px; font-size: 11px;">${hours.toFixed(2)} Hrs | Room ${s.Room}${coTeacherDisplay}</div>
 ${notesHTML}
 <div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
 </div>`;
 }).join('');
 
 gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
-}
 });
 
 gridHTML += `</tr>`;
 });
 
 gridHTML += `</tbody></table>`;
-
-const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
-
-if (!semesterData.courseNotes) semesterData.courseNotes = {};
-const courseNotes = semesterData.courseNotes[courseCode] || '';
-
-const uniqueTeacherInitials = new Set();
-sessions.forEach(s => {
-if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials);
-if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2);
-});
-const courseTeachers = Array.from(uniqueTeacherInitials)
-.map(initials => semesterData.teachers.find(t => t.Initials === initials))
-.filter(t => t)
-.sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
-
-const teacherContactHTML = courseTeachers.length > 0 ? `
-<div class="pdf-teacher-info">
-<h4>Teacher Contact:</h4>
-<div class="pdf-teacher-info-content">
-${courseTeachers.map(t => `
-<div class="pdf-teacher-info-item">
-<span>${t.Name} ${t.Surname}:</span>
-${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}
-</div>
-`).join('')}
-</div>
-</div>
-` : '';
-
-const notesSection = `
-<div class="pdf-notes-section">
-<h4>Course Notes:</h4>
-<div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div>
-</div>
-`;
-
-const hasCompulsory = sessions.some(s => semesterData.subjects.find(sub => sub.Subject === s.Subject)?.Compulsory);
-const hasOnline = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Online'));
-const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Blended'));
-
-let legendHTML = '';
-if (hasCompulsory || hasOnline || hasBlended) {
-legendHTML = `
-<div class="pdf-legend-section">
-<h4>Legend:</h4>
-${hasCompulsory ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
-${hasOnline ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
-${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
-</div>
-`;
-}
-
-const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
 
 container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${title}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div></div>`;
 }

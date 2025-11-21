@@ -930,9 +930,8 @@ document.querySelector('#addTeacherForm select[name="HomeCollege"]').value = ite
 document.querySelector('#addTeacherForm select[name="EmploymentType"]').value = item.EmploymentType;
 document.querySelector('#addTeacherForm input[name="TotalHours"]').value = item.TotalHours;
 document.querySelector('#addTeacherForm input[name="editIndex"]').value = index;
-document.getElementById('deleteTaskBtn').style.display = 'none';
 } else {
-// Original edit behavior for other types (Courses, Subjects)
+// Original edit behavior for other types
 const item = dataCollection[index];
 for (const key in item) {
 const input = form.querySelector(`[name="${key}"]`);

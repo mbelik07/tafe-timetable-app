@@ -1901,7 +1901,10 @@ function renderCoursePrintView(courseCode) {
 
     const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
 
-    container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode})${collegeDisplay}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>`;
+  const collegeDisplay = semesterData.currentCollege === 'Master View' 
+? '<span style="display: inline-block; background: #667eea; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-left: 12px;">Master View</span>'
+: `<span style="display: inline-block; background: #1e3a8a; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-left: 12px;">📍 ${semesterData.currentCollege}</span>`;  
+  container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode})${collegeDisplay}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>`;
 
     const courseNotesTextarea = container.querySelector('.pdf-notes-content');
     if (courseNotesTextarea) {

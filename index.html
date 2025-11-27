@@ -1877,13 +1877,11 @@ const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 const timeSlots = new Set();
 sessions.forEach(s => {
-timeSlots.add(`${s.ClassStart}-${s.ClassEnd}`);
+timeSlots.add(s.ClassStart);
 });
 
 const sortedTimeSlots = Array.from(timeSlots).sort((a, b) => {
-const startA = timeToMinutes(a.split('-')[0]);
-const startB = timeToMinutes(b.split('-')[0]);
-return startA - startB;
+return timeToMinutes(a) - timeToMinutes(b);
 });
 
 const grid = {};
@@ -1895,7 +1893,7 @@ grid[slot][day] = [];
 });
 
 sessions.forEach(s => {
-const slot = `${s.ClassStart}-${s.ClassEnd}`;
+const slot = s.ClassStart;
 if (grid[slot] && grid[slot][s.Day]) {
 grid[slot][s.Day].push(s);
 }

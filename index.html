@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,20 +12,16 @@
 <title>TAFE Interactive Timetabling Application</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<!-- FontAwesome Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
 .sidebar { transition: transform 0.3s ease-in-out; }
 .sidebar-open { transform: translateX(0) !important; }
 .view-container { display: none; }
 .view-container.active { display: block; }
-/* Updated College Tab Styles to match Master View */
-.college-tab { padding: 10px 20px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 0.5rem; font-weight: 600; transition: all 0.2s; }
-.college-tab:hover { background: #e5e7eb; color: #1e3a8a; }
-.college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; color: #1e3a8a; box-shadow: 0 -2px 4px rgba(0,0,0,0.05); }
-.college-tab i { font-size: 1.1em; }
-
+.college-tab { padding: 8px 16px; border: 1px solid transparent; border-bottom: none; background: #f3f4f6; color: #4b5563; cursor: pointer; border-radius: 6px 6px 0 0; display: inline-flex; align-items: center; gap: 6px; }
+.college-tab.active { background: white; border-color: #d1d5db; border-bottom-color: white; font-weight: bold; color: #1e3a8a; }
 .timetable-main-grid { display: grid; grid-template-columns: 50px repeat(5, minmax(200px, 1fr)); grid-template-rows: auto 1fr; border: 1px solid #d1d5db; }
 .timetable-header { background-color: #007bff; color: white; font-weight: bold; padding: 0.75rem 0.5rem; text-align: center; border-left: 1px solid #d1d5db; grid-row: 1; }
 .time-labels { grid-row: 2; grid-column: 1; display: flex; flex-direction: column; }
@@ -42,22 +39,21 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .session-block.compulsory.online { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700, 0 0 0 8px #3b82f6; }
 .session-block.compulsory.blended { box-shadow: 0 0 0 4px #ffff00, 0 0 0 5px #ffd700, 0 0 0 8px #3b82f6; }
 .dispute-warning { border: 3px solid #ef4444 !important; z-index: 15; animation: pulse-border 1.5s infinite; }
-.dispute-warning::after { content: '⚠️ DISPUTED'; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 0 2px; border-radius: 3px;}
+.dispute-warning::after { content: '\f071  DISPUTED'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: 2px; right: 4px; font-weight: bold; color: #ef4444; font-size: 10px; background: white; padding: 1px 4px; border-radius: 3px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
 @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 .resize-handle { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; cursor: ns-resize; z-index: 20; }
 .context-menu { position: fixed; background: #2d3748; color: white; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; min-width: 220px; display: none; }
 .context-menu.active { display: block; }
-.context-menu-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #4a5568; display: flex; align-items: center; gap: 0.5rem; }
+.context-menu-item { padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #4a5568; display: flex; align-items: center; }
 .context-menu-item:last-child { border-bottom: none; }
 .context-menu-item:hover { background: #4a5568; }
-.context-menu-item i { width: 20px; text-align: center; }
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 100; display: none; }
 .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.5rem; width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto; z-index: 101; }
 .modal-overlay.active { display: block; }
 
 /* Management Modal Improvements */
 .management-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; }
-.management-modal-title { font-size: 1.875rem; font-weight: bold; color: #1e3a8a; margin: 0; }
+.management-modal-title { font-size: 1.875rem; font-weight: bold; color: #1e3a8a; margin: 0; display: flex; align-items: center; gap: 0.5rem; }
 .management-modal-actions { display: flex; gap: 0.75rem; }
 .add-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: bold; padding: 0.625rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .add-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
@@ -77,7 +73,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 
 /* Action Buttons - Compact */
 .action-buttons { display: flex; gap: 0.5rem; justify-content: center; }
-.action-btn { padding: 0.375rem 0.75rem; border: none; border-radius: 0.25rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 0.25rem; }
+.action-btn { padding: 0.375rem 0.75rem; border: none; border-radius: 0.25rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 .edit-btn { background: #3b82f6; color: white; }
 .edit-btn:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3); }
 .delete-btn { background: #ef4444; color: white; }
@@ -85,14 +81,14 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 
 /* Form Section */
 .management-form-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #e5e7eb; }
-.management-form-section h3 { font-size: 1.125rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; }
+.management-form-section h3 { font-size: 1.125rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
 .form-group { display: flex; flex-direction: column; }
 .form-group label { font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.375rem; }
 .form-group input, .form-group select { padding: 0.625rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; transition: border-color 0.2s; }
 .form-group input:focus, .form-group select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
 .form-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem; }
-.form-btn { padding: 0.625rem 1.25rem; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.form-btn { padding: 0.625rem 1.25rem; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
 .form-btn-submit { background: #10b981; color: white; }
 .form-btn-submit:hover { background: #059669; transform: translateY(-1px); }
 .form-btn-cancel { background: #9ca3af; color: white; }
@@ -120,18 +116,18 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .pdf-teacher-info { flex: 1.2; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; display: flex; flex-direction: column; height: fit-content; }
 .pdf-teacher-info h4 { font-weight: bold; margin: 0 0 6px 0; font-size: 13px; flex-shrink: 0; }
 .pdf-teacher-info-content { flex: 0; overflow-y: auto; }
-.pdf-teacher-info-item { margin-bottom: 6px; font-size: 13px; line-height: 1.4; color: #222; word-break: break-word; display: flex; gap: 4px; align-items: flex-start; }
+.pdf-teacher-info-item { margin-bottom: 6px; font-size: 11px; line-height: 1.4; color: #222; word-break: break-word; display: flex; gap: 4px; align-items: flex-start; }
 .pdf-teacher-info-item span { font-weight: 600; flex-shrink: 0; }
-.pdf-teacher-info-item a { color: #0066cc; text-decoration: underline; font-size: 12px; word-break: break-all; letter-spacing: 0.2px; flex: 1; }
+.pdf-teacher-info-item a { color: #0066cc; font-size: 10px; word-break: break-all; letter-spacing: 0.2px; flex: 1; }
 
 .pdf-notes-section { flex: 1.3; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; display: flex; flex-direction: column; height: fit-content; }
 .pdf-notes-section h4 { font-weight: bold; margin: 0 0 6px 0; font-size: 13px; flex-shrink: 0; }
 .pdf-notes-content { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; letter-spacing: 0.3px; line-height: 1.6; color: #222; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 10px 12px; flex: 0; white-space: pre-wrap; word-wrap: break-word; hyphens: auto; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-y: auto; }
 
 .pdf-legend-section { flex: 0; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; display: flex; flex-direction: column; height: fit-content; }
-.pdf-legend-section h4 { font-weight: bold; margin: 0 0 6px 0; font-size: 13px; flex-shrink: 0; }
+.pdf-legend-section h4 { font-weight: bold; margin: 0 0 6px 0; font-size: 11px; flex-shrink: 0; }
 .pdf-legend-item { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; font-size: 12px; }
-.pdf-legend-circle { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.pdf-legend-circle { width: 12px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
 .pdf-total-hours { margin-top: 8px; text-align: right; font-size: 11px; font-weight: bold; }
 .pdf-total-hours-value { display: inline-block; background: #1f2937; color: white; padding: 4px 10px; border-radius: 2px; margin-left: 6px; font-size: 10px; }
@@ -141,7 +137,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .course-list-item:hover { background: #e5e7eb; }
 .course-list-item.active { background: #dbeafe; border-color: #3b82f6; font-weight: bold; }
 .staff-notes-input { max-width: 200px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem; }
-.task-card { padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; margin-bottom: 1rem; background: white; }
+.task-card { padding: 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; margin-bottom: 1rem; background: white; transition: all 0.3s; }
 .task-card.high { border-left: 4px solid #dc2626; background: #fee2e2; }
 .task-card.medium { border-left: 4px solid #f59e0b; background: #fef3c7; }
 .task-card.low { border-left: 4px solid #10b981; background: #ecfdf5; }
@@ -154,8 +150,8 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .task-status-blocked { background: #fee2e2; color: #991b1b; }
 .task-meta { display: flex; gap: 1rem; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; flex-wrap: wrap; align-items: center; }
 .task-description { color: #4b5563; margin-bottom: 0.75rem; }
-.task-actions { display: flex; gap: 0.5rem; }
-.task-actions button { padding: 0.25rem 0.75rem; font-size: 0.875rem; border-radius: 0.375rem; border: none; cursor: pointer; }
+.task-actions { display: flex; gap: 0.5rem; align-items: center; }
+.task-actions button { padding: 0.25rem 0.75rem; font-size: 0.875rem; border-radius: 0.375rem; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; }
 .task-edit-btn { background: #3b82f6; color: white; }
 .task-edit-btn:hover { background: #2563eb; }
 .task-delete-btn { background: #ef4444; color: white; }
@@ -165,14 +161,27 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .dropdown-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 .dropdown-content { position: absolute; background: white; min-width: 250px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 0.375rem; z-index: 1; top: 100%; left: 0; margin-top: 0.5rem; display: none; border: 2px solid #667eea; max-height: 400px; overflow-y: auto; }
 .dropdown-content.show { display: block; }
-.dropdown-item { color: #1f2937; padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #e5e7eb; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+.dropdown-item { color: #1f2937; padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #e5e7eb; transition: all 0.2s; display: flex; align-items: center; }
 .dropdown-item:last-child { border-bottom: none; }
 .dropdown-item:hover { background: #f3f4f6; color: #667eea; font-weight: 500; }
-.dropdown-item i { width: 20px; text-align: center; color: #1e3a8a; }
 .college-checkboxes { display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap; }
 .college-checkbox-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 500; }
 .college-checkbox-label input { cursor: pointer; width: 18px; height: 18px; }
 .unassigned-badge { display: inline-block; background: #fbbf24; color: #78350f; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
+
+/* New Features */
+.task-filter-container { display: flex; justify-content: flex-end; margin-bottom: 1rem; align-items: center; }
+.toggle-checkbox { appearance: none; width: 40px; height: 20px; background: #ccc; border-radius: 20px; position: relative; cursor: pointer; outline: none; }
+.toggle-checkbox::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: 0.3s; }
+.toggle-checkbox:checked { background: #3b82f6; }
+.toggle-checkbox:checked::after { transform: translateX(20px); }
+.toggle-label { margin-left: 8px; font-weight: bold; color: #4b5563; }
+.wizard-step { border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem; background: #f9fafb; margin-bottom: 1rem; }
+.wizard-step h4 { font-weight: bold; margin-bottom: 0.5rem; color: #1f2937; }
+.college-tag { display: inline-flex; align-items: center; background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 0.875rem; margin-right: 0.5rem; margin-bottom: 0.5rem; }
+.college-tag button { margin-left: 6px; color: #ef4444; font-weight: bold; cursor: pointer; border: none; background: none; }
+.done-btn { background: #10b981; color: white; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s; margin-right: 0.5rem; }
+.done-btn:hover { background: #059669;transform: scale(1.1); }
 
 @media print { 
   body * { visibility: hidden; } 
@@ -189,15 +198,15 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="p-4 bg-blue-900 text-white flex justify-between items-center no-print"><h2 class="text-xl font-bold">Data Hub</h2><button class="text-2xl" id="closeSidebarBtn">×</button></div>
 <div class="p-4 space-y-3 no-print">
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Management</h3>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSemestersBtn"><i class="fa-solid fa-calendar-days mr-2 text-blue-900"></i> Manage Semesters</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageTeachersBtn"><i class="fa-solid fa-chalkboard-user mr-2 text-blue-900"></i> Manage Teachers</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageCoursesBtn"><i class="fa-solid fa-book mr-2 text-blue-900"></i> Manage Courses</button>
-<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" id="manageSubjectsBtn"><i class="fa-solid fa-palette mr-2 text-blue-900"></i> Manage Subjects</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageSemestersBtn"><i class="fas fa-calendar-alt fa-fw mr-3"></i> Manage Semesters</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageTeachersBtn"><i class="fas fa-chalkboard-user fa-fw mr-3"></i> Manage Teachers</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageCoursesBtn"><i class="fas fa-book-open fa-fw mr-3"></i> Manage Courses</button>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageSubjectsBtn"><i class="fas fa-shapes fa-fw mr-3"></i> Manage Subjects</button>
 <hr class="my-4"/>
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
-<button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" id="exportDataBtn"><i class="fa-solid fa-file-export mr-2"></i> Export Data</button>
-<button class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" id="importDataBtn"><i class="fa-solid fa-file-import mr-2"></i> Import Data</button>
-<button class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" id="loadSampleDataBtn"><i class="fa-solid fa-rotate mr-2"></i> Load Sample Data</button>
+<button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center" id="exportDataBtn"><i class="fas fa-file-export fa-fw mr-2"></i> Export Data</button>
+<button class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center" id="importDataBtn"><i class="fas fa-file-import fa-fw mr-2"></i> Import Data</button>
+<button class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded flex items-center" id="loadSampleDataBtn"><i class="fas fa-vial fa-fw mr-2"></i> Load Sample Data</button>
 <input type="file" id="importFileInput" accept=".json" style="display: none;"/>
 </div>
 </div>
@@ -205,17 +214,17 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <header class="bg-white shadow-md p-4 flex justify-between items-center no-print">
 <div class="flex items-center gap-4"><img alt="TAFE Logo" src="https://res.cloudinary.com/dimqqmfx6/image/upload/v1762673524/ci_1595_1762673524_TAFE_logo_ecudtj.png" style="height: 50px;"/><h1 class="text-2xl font-bold text-blue-900">Interactive Timetabling App</h1></div>
 <div class="flex items-center gap-3">
-<button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded" id="openSidebarBtn"><i class="fa-solid fa-bars mr-2"></i> Open Menu</button>
+<button class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded flex items-center" id="openSidebarBtn"><i class="fas fa-bars mr-2"></i> Menu</button>
 <div class="dropdown-menu">
-<button class="dropdown-btn" id="semesterDropdownBtn"><i class="fa-solid fa-calendar-days"></i> Semester <i class="fa-solid fa-caret-down ml-1"></i></button>
+<button class="dropdown-btn" id="semesterDropdownBtn"><i class="fas fa-calendar-day mr-2"></i> Semester <i class="fas fa-chevron-down ml-1 text-xs opacity-75"></i></button>
 <div class="dropdown-content" id="semesterDropdown"></div>
 </div>
 <div class="dropdown-menu">
-<button class="dropdown-btn" id="viewDropdownBtn"><i class="fa-solid fa-eye"></i> View <i class="fa-solid fa-caret-down ml-1"></i></button>
+<button class="dropdown-btn" id="viewDropdownBtn"><i class="fas fa-layer-group mr-2"></i> View <i class="fas fa-chevron-down ml-1 text-xs opacity-75"></i></button>
 <div class="dropdown-content" id="viewDropdown"></div>
 </div>
 <div id="secondary-selectors"></div>
-<button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded" id="printBtn"><i class="fa-solid fa-file-pdf mr-2"></i> Download PDF</button>
+<button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded flex items-center" id="printBtn"><i class="fas fa-print mr-2"></i> Print PDF</button>
 </div>
 </header>
 <main class="p-4">
@@ -226,20 +235,37 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <div class="view-container" id="dispute-log-view"></div>
 <div class="view-container" id="course-print-view"></div>
 <div class="view-container" id="teacher-print-view"></div>
-<div class="view-container" id="tasks-view"><div class="bg-white p-6 rounded-lg shadow-lg"><h2 class="text-2xl font-bold mb-2"><i class="fa-solid fa-clipboard-list mr-2 text-blue-900"></i> Task Management</h2><p class="text-gray-600 mb-4">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p><button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-6" id="addTaskBtn"><i class="fa-solid fa-plus mr-2"></i> Add New Task</button><div id="tasks-container"></div></div></div>
+<div class="view-container" id="tasks-view">
+<div class="bg-white p-6 rounded-lg shadow-lg">
+<div class="flex justify-between items-center mb-4">
+<div>
+<h2 class="text-2xl font-bold mb-2"><i class="fas fa-clipboard-list mr-2 text-blue-600"></i> Task Management</h2>
+<p class="text-gray-600">Semester: <span id="tasksSemesterLabel" class="font-bold text-blue-900"></span></p>
+</div>
+<div class="flex items-center gap-4">
+<div class="task-filter-container no-print">
+<input type="checkbox" id="hideCompletedToggle" class="toggle-checkbox">
+<label for="hideCompletedToggle" class="toggle-label">Hide Completed</label>
+</div>
+<button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center" id="addTaskBtn"><i class="fas fa-plus-circle mr-2"></i> Add New Task</button>
+</div>
+</div>
+<div id="tasks-container"></div>
+</div>
+</div>
 </div>
 </main>
 </div>
 <div class="context-menu" id="contextMenu"></div>
-<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><i class="fa-solid fa-plus"></i> Add</button><button class="close-btn" id="closeModalBtn">×</button></div></div><div id="modalContent"></div></div></div>
-<div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
-<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle">Add/Edit Session</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Moss Vale" class="w-4 h-4"> Moss Vale</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Goulburn" class="w-4 h-4"> Goulburn</label><label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="Queanbeyan" class="w-4 h-4"> Queanbeyan</label></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteSessionBtn" type="button">Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Save Session</button></div></form></div></div>
-<div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Duplicate to Another Day</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
-<div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900">Add / Edit Teacher</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" class="w-full border p-2 rounded" required><option value="Moss Vale">Moss Vale</option><option value="Goulburn">Goulburn</option><option value="Queanbeyan">Queanbeyan</option></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelAddTeacherBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Teacher</button></div></form></div></div>
-  <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" id="deleteTaskBtn" style="display: none;">Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500" id="cancelTaskBtn">Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Task</button></div></div></form></div></div>
+<div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><i class="fas fa-plus"></i> Add</button><button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button></div></div><div id="modalContent"></div></div></div>
+<div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-calendar-alt mr-3"></i> Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
+<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle"><i class="fas fa-clock mr-2"></i> Session Details</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4" id="sessionCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteSessionBtn" type="button"><i class="fas fa-trash-alt mr-2"></i> Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center" type="submit"><i class="fas fa-save mr-2"></i> Save Session</button></div></form></div></div>
+<div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-copy mr-2"></i> Duplicate Session</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
+<div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-user-plus mr-2"></i> Teacher Details</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" id="teacherHomeCollegeSelect" class="w-full border p-2 rounded" required></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex items-center gap-2"><input type="checkbox" name="IsHeadTeacher" class="w-5 h-5"> <label class="font-bold text-blue-900">Head Teacher (Reporting)</label></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelAddTeacherBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Teacher</button></div></form></div></div>
+  <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteTaskBtn" style="display: none;"><i class="fas fa-trash-alt mr-2"></i> Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelTaskBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Task</button></div></div></form></div></div>
 <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl border-2 border-blue-500">
-<div style="width: 60px; height: 60px; border: 4px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+<i class="fas fa-circle-notch fa-spin text-5xl text-blue-500 mb-4"></i>
 <h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
 <p class="text-gray-600">Please wait, this may take a moment.</p>
 </div>
@@ -254,19 +280,24 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 <script src="pdf-generator.js"></script>
 
 <script>
-// Global State for persistence
-window.appState = {
-    selectedCourse: null,
-    selectedTeacher: null
-};
-
 let selectedCourseForSubjects = null;
 let sidebarOpen = false;
+let showCompletedTasks = true;
 
 document.addEventListener('DOMContentLoaded', () => {
 let db = {};
-const colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
-const getNewSemesterData = () => ({ courses: [], teachers: [], subjects: [], schedule: [], currentCollege: 'Moss Vale', staffNotes: {}, tasks: [] });
+const defaultColleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
+const getNewSemesterData = (collegesList = null, config = {}) => ({ 
+    courses: [], 
+    teachers: [], 
+    subjects: [], 
+    schedule: [], 
+    currentCollege: (collegesList && collegesList[0]) || 'Moss Vale', 
+    colleges: collegesList || [...defaultColleges],
+    config: { startTime: 8, endTime: 18, ...config },
+    staffNotes: {}, 
+    tasks: [] 
+});
 
 const saveData = () => localStorage.setItem('timetableDataV2', JSON.stringify(db));
 const loadData = () => {
@@ -274,6 +305,8 @@ const savedData = localStorage.getItem('timetableDataV2');
 if (savedData) {
 db = JSON.parse(savedData);
 Object.keys(db.semesters).forEach(semKey => {
+if (!db.semesters[semKey].colleges) db.semesters[semKey].colleges = [...defaultColleges];
+if (!db.semesters[semKey].config) db.semesters[semKey].config = { startTime: 8, endTime: 18 };
 if (db.semesters[semKey].subjects) {
 db.semesters[semKey].subjects.forEach(subj => {
 if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
@@ -305,7 +338,7 @@ document.body.appendChild(link);
 link.click();
 document.body.removeChild(link);
 URL.revokeObjectURL(url);
-alert('Data exported successfully!');
+alert('✅ Data exported successfully!');
 };
 
 const importData = () => {
@@ -325,9 +358,11 @@ if (!importedData.semesters || !importedData.currentSemester) {
 throw new Error('Invalid data format. Missing semesters or currentSemester.');
 }
 
-if (confirm('This will replace all your current data. Are you sure?')) {
+if (confirm('⚠️ This will replace all your current data. Are you sure?')) {
 db = importedData;
 Object.keys(db.semesters).forEach(semKey => {
+if (!db.semesters[semKey].colleges) db.semesters[semKey].colleges = [...defaultColleges];
+if (!db.semesters[semKey].config) db.semesters[semKey].config = { startTime: 8, endTime: 18 };
 if (db.semesters[semKey].subjects) {
 db.semesters[semKey].subjects.forEach(subj => {
 if (!subj.DeliveryMode) subj.DeliveryMode = 'Face-to-Face';
@@ -342,10 +377,10 @@ db.semesters[semKey].tasks = [];
 });
 saveData();
 processAndRenderAll();
-alert('Data imported successfully!');
+alert('✅ Data imported successfully!');
 }
 } catch (error) {
-alert(`Error importing data: ${error.message}`);
+alert(`❌ Error importing data: ${error.message}`);
 }
 };
 reader.readAsText(file);
@@ -363,7 +398,10 @@ db.semesters['Default Semester'] = getNewSemesterData();
 db.currentSemester = 'Default Semester';
 }
 }
-return db.semesters[db.currentSemester];
+const data = db.semesters[db.currentSemester];
+if(!data.colleges) data.colleges = [...defaultColleges];
+if(!data.config) data.config = { startTime: 8, endTime: 18 };
+return data;
 };
 
 const collegeTabsContainer = document.getElementById('college-tabs-container');
@@ -447,7 +485,12 @@ document.getElementById('importDataBtn').addEventListener('click', importData);
 document.getElementById('addTaskBtn').addEventListener('click', openTaskModal);
 document.getElementById('closeTaskModalBtn').addEventListener('click', () => taskModal.classList.remove('active'));
 document.getElementById('cancelTaskBtn').addEventListener('click', () => taskModal.classList.remove('active'));
-  document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
+document.getElementById('hideCompletedToggle').addEventListener('change', (e) => {
+    showCompletedTasks = !e.target.checked;
+    renderTasksView();
+});
+
+document.getElementById('addTeacherForm').addEventListener('submit', (e) => {
 e.preventDefault();
 const formData = new FormData(e.target);
 const editIndex = formData.get('editIndex');
@@ -461,6 +504,7 @@ Email: formData.get('Email'),
 HomeCollege: formData.get('HomeCollege'),
 EmploymentType: formData.get('EmploymentType'),
 TotalHours: parseFloat(formData.get('TotalHours')) || 0,
+IsHeadTeacher: formData.has('IsHeadTeacher')
 };
 
 if (editIndex) {
@@ -572,6 +616,7 @@ for (let j = i + 1; j < semesterData.schedule.length; j++) {
 const s1 = semesterData.schedule[i];
 const s2 = semesterData.schedule[j];
 
+// Compare using dynamic college lists
 const sharedColleges = s1.colleges?.filter(c => s2.colleges?.includes(c)) || [];
 if (sharedColleges.length === 0) continue;
 
@@ -600,24 +645,24 @@ function renderSemesterDropdown() {
 const semesterNames = Object.keys(db.semesters).sort();
 let html = '';
 semesterNames.forEach(name => {
-html += `<div class="dropdown-item ${db.currentSemester === name ? 'font-bold text-purple-600' : ''}" onclick="changeSemester('${name}')">${name}</div>`;
+html += `<div class="dropdown-item ${db.currentSemester === name ? 'font-bold text-purple-600' : ''}" onclick="changeSemester('${name}')"><i class="fas fa-calendar-check mr-2 text-gray-400"></i> ${name}</div>`;
 });
 semesterDropdown.innerHTML = html;
 }
 
 function renderViewDropdown() {
 const views = [
-{ value: 'main-timetable', label: 'Main Timetable', icon: 'fa-table-columns' },
-{ value: 'staff-summary', label: 'Staff Summary', icon: 'fa-users' },
-{ value: 'dispute-log', label: 'Dispute Log', icon: 'fa-triangle-exclamation' },
-{ value: 'course-print', label: 'Course Print', icon: 'fa-book' },
-{ value: 'teacher-print', label: 'Teacher Print', icon: 'fa-chalkboard-user' },
-{ value: 'tasks', label: 'Tasks', icon: 'fa-clipboard-list' }
+{ value: 'main-timetable', label: '<i class="fas fa-table fa-fw mr-2 text-blue-500"></i> Main Timetable' },
+{ value: 'staff-summary', label: '<i class="fas fa-users fa-fw mr-2 text-green-500"></i> Staff Summary' },
+{ value: 'dispute-log', label: '<i class="fas fa-exclamation-triangle fa-fw mr-2 text-red-500"></i> Dispute Log' },
+{ value: 'course-print', label: '<i class="fas fa-book fa-fw mr-2 text-purple-500"></i> Course Print' },
+{ value: 'teacher-print', label: '<i class="fas fa-user-tie fa-fw mr-2 text-indigo-500"></i> Teacher Print' },
+{ value: 'tasks', label: '<i class="fas fa-clipboard-check fa-fw mr-2 text-yellow-600"></i> Tasks' }
 ];
 
 let html = '';
 views.forEach(view => {
-html += `<div class="dropdown-item" onclick="changeView('${view.value}')"><i class="fa-solid ${view.icon} mr-2 text-blue-900"></i> ${view.label}</div>`;
+html += `<div class="dropdown-item" onclick="changeView('${view.value}')">${view.label}</div>`;
 });
 viewDropdown.innerHTML = html;
 }
@@ -641,8 +686,9 @@ viewDropdown.classList.remove('show');
 
 function renderCollegeTabs() {
 const currentData = getCurrentSemesterData();
-let tabsHTML = `<button class="college-tab ${currentData.currentCollege === 'Master View' ? 'active' : ''}" data-college="Master View"><i class="fa-solid fa-globe"></i> Master View</button>`;
-tabsHTML += colleges.map(c => `<button class="college-tab ${currentData.currentCollege === c ? 'active' : ''}" data-college="${c}"><i class="fa-solid fa-school"></i> ${c}</button>`).join('');
+const currentColleges = currentData.colleges || defaultColleges;
+let tabsHTML = `<button class="college-tab ${currentData.currentCollege === 'Master View' ? 'active' : ''}" data-college="Master View"><i class="fas fa-globe"></i> Master View</button>`;
+tabsHTML += currentColleges.map(c => `<button class="college-tab ${currentData.currentCollege === c ? 'active' : ''}" data-college="${c}"><i class="fas fa-map-marker-alt"></i> ${c}</button>`).join('');
 collegeTabsContainer.innerHTML = tabsHTML;
 collegeTabsContainer.querySelectorAll('.college-tab').forEach(tab => tab.addEventListener('click', (e) => {
 getCurrentSemesterData().currentCollege = e.currentTarget.dataset.college;
@@ -652,52 +698,131 @@ processAndRenderAll();
 
 function openSemesterModal() {
 const contentEl = document.getElementById('semesterModalContent');
-let contentHTML = `<h3 class="text-lg font-bold mb-2">Existing Semesters</h3><div class="space-y-2 mb-6 border p-2 rounded bg-gray-50 max-h-48 overflow-y-auto">`;
-
 const semesterNames = Object.keys(db.semesters).sort();
-semesterNames.forEach(name => {
-contentHTML += `<div class="flex justify-between items-center p-2 border-b"><span>${name}</span>
-<button class="text-red-500 hover:text-red-700 ${semesterNames.length <= 1 ? 'opacity-50 cursor-not-allowed' : ''}" data-action="delete-semester" data-name="${name}" ${semesterNames.length <= 1 ? 'disabled' : ''}><i class="fa-solid fa-trash"></i> Delete</button></div>`;
-});
-contentHTML += `</div>`;
 
-contentHTML += `<form id="addSemesterForm" class="border-t pt-4">
-<h3 class="text-lg font-bold mb-2">Create New Semester</h3>
-<div class="flex gap-2">
-<input type="text" name="semesterName" placeholder="e.g., Semester 2 2024" class="flex-grow border p-2 rounded" required>
-<button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create</button>
+let contentHTML = `
+<div class="wizard-step">
+<h4>1. Create New Semester</h4>
+<div class="grid grid-cols-1 gap-4">
+<div>
+<label class="block text-sm font-bold mb-1">New Semester Name</label>
+<input type="text" id="newSemName" placeholder="e.g., Semester 2 2025" class="w-full border p-2 rounded">
 </div>
-</form>`;
+<div>
+<label class="block text-sm font-bold mb-1">Copy From (Optional)</label>
+<select id="copySource" class="w-full border p-2 rounded">
+<option value="">-- Start Fresh (Blank) --</option>
+${semesterNames.map(name => `<option value="${name}">${name}</option>`).join('')}
+</select>
+</div>
+</div>
+</div>
+
+<div class="wizard-step">
+<h4>2. Configure Colleges</h4>
+<div class="flex gap-2 mb-2">
+<input type="text" id="newCollegeInput" placeholder="Add College Name" class="border p-2 rounded flex-grow">
+<button id="addCollegeBtn" class="bg-blue-600 text-white px-3 rounded hover:bg-blue-700"><i class="fas fa-plus"></i> Add</button>
+</div>
+<div id="collegeListContainer" class="bg-white p-2 border rounded min-h-[50px]"></div>
+</div>
+
+<div class="wizard-step">
+<h4>3. Timetable Configuration</h4>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-bold mb-1">Start Time (24h)</label>
+<input type="number" id="configStartTime" value="8" min="6" max="20" class="w-full border p-2 rounded">
+</div>
+<div>
+<label class="block text-sm font-bold mb-1">End Time (24h)</label>
+<input type="number" id="configEndTime" value="18" min="12" max="23" class="w-full border p-2 rounded">
+</div>
+</div>
+</div>
+
+<div class="flex justify-between items-center mt-4 pt-4 border-t">
+<div>
+    <h4 class="text-sm font-bold mb-2">Or manage existing:</h4>
+    <div class="flex gap-2">
+        <select id="deleteSource" class="border p-2 rounded text-sm">
+            ${semesterNames.map(name => `<option value="${name}">${name}</option>`).join('')}
+        </select>
+        <button id="deleteSemBtn" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"><i class="fas fa-trash-alt"></i> Delete</button>
+    </div>
+</div>
+<button id="createSemBtn" class="bg-green-600 text-white px-6 py-3 rounded font-bold hover:bg-green-700 text-lg"><i class="fas fa-rocket mr-2"></i> Create Semester</button>
+</div>
+`;
 
 contentEl.innerHTML = contentHTML;
 semesterModal.classList.add('active');
 
-contentEl.querySelector('#addSemesterForm').addEventListener('submit', e => {
-e.preventDefault();
-const newName = e.target.elements.semesterName.value.trim();
-if (newName && !db.semesters[newName]) {
-db.semesters[newName] = getNewSemesterData();
-db.currentSemester = newName;
-semesterModal.classList.remove('active');
-processAndRenderAll();
-} else {
-alert('Semester name is empty or already exists.');
+// Wizard Logic
+let tempColleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
+
+const renderColleges = () => {
+const container = document.getElementById('collegeListContainer');
+container.innerHTML = tempColleges.map((c, i) => 
+`<span class="college-tag">${c} <button onclick="window.removeWizardCollege(${i})">×</button></span>`
+).join('');
+};
+
+document.getElementById('addCollegeBtn').addEventListener('click', () => {
+const val = document.getElementById('newCollegeInput').value.trim();
+if(val && !tempColleges.includes(val)) {
+tempColleges.push(val);
+document.getElementById('newCollegeInput').value = '';
+renderColleges();
 }
 });
 
-contentEl.querySelectorAll('[data-action="delete-semester"]').forEach(btn => {
-btn.addEventListener('click', e => {
-const nameToDelete = e.target.dataset.name;
-if (confirm(`Are you sure you want to delete "${nameToDelete}"? This action cannot be undone.`)) {
-delete db.semesters[nameToDelete];
-if (db.currentSemester === nameToDelete) {
-db.currentSemester = Object.keys(db.semesters)[0];
+window.removeWizardCollege = (index) => {
+tempColleges.splice(index, 1);
+renderColleges();
+};
+
+document.getElementById('createSemBtn').addEventListener('click', () => {
+const newName = document.getElementById('newSemName').value.trim();
+const copySource = document.getElementById('copySource').value;
+const sTime = parseInt(document.getElementById('configStartTime').value) || 8;
+const eTime = parseInt(document.getElementById('configEndTime').value) || 18;
+
+if (!newName) return alert("Please enter a semester name");
+if (db.semesters[newName]) return alert("Semester name already exists");
+if (tempColleges.length === 0) return alert("Please add at least one college");
+
+let newData;
+if (copySource && db.semesters[copySource]) {
+// Deep copy
+newData = JSON.parse(JSON.stringify(db.semesters[copySource]));
+} else {
+newData = getNewSemesterData();
 }
+
+// Apply wizard configs
+newData.colleges = [...tempColleges];
+newData.currentCollege = tempColleges[0];
+newData.config = { startTime: sTime, endTime: eTime };
+
+db.semesters[newName] = newData;
+db.currentSemester = newName;
+semesterModal.classList.remove('active');
+processAndRenderAll();
+alert(`🚀 ${newName} created successfully!`);
+});
+
+document.getElementById('deleteSemBtn').addEventListener('click', () => {
+const name = document.getElementById('deleteSource').value;
+if(confirm(`Delete ${name}? This cannot be undone.`)) {
+delete db.semesters[name];
+if (db.currentSemester === name) db.currentSemester = Object.keys(db.semesters)[0] || '';
 openSemesterModal();
 processAndRenderAll();
 }
 });
-});
+
+renderColleges();
 }
 
 function openTaskModal(taskId = null) {
@@ -729,7 +854,7 @@ return nameA.localeCompare(nameB);
 });
 
 const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-const sortedColleges = [...colleges].sort();
+const sortedColleges = [...semesterData.colleges].sort();
 
 teacherSelect.innerHTML = '<option value="">-- None --</option>' + sortedTeachers.map(t => `<option value="${t.Initials}">${t.Name} ${t.Surname}</option>`).join('');
 courseSelect.innerHTML = '<option value="">-- None --</option>' + sortedCourses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('');
@@ -795,12 +920,17 @@ function renderTasksView() {
 const container = document.getElementById('tasks-container');
 const semesterLabel = document.getElementById('tasksSemesterLabel');
 const semesterData = getCurrentSemesterData();
-const tasks = semesterData.tasks || [];
+let tasks = semesterData.tasks || [];
 
 semesterLabel.textContent = db.currentSemester;
 
+// Filter
+if (!showCompletedTasks) {
+    tasks = tasks.filter(t => t.status !== 'done');
+}
+
 if (tasks.length === 0) {
-container.innerHTML = '<p class="text-center text-gray-500 py-8">No tasks yet. Click "Add New Task" to create one.</p>';
+container.innerHTML = '<p class="text-center text-gray-500 py-8">No tasks found.</p>';
 return;
 }
 
@@ -822,16 +952,17 @@ html += `
 <span class="task-status-badge ${statusClass}">${statusText}</span>
 </div>
 <div class="task-meta">
-<span><i class="fa-solid fa-user mr-1 text-blue-900"></i> ${teacherDisplay}</span>
-<span><i class="fa-solid fa-book mr-1 text-blue-900"></i> ${courseDisplay}</span>
-<span><i class="fa-solid fa-school mr-1 text-blue-900"></i> ${collegeDisplay}</span>
-<span><i class="fa-solid fa-calendar-days mr-1 text-blue-900"></i> ${dueDate}</span>
-<span><i class="fa-solid fa-bullseye mr-1 text-blue-900"></i> ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
+<span><i class="fas fa-user fa-fw mr-1 text-gray-400"></i> ${teacherDisplay}</span>
+<span><i class="fas fa-book fa-fw mr-1 text-gray-400"></i> ${courseDisplay}</span>
+<span><i class="fas fa-university fa-fw mr-1 text-gray-400"></i> ${collegeDisplay}</span>
+<span><i class="fas fa-calendar-alt fa-fw mr-1 text-gray-400"></i> ${dueDate}</span>
+<span><i class="fas fa-bullseye fa-fw mr-1 text-gray-400"></i> ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
 </div>
 ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
 <div class="task-actions">
-<button class="task-edit-btn" onclick="window.editTask(${task.id})"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-<button class="task-delete-btn" onclick="window.deleteTaskFromList(${task.id})"><i class="fa-solid fa-trash"></i> Delete</button>
+<button class="done-btn" onclick="window.toggleTaskStatus(${task.id})" title="Mark as Done"><i class="fas fa-check"></i></button>
+<button class="task-edit-btn" onclick="window.editTask(${task.id})">Edit</button>
+<button class="task-delete-btn" onclick="window.deleteTaskFromList(${task.id})">Delete</button>
 </div>
 </div>
 `;
@@ -839,6 +970,16 @@ ${task.description ? `<div class="task-description">${task.description}</div>` :
 
 container.innerHTML = html;
 }
+
+window.toggleTaskStatus = (taskId) => {
+    const semesterData = getCurrentSemesterData();
+    const task = semesterData.tasks.find(t => t.id === taskId);
+    if(task) {
+        task.status = 'done';
+        saveData();
+        renderTasksView();
+    }
+};
 
 window.editTask = (taskId) => {
 openTaskModal(taskId);
@@ -852,34 +993,11 @@ processAndRenderAll();
 }
 };
 
-// Management Configuration for global handlers
-const MANAGEMENT_FIELDS = {
-    'teachers': ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours'],
-    'courses': ['Code', 'Name'],
-    'subjects': ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']
-};
-
-// Global Management Handlers
-window.handleManagementDelete = (type, index) => {
-    if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
-        const semesterData = getCurrentSemesterData();
-        const dataCollection = semesterData[type];
-        dataCollection.splice(parseInt(index, 10), 1);
-        
-        const capitalType = type.charAt(0).toUpperCase() + type.slice(1);
-        const data = dataCollection;
-        const fields = MANAGEMENT_FIELDS[type];
-
-        openManagementModal(capitalType, data, fields);
-        processAndRenderAll();
-    }
-};
-
-window.handleManagementEdit = (type, index) => {
+// ROBUST GLOBAL HANDLERS FOR MANAGEMENT ACTIONS
+window.handleEdit = (type, index) => {
     const semesterData = getCurrentSemesterData();
     const dataCollection = semesterData[type];
     const item = dataCollection[parseInt(index, 10)];
-    const capitalType = type.charAt(0).toUpperCase() + type.slice(1);
 
     if (type === 'teachers') {
         document.getElementById('addTeacherModal').classList.add('active');
@@ -888,11 +1006,17 @@ window.handleManagementEdit = (type, index) => {
         document.querySelector('#addTeacherForm input[name="Surname"]').value = item.Surname;
         document.querySelector('#addTeacherForm input[name="Initials"]').value = item.Initials;
         document.querySelector('#addTeacherForm input[name="Email"]').value = item.Email;
-        document.querySelector('#addTeacherForm select[name="HomeCollege"]').value = item.HomeCollege;
         document.querySelector('#addTeacherForm select[name="EmploymentType"]').value = item.EmploymentType;
         document.querySelector('#addTeacherForm input[name="TotalHours"]').value = item.TotalHours;
         document.querySelector('#addTeacherForm input[name="editIndex"]').value = index;
+        document.querySelector('#addTeacherForm input[name="IsHeadTeacher"]').checked = item.IsHeadTeacher || false;
+        
+        // Dynamic Home College Dropdown
+        const collegeSelect = document.getElementById('teacherHomeCollegeSelect');
+        collegeSelect.innerHTML = semesterData.colleges.map(c => `<option value="${c}" ${c === item.HomeCollege ? 'selected' : ''}>${c}</option>`).join('');
+        
     } else {
+        // Logic for non-teacher editing (Subjects/Courses)
         const form = document.getElementById('addForm');
         if (form) {
             for (const key in item) {
@@ -906,268 +1030,254 @@ window.handleManagementEdit = (type, index) => {
                 }
             }
             form.querySelector('[name="editIndex"]').value = index;
-            form.querySelector('button[type="submit"]').textContent = `Update ${capitalType.slice(0, -1)}`;
+            const btn = form.querySelector('button[type="submit"]');
+            if(btn) btn.textContent = `Update ${type.slice(0, -1)}`;
             const cancelBtn = document.getElementById('cancelEditBtn');
             if (cancelBtn) cancelBtn.style.display = 'block';
         }
     }
 };
 
-function openManagementModal(title, data, fields) {
-    document.getElementById('modalTitle').textContent = `Manage ${title}`;
-    const addItemBtn = document.getElementById('addItemBtn');
-    
-    // Reset addItemBtn handler to prevent stacking
-    addItemBtn.onclick = null;
-
-    if (title === 'Subjects') {
-        addItemBtn.style.display = 'none';
+window.handleDelete = (type, index) => {
+    if (confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
         const semesterData = getCurrentSemesterData();
-        if (!selectedCourseForSubjects && semesterData.courses.length > 0) {
-            selectedCourseForSubjects = semesterData.courses[0].Code;
-        }
-
-        const renderSubjectsModal = () => {
-            const filteredSubjects = data.filter(s => s.CourseCode === selectedCourseForSubjects);
-            const sortedSubjects = [...filteredSubjects].sort((a, b) => {
-                const subjectA = (a.Subject || '').toLowerCase();
-                const subjectB = (b.Subject || '').toLowerCase();
-                return subjectA.localeCompare(subjectB);
-            });
-
-            let contentHTML = `<div style="display: flex; gap: 1.5rem;">`;
-            contentHTML += `<div style="flex: 0 0 30%; background: #f9fafb; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
-            <h3 class="text-lg font-bold mb-3">Courses</h3>
-            <div class="space-y-2">`;
-
-            const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-            sortedCourses.forEach(course => {
-                const isActive = course.Code === selectedCourseForSubjects;
-                contentHTML += `<div class="course-list-item ${isActive ? 'active' : ''}" data-course-code="${course.Code}">
-                <div class="font-bold">${course.Code}</div>
-                <div class="text-sm text-gray-600">${course.Name}</div>
-                </div>`;
-            });
-
-            contentHTML += `</div></div>`;
-            contentHTML += `<div style="flex: 1;">`;
-            contentHTML += `<div class="management-table-wrapper"><table class="management-table"><thead><tr><th>Subject</th><th>Color</th><th>Units</th><th>Compulsory</th><th>Delivery</th><th>Actions</th></tr></thead><tbody>`;
-
-            sortedSubjects.forEach((item) => {
-                const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold text-xs">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">No</span>';
-                const deliveryMode = item.DeliveryMode || 'Face-to-Face';
-                const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold text-xs">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold text-xs">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">F2F</span>');
-                const originalIndex = data.indexOf(item);
-                contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('subjects', ${originalIndex})"><i class="fa-solid fa-pen-to-square"></i> Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('subjects', ${originalIndex})"><i class="fa-solid fa-trash"></i> Delete</button></div></td></tr>`;
-            });
-
-            contentHTML += `</tbody></table></div>`;
-
-            const formHTML = `<div class="management-form-section">
-            <h3>Add / Edit Subject for ${selectedCourseForSubjects}</h3>
-            <form id="addForm" class="space-y-4">
-            <div class="form-grid">
-            <div class="form-group"><label>Subject</label><input type="text" name="Subject" required></div>
-            <div class="form-group"><label>Color</label><input type="color" name="Color" required></div>
-            <div class="form-group"><label>Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" required></div>
-            <div class="form-group"><label><input type="checkbox" name="Compulsory"> Mark as Compulsory</label></div>
-            <div class="form-group"><label>Delivery Mode</label><select name="DeliveryMode" required><option value="Face-to-Face">Face-to-Face</option><option value="Online">Online</option><option value="Blended">Blended</option></select></div>
-            </div>
-            <input type="hidden" name="editIndex">
-            <input type="hidden" name="CourseCode" value="${selectedCourseForSubjects}">
-            <div class="form-actions">
-            <button type="submit" class="form-btn form-btn-submit">Add Subject</button>
-            <button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;">Cancel Edit</button>
-            </div>
-            </form>
-            </div>`;
-
-            contentHTML += formHTML;
-            contentHTML += `</div></div>`;
-
-            document.getElementById('modalContent').innerHTML = contentHTML;
-            managementModal.classList.add('active');
-
-            const form = document.getElementById('addForm');
-            const cancelBtn = document.getElementById('cancelEditBtn');
-
-            cancelBtn.addEventListener('click', () => {
-                form.reset();
-                form.querySelector('[name="editIndex"]').value = '';
-                form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
-                form.querySelector('button[type="submit"]').textContent = 'Add Subject';
-                cancelBtn.style.display = 'none';
-            });
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const editIndex = formData.get('editIndex');
-
-                const subjectData = {
-                    Subject: formData.get('Subject'),
-                    CourseCode: selectedCourseForSubjects,
-                    Color: formData.get('Color'),
-                    Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
-                    Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on',
-                    DeliveryMode: formData.get('DeliveryMode') || 'Face-to-Face'
-                };
-
-                if (editIndex) {
-                    data[parseInt(editIndex, 10)] = subjectData;
-                } else {
-                    data.push(subjectData);
-                }
-                openManagementModal('Subjects', data, fields);
-                processAndRenderAll();
-            });
-
-            document.querySelectorAll('.course-list-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    selectedCourseForSubjects = e.currentTarget.dataset.courseCode;
-                    renderSubjectsModal();
-                });
-            });
-        };
-
-        renderSubjectsModal();
-        return;
+        semesterData[type].splice(parseInt(index, 10), 1);
+        
+        // For robust re-rendering, we'll trigger a dedicated refresh.
+        if(type==='teachers') document.getElementById('manageTeachersBtn').click();
+        else if(type==='courses') document.getElementById('manageCoursesBtn').click();
+        else if(type==='subjects') document.getElementById('manageSubjectsBtn').click();
+        processAndRenderAll();
     }
+};
 
-    let displayData = data;
-    if (title === 'Teachers') {
-        addItemBtn.style.display = 'flex';
-        addItemBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Teacher';
-        addItemBtn.onclick = () => {
-            document.getElementById('addTeacherModal').classList.add('active');
-            document.getElementById('addTeacherForm').reset();
-            document.querySelector('#addTeacherForm input[name="editIndex"]').value = '';
-            document.querySelector('#addTeacherForm input[name="Initials"]').value = '';
-        };
+function openManagementModal(title, data, fields) {
+document.getElementById('modalTitle').innerHTML = `<i class="fas fa-cog text-blue-900"></i> Manage ${title}`;
+const addItemBtn = document.getElementById('addItemBtn');
 
-        displayData = [...data].sort((a, b) => {
-            const surnameA = (a.Surname || '').toLowerCase();
-            const surnameB = (b.Surname || '').toLowerCase();
-            if (surnameA < surnameB) return -1;
-            if (surnameA > surnameB) return 1;
-            const nameA = (a.Name || '').toLowerCase();
-            const nameB = (b.Name || '').toLowerCase();
-            if (nameA < nameB) return -1;
-            if (nameA > nameB) return 1;
-            return 0;
-        });
-    } else if (title === 'Courses') {
-        addItemBtn.style.display = 'flex';
-        addItemBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Course';
-        addItemBtn.onclick = () => {
-            const form = document.getElementById('addForm');
-            if (form) {
-                form.reset();
-                form.querySelector('[name="editIndex"]').value = '';
-                form.querySelector('button[type="submit"]').textContent = 'Add Course';
-                const cancelBtn = document.getElementById('cancelEditBtn');
-                if (cancelBtn) cancelBtn.style.display = 'none';
-            }
-        };
-        displayData = [...data].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-    }
+if (title === 'Subjects') {
+addItemBtn.style.display = 'none';
+const semesterData = getCurrentSemesterData();
+if (!selectedCourseForSubjects && semesterData.courses.length > 0) {
+selectedCourseForSubjects = semesterData.courses[0].Code;
+}
 
-    let contentHTML = `<div class="management-table-wrapper"><table class="management-table"><thead><tr>`;
-    contentHTML += fields.map(f => `<th>${f}</th>`).join('') + `<th>Actions</th></tr></thead><tbody>`;
-    displayData.forEach((item, index) => {
-        const originalIndex = data.indexOf(item);
-        const type = title.toLowerCase();
-        contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleManagementEdit('${type}', ${originalIndex})"><i class="fa-solid fa-pen-to-square"></i> Edit</button><button class="action-btn delete-btn" onclick="window.handleManagementDelete('${type}', ${originalIndex})"><i class="fa-solid fa-trash"></i> Delete</button></div></td></tr>`;
-    });
-    contentHTML += `</tbody></table></div>`;
+const renderSubjectsModal = () => {
+const filteredSubjects = data.filter(s => s.CourseCode === selectedCourseForSubjects);
+const sortedSubjects = [...filteredSubjects].sort((a, b) => {
+const subjectA = (a.Subject || '').toLowerCase();
+const subjectB = (b.Subject || '').toLowerCase();
+return subjectA.localeCompare(subjectB);
+});
 
-    let formHTML = '';
-    if (title !== 'Teachers') {
-        formHTML = `<div class="management-form-section">
-        <h3>Add / Edit ${title.slice(0, -1)}</h3>
-        <form id="addForm" class="space-y-4">
-        <div class="form-grid">
-        ${fields.map(f => `<div class="form-group"><label>${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" required></div>`).join('')}
-        </div>
-        <input type="hidden" name="editIndex">
-        <div class="form-actions">
-        <button type="submit" class="form-btn form-btn-submit">Add ${title.slice(0, -1)}</button>
-        <button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;">Cancel Edit</button>
-        </div>
-        </form>
-        </div>`;
-    }
+let contentHTML = `<div style="display: flex; gap: 1.5rem;">`;
 
-    document.getElementById('modalContent').innerHTML = contentHTML + formHTML;
-    managementModal.classList.add('active');
+contentHTML += `<div style="flex: 0 0 30%; background: #f9fafb; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
+<h3 class="text-lg font-bold mb-3"><i class="fas fa-book-open mr-2"></i> Courses</h3>
+<div class="space-y-2">`;
 
-    const form = document.getElementById('addForm');
-    const cancelBtn = document.getElementById('cancelEditBtn');
+const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
+sortedCourses.forEach(course => {
+const isActive = course.Code === selectedCourseForSubjects;
+contentHTML += `<div class="course-list-item ${isActive ? 'active' : ''}" data-course-code="${course.Code}">
+<div class="font-bold">${course.Code}</div>
+<div class="text-sm text-gray-600">${course.Name}</div>
+</div>`;
+});
 
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-            form.reset();
-            form.querySelector('[name="editIndex"]').value = '';
-            form.querySelector('button[type="submit"]').textContent = `Add ${title.slice(0, -1)}`;
-            cancelBtn.style.display = 'none';
-            if (title === 'Teachers') {
-                const initialsInput = form.querySelector('input[name="Initials"]');
-                initialsInput.value = '';
-            }
-        });
-    }
+contentHTML += `</div></div>`;
 
-    if (title === 'Teachers') {
-        const nameInput = form.querySelector('input[name="Name"]');
-        const surnameInput = form.querySelector('input[name="Surname"]');
-        const initialsInput = form.querySelector('input[name="Initials"]');
-        const updateInitials = () => {
-            const firstInitial = nameInput.value.trim()[0]?.toUpperCase() || '';
-            const secondInitial = surnameInput.value.trim()[0]?.toUpperCase() || '';
-            initialsInput.value = `${firstInitial}${secondInitial}`;
-        };
-        nameInput.addEventListener('input', updateInitials);
-        surnameInput.addEventListener('input', updateInitials);
-    }
+contentHTML += `<div style="flex: 1;">`;
 
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const editIndex = formData.get('editIndex');
-            const semesterData = getCurrentSemesterData();
+contentHTML += `<div class="management-table-wrapper"><table class="management-table"><thead><tr><th>Subject</th><th>Color</th><th>Units</th><th>Compulsory</th><th>Delivery</th><th>Actions</th></tr></thead><tbody>`;
 
-            if (title === 'Teachers') {
-                const teacherData = {
-                    Name: formData.get('Name'),
-                    Surname: formData.get('Surname'),
-                    Initials: formData.get('Initials'),
-                    Email: formData.get('Email'),
-                    HomeCollege: formData.get('HomeCollege'),
-                    EmploymentType: formData.get('EmploymentType'),
-                    TotalHours: parseFloat(formData.get('TotalHours')) || 0,
-                };
-                if (editIndex) {
-                    semesterData.teachers[parseInt(editIndex, 10)] = teacherData;
-                } else {
-                    semesterData.teachers.push(teacherData);
-                }
-            } else {
-                const newItem = {};
-                fields.forEach(f => {
-                    const value = formData.get(f)
-                    newItem[f] = f === 'Units' ? (value ? value.split(',').map(u => u.trim()).filter(Boolean) : []) : value
-                });
-                if (editIndex) {
-                    data[parseInt(editIndex, 10)] = newItem;
-                } else {
-                    data.push(newItem);
-                }
-            }
-            openManagementModal(title, data, fields);
-            processAndRenderAll();
-        });
-    }
+sortedSubjects.forEach((item) => {
+const compulsoryBadge = item.Compulsory ? '<span class="bg-yellow-300 text-black px-2 py-1 rounded font-bold text-xs">Yes</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">No</span>';
+const deliveryMode = item.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = deliveryMode === 'Online' ? '<span class="bg-blue-500 text-white px-2 py-1 rounded font-bold text-xs">Online</span>' : (deliveryMode === 'Blended' ? '<span class="bg-blue-400 text-white px-2 py-1 rounded font-bold text-xs">Blended</span>' : '<span class="bg-gray-300 text-black px-2 py-1 rounded text-xs">F2F</span>');
+const originalIndex = data.indexOf(item);
+// USING GLOBAL HANDLERS HERE
+contentHTML += `<tr><td><span class="color-circle" style="background-color: ${item.Color};"></span>${item.Subject}</td><td>${item.Color}</td><td>${Array.isArray(item.Units) ? item.Units.join(', ') : (item.Units || '')}</td><td>${compulsoryBadge}</td><td>${deliveryBadge}</td><td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleEdit('subjects', ${originalIndex})"><i class="fas fa-edit"></i> Edit</button><button class="action-btn delete-btn" onclick="window.handleDelete('subjects', ${originalIndex})"><i class="fas fa-trash-alt"></i> Delete</button></div></td></tr>`;
+});
+
+contentHTML += `</tbody></table></div>`;
+
+const formHTML = `<div class="management-form-section">
+<h3><i class="fas fa-edit mr-2"></i> Add / Edit Subject for ${selectedCourseForSubjects}</h3>
+<form id="addForm" class="space-y-4">
+<div class="form-grid">
+<div class="form-group"><label>Subject</label><input type="text" name="Subject" required></div>
+<div class="form-group"><label>Color</label><input type="color" name="Color" required></div>
+<div class="form-group"><label>Units</label><input type="text" name="Units" placeholder="Unit1, Unit2" required></div>
+<div class="form-group"><label><input type="checkbox" name="Compulsory"> Mark as Compulsory</label></div>
+<div class="form-group"><label>Delivery Mode</label><select name="DeliveryMode" required><option value="Face-to-Face">Face-to-Face</option><option value="Online">Online</option><option value="Blended">Blended</option></select></div>
+</div>
+<input type="hidden" name="editIndex">
+<input type="hidden" name="CourseCode" value="${selectedCourseForSubjects}">
+<div class="form-actions">
+<button type="submit" class="form-btn form-btn-submit"><i class="fas fa-plus"></i> Add Subject</button>
+<button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;"><i class="fas fa-times"></i> Cancel Edit</button>
+</div>
+</form>
+</div>`;
+
+contentHTML += formHTML;
+contentHTML += `</div></div>`;
+
+document.getElementById('modalContent').innerHTML = contentHTML;
+managementModal.classList.add('active');
+
+const form = document.getElementById('addForm');
+const cancelBtn = document.getElementById('cancelEditBtn');
+
+cancelBtn.addEventListener('click', () => {
+form.reset();
+form.querySelector('[name="editIndex"]').value = '';
+form.querySelector('[name="CourseCode"]').value = selectedCourseForSubjects;
+form.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add Subject';
+cancelBtn.style.display = 'none';
+});
+
+form.addEventListener('submit', (e) => {
+e.preventDefault();
+const formData = new FormData(e.target);
+const editIndex = formData.get('editIndex');
+
+const subjectData = {
+Subject: formData.get('Subject'),
+CourseCode: selectedCourseForSubjects,
+Color: formData.get('Color'),
+Units: formData.get('Units') ? formData.get('Units').split(',').map(u => u.trim()).filter(Boolean) : [],
+Compulsory: formData.has('Compulsory') && formData.get('Compulsory') === 'on',
+DeliveryMode: formData.get('DeliveryMode') || 'Face-to-Face'
+};
+
+if (editIndex) {
+data[parseInt(editIndex, 10)] = subjectData;
+} else {
+data.push(subjectData);
+}
+openManagementModal('Subjects', data, fields);
+processAndRenderAll();
+});
+
+document.querySelectorAll('.course-list-item').forEach(item => {
+item.addEventListener('click', (e) => {
+selectedCourseForSubjects = e.currentTarget.dataset.courseCode;
+renderSubjectsModal();
+});
+});
+
+};
+
+renderSubjectsModal();
+return;
+}
+
+let displayData = data;
+if (title === 'Teachers') {
+addItemBtn.style.display = 'block';
+addItemBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add Teacher';
+addItemBtn.onclick = () => {
+document.getElementById('addTeacherModal').classList.add('active');
+document.getElementById('addTeacherForm').reset();
+document.querySelector('#addTeacherForm input[name="editIndex"]').value = '';
+document.querySelector('#addTeacherForm input[name="Initials"]').value = '';
+// Populate dynamic colleges
+const semesterData = getCurrentSemesterData();
+const collegeSelect = document.getElementById('teacherHomeCollegeSelect');
+collegeSelect.innerHTML = semesterData.colleges.map(c => `<option value="${c}">${c}</option>`).join('');
+};
+
+displayData = [...data].sort((a, b) => {
+const surnameA = (a.Surname || '').toLowerCase();
+const surnameB = (b.Surname || '').toLowerCase();
+if (surnameA < surnameB) return -1;
+if (surnameA > surnameB) return 1;
+const nameA = (a.Name || '').toLowerCase();
+const nameB = (b.Name || '').toLowerCase();
+if (nameA < nameB) return -1;
+if (nameA > nameB) return 1;
+return 0;
+});
+} else if (title === 'Courses') {
+addItemBtn.style.display = 'block';
+addItemBtn.innerHTML = '<i class="fas fa-plus"></i> Add Course';
+addItemBtn.onclick = () => {
+const form = document.getElementById('addForm');
+if (form) {
+form.reset();
+form.querySelector('[name="editIndex"]').value = '';
+form.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-plus"></i> Add Course';
+const cancelBtn = document.getElementById('cancelEditBtn');
+if (cancelBtn) cancelBtn.style.display = 'none';
+}
+};
+displayData = [...data].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
+}
+
+let contentHTML = `<div class="management-table-wrapper"><table class="management-table"><thead><tr>`;
+contentHTML += fields.map(f => `<th>${f}</th>`).join('') + `<th>Actions</th></tr></thead><tbody>`;
+displayData.forEach((item, index) => {
+const originalIndex = data.indexOf(item);
+// Using correct lower case type key for teachers/courses
+const typeKey = title.toLowerCase(); 
+contentHTML += `<tr>${fields.map(f => `<td>${Array.isArray(item[f]) ? item[f].join(', ') : (item[f] || '')}</td>`).join('')}<td><div class="action-buttons"><button class="action-btn edit-btn" onclick="window.handleEdit('${typeKey}', ${originalIndex})"><i class="fas fa-edit"></i> Edit</button><button class="action-btn delete-btn" onclick="window.handleDelete('${typeKey}', ${originalIndex})"><i class="fas fa-trash-alt"></i> Delete</button></div></td></tr>`;
+});
+contentHTML += `</tbody></table></div>`;
+
+let formHTML = '';
+if (title !== 'Teachers') {
+formHTML = `<div class="management-form-section">
+<h3><i class="fas fa-edit mr-2"></i> Add / Edit ${title.slice(0, -1)}</h3>
+<form id="addForm" class="space-y-4">
+<div class="form-grid">
+${fields.map(f => `<div class="form-group"><label>${f}</label><input type="${f.toLowerCase().includes('color') ? 'color' : 'text'}" name="${f}" placeholder="${f === 'Units' ? 'Unit1, Unit2' : ''}" required></div>`).join('')}
+</div>
+<input type="hidden" name="editIndex">
+<div class="form-actions">
+<button type="submit" class="form-btn form-btn-submit"><i class="fas fa-plus"></i> Add ${title.slice(0, -1)}</button>
+<button type="button" id="cancelEditBtn" class="form-btn form-btn-cancel" style="display: none;"><i class="fas fa-times"></i> Cancel Edit</button>
+</div>
+</form>
+</div>`;
+}
+
+document.getElementById('modalContent').innerHTML = contentHTML + formHTML;
+managementModal.classList.add('active');
+
+const form = document.getElementById('addForm');
+const cancelBtn = document.getElementById('cancelEditBtn');
+
+if (cancelBtn) {
+cancelBtn.addEventListener('click', () => {
+form.reset();
+form.querySelector('[name="editIndex"]').value = '';
+form.querySelector('button[type="submit"]').innerHTML = `<i class="fas fa-plus"></i> Add ${title.slice(0, -1)}`;
+cancelBtn.style.display = 'none';
+});
+}
+
+// Only for courses since Teachers uses separate modal
+if (title === 'Courses') {
+form.addEventListener('submit', (e) => {
+e.preventDefault();
+const formData = new FormData(e.target);
+const editIndex = formData.get('editIndex');
+const newItem = {};
+fields.forEach(f => {
+const value = formData.get(f)
+newItem[f] = f === 'Units' ? (value ? value.split(',').map(u => u.trim()).filter(Boolean) : []) : value
+});
+if (editIndex) {
+data[parseInt(editIndex, 10)] = newItem;
+} else {
+data.push(newItem);
+}
+openManagementModal(title, data, fields);
+processAndRenderAll();
+});
+}
 }
 
 const renderers = { 'main-timetable': renderMainTimetableView, 'staff-summary': renderStaffSummaryView, 'dispute-log': renderDisputeLogView, 'course-print': renderCoursePrintView, 'teacher-print': renderTeacherPrintView, 'tasks': renderTasksView };
@@ -1185,7 +1295,7 @@ secondarySelectorsContainer.innerHTML = '';
 if (selectedView === 'course-print') {
 if (semesterData.courses.length > 0) {
 const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn"><i class="fa-solid fa-book mr-2"></i> Course <i class="fa-solid fa-caret-down ml-1"></i></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn"><i class="fas fa-book mr-2"></i> Course <i class="fas fa-chevron-down ml-1 text-xs opacity-75"></i></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('courseDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
@@ -1205,7 +1315,7 @@ const nameA = (a.Name || '').toLowerCase();
 const nameB = (b.Name || '').toLowerCase();
 return nameA.localeCompare(nameB);
 });
-let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn"><i class="fa-solid fa-chalkboard-user mr-2"></i> Teacher <i class="fa-solid fa-caret-down ml-1"></i></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
+let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="teacherDropdownBtn"><i class="fas fa-user-tie mr-2"></i> Teacher <i class="fas fa-chevron-down ml-1 text-xs opacity-75"></i></button><div class="dropdown-content" id="teacherDropdown">${sortedTeachers.map(t => `<div class="dropdown-item" onclick="selectTeacher('${t.Initials}')">${t.Name} ${t.Surname}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
 document.getElementById('teacherDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
@@ -1219,13 +1329,11 @@ document.getElementById('teacherDropdown').classList.toggle('show');
 }
   
 window.selectCourse = (courseCode) => {
-window.appState.selectedCourse = courseCode;
 renderCoursePrintView(courseCode);
 document.getElementById('courseDropdown').classList.remove('show');
 };
 
 window.selectTeacher = (teacherInitials) => {
-window.appState.selectedTeacher = teacherInitials;
 renderTeacherPrintView(teacherInitials);
 document.getElementById('teacherDropdown').classList.remove('show');
 };
@@ -1274,9 +1382,13 @@ function renderMainTimetableView() {
 const grid = document.getElementById('main-timetable-grid');
 const titleEl = document.getElementById('main-timetable-title');
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const startTime = 8, endTime = 18, slotHeight = 30;
-const totalRows = (endTime - startTime) * 2;
 const semesterData = getCurrentSemesterData();
+
+// Use dynamic config or defaults
+const startTime = semesterData.config?.startTime || 8;
+const endTime = semesterData.config?.endTime || 18;
+const slotHeight = 30;
+const totalRows = (endTime - startTime) * 2;
 
 titleEl.textContent = `${semesterData.currentCollege} Timetable - ${db.currentSemester}`;
 
@@ -1350,10 +1462,10 @@ e.preventDefault();
 e.stopPropagation();
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 let menuHTML = `
-<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})"><i class="fa-solid fa-copy"></i> Duplicate to Same Day</div>
-<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})"><i class="fa-solid fa-calendar-plus"></i> Duplicate to Another Day</div>
-<div class="context-menu-item" onclick="editSessionFromContext(${session.id})"><i class="fa-solid fa-pen-to-square"></i> Edit Session</div>
-<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})"><i class="fa-solid fa-trash"></i> Delete Session</div>
+<div class="context-menu-item" onclick="duplicateSessionSameDay(${session.id})"><i class="fas fa-clone fa-fw mr-2 text-blue-400"></i> Duplicate to Same Day</div>
+<div class="context-menu-item" onclick="openDuplicateDayModal(${session.id})"><i class="fas fa-calendar-plus fa-fw mr-2 text-green-400"></i> Duplicate to Another Day</div>
+<div class="context-menu-item" onclick="editSessionFromContext(${session.id})"><i class="fas fa-edit fa-fw mr-2 text-yellow-400"></i> Edit Session</div>
+<div class="context-menu-item" onclick="deleteSessionFromContext(${session.id})"><i class="fas fa-trash-alt fa-fw mr-2 text-red-400"></i> Delete Session</div>
 `;
 contextMenu.innerHTML = menuHTML;
 contextMenu.classList.add('active');
@@ -1380,7 +1492,7 @@ if (!session) return;
 
 let contentHTML = '<h3 class="text-lg font-bold mb-4">Select a day to duplicate to:</h3><div class="space-y-2">';
 days.forEach(day => {
-contentHTML += `<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold" onclick="duplicateSessionToDay(${sessionId}, '${day}')">${day}</button>`;
+contentHTML += `<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" onclick="duplicateSessionToDay(${sessionId}, '${day}')"><i class="fas fa-calendar-day mr-2 text-gray-500"></i> ${day}</button>`;
 });
 contentHTML += '</div>';
 document.getElementById('duplicateDayContent').innerHTML = contentHTML;
@@ -1457,8 +1569,10 @@ document.removeEventListener('mouseup', onMouseUp);
 const selected = grid.querySelectorAll('.slot-selected');
 if (selected.length > 0) {
 const day = selected[0].dataset.day, startTime = selected[0].dataset.time;
+const semesterData = getCurrentSemesterData();
+const gridStart = semesterData.config?.startTime || 8;
 const lastSlotIndex = parseInt(selected[selected.length - 1].dataset.slotIndex, 10);
-const endMinutes = (8 * 60) + ((lastSlotIndex + 1) * 30);
+const endMinutes = (gridStart * 60) + ((lastSlotIndex + 1) * 30);
 const endTime = `${Math.floor(endMinutes / 60).toString().padStart(2, '0')}:${(endMinutes % 60).toString().padStart(2, '0')}`;
 openSessionModal(null, day, startTime, endTime);
 }
@@ -1521,8 +1635,10 @@ const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
 const timeSlot = dropTarget?.closest('.time-slot');
 
 if (timeSlot) {
+const semesterData = getCurrentSemesterData();
+const gridStart = semesterData.config?.startTime || 8;
 const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
-const startMins = (8 * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
+const startMins = (gridStart * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
 const endMins = startMins + duration;
 const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
 session.Day = timeSlot.dataset.day;
@@ -1561,14 +1677,14 @@ document.addEventListener('mouseup', onMouseUp);
 function openSessionModal(session, day = null, startTime = null, endTime = null) {
 sessionForm.reset();
 const semesterData = getCurrentSemesterData();
-document.getElementById('sessionModalTitle').textContent = session ? 'Edit Session' : 'Add New Session';
+document.getElementById('sessionModalTitle').innerHTML = session ? '<i class="fas fa-edit mr-2"></i> Edit Session' : '<i class="fas fa-plus mr-2"></i> Add New Session';
 document.getElementById('sessionId').value = session?.id || '';
 document.getElementById('sessionDay').value = session?.Day || day;
 document.getElementById('sessionStartTime').value = session?.ClassStart || startTime;
 document.getElementById('sessionEndTime').value = session?.ClassEnd || endTime || '';
 document.getElementById('sessionRoom').value = session?.Room || '';
 document.getElementById('sessionNotes').value = session?.notes || '';
-document.getElementById('deleteSessionBtn').style.display = session ? 'block' : 'none';
+document.getElementById('deleteSessionBtn').style.display = session ? 'flex' : 'none';
 
 const courseSelect = document.getElementById('sessionCourse');
 const subjectSelect = document.getElementById('sessionSubject');
@@ -1602,10 +1718,10 @@ return 0;
 teacherSelect.innerHTML = '<option value="">-- Unassigned --</option>' + sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
 teacher2Select.innerHTML = `<option value="">-- None --</option>` + sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials2 === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
 
-const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
-collegeCheckboxes.forEach(cb => {
-cb.checked = session?.colleges?.includes(cb.value) || (!session && cb.value === semesterData.currentCollege);
-});
+const checkboxesContainer = document.getElementById('sessionCollegeCheckboxes');
+checkboxesContainer.innerHTML = semesterData.colleges.map(c => `
+<label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="${c}" ${session?.colleges?.includes(c) || (!session && c === semesterData.currentCollege) ? 'checked' : ''} class="w-4 h-4"> ${c}</label>
+`).join('');
 
 document.getElementById('sessionModal').classList.add('active');
 }
@@ -1737,194 +1853,192 @@ container.innerHTML = contentHTML;
 }
 
 function renderCoursePrintView(courseCode) {
-    const container = document.getElementById('course-print-view');
-    const semesterData = getCurrentSemesterData();
+const container = document.getElementById('course-print-view');
+const semesterData = getCurrentSemesterData();
 
-    // Use stored course code if available and no explicit code provided
-    if (!courseCode && window.appState.selectedCourse) {
-        // verify it exists in current semester data
-        const exists = semesterData.courses.some(c => c.Code === window.appState.selectedCourse);
-        if (exists) {
-            courseCode = window.appState.selectedCourse;
-        }
-    }
+if (!courseCode && semesterData.courses.length > 0) {
+courseCode = semesterData.courses[0].Code;
+}
 
-    if (!courseCode && semesterData.courses.length > 0) {
-        courseCode = semesterData.courses[0].Code;
-    }
+if (!courseCode) {
+container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
+return;
+}
 
-    // Retrieve teacher state if available to ensure persistence across views too if needed
-    // but Course Print View is course-centric.
+const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
+const scheduleToFilter = semesterData.currentCollege === 'Master View'
+? semesterData.schedule
+: semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
 
-    if (!courseCode) {
-        container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
-        return;
-    }
+let sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
+sessions = sortSessionsChronologically(sessions);
 
-    // Update global state
-    window.appState.selectedCourse = courseCode;
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-    const courseInfo = semesterData.courses.find(c => c.Code === courseCode);
-    const scheduleToFilter = semesterData.currentCollege === 'Master View'
-        ? semesterData.schedule
-        : semesterData.schedule.filter(s => s.colleges?.includes(semesterData.currentCollege));
+const timeSlots = new Set();
+sessions.forEach(s => {
+timeSlots.add(`${s.ClassStart}-${s.ClassEnd}`);
+});
 
-    let sessions = scheduleToFilter.filter(s => s.CourseCode === courseCode);
-    sessions = sortSessionsChronologically(sessions);
+const sortedTimeSlots = Array.from(timeSlots).sort((a, b) => {
+const startA = timeToMinutes(a.split('-')[0]);
+const startB = timeToMinutes(b.split('-')[0]);
+return startA - startB;
+});
 
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const grid = {};
+sortedTimeSlots.forEach(slot => {
+grid[slot] = {};
+days.forEach(day => {
+grid[slot][day] = [];
+});
+});
 
-    // Group by Start Time only
-    const startTimes = new Set();
-    sessions.forEach(s => startTimes.add(s.ClassStart));
-    const sortedStartTimes = Array.from(startTimes).sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
+sessions.forEach(s => {
+const slot = `${s.ClassStart}-${s.ClassEnd}`;
+if (grid[slot] && grid[slot][s.Day]) {
+grid[slot][s.Day].push(s);
+}
+});
 
-    let gridHTML = `<table class="pdf-print-grid">
-    <thead>
-    <tr>
-    <th class="pdf-print-grid">Time</th>
-    ${days.map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
-    </tr>
-    </thead>
-    <tbody>`;
+let gridHTML = `<table class="pdf-print-grid">
+<thead>
+<tr>
+<th class="pdf-print-grid">Time</th>
+${days.map(d => `<th class="pdf-day-header">${d}</th>`).join('')}
+</tr>
+</thead>
+<tbody>`;
 
-    sortedStartTimes.forEach(startTime => {
-        // Calculate max end time for this row's sessions to creating a label
-        let lateEndTime = startTime;
-        sessions.filter(s => s.ClassStart === startTime).forEach(s => {
-             if (timeToMinutes(s.ClassEnd) > timeToMinutes(lateEndTime)) {
-                 lateEndTime = s.ClassEnd;
-             }
-        });
-        
-        const rowLabel = `${startTime} - ${lateEndTime}`;
+sortedTimeSlots.forEach(timeSlot => {
+gridHTML += `<tr>
+<td class="pdf-period-label">${timeSlot}</td>`;
 
-        gridHTML += `<tr>
-        <td class="pdf-period-label">${rowLabel}</td>`;
+days.forEach(day => {
+const daySessions = grid[timeSlot][day] || [];
 
-        days.forEach(day => {
-            const daySessions = sessions.filter(s => s.ClassStart === startTime && s.Day === day);
+if (daySessions.length === 0) {
+gridHTML += `<td class="pdf-cell" style="background-color: #f9f9f9;"></td>`;
+} else {
+const sessionsHTML = daySessions.map(s => {
+const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
+const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
+const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
+const teacherDisplay = s.TeacherInitials
+? (teacher2Info
+? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}`
+: (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials))
+: 'UNASSIGNED';
+const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
+const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
+const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
+const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
+const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
+const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
+const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
+const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
-            if (daySessions.length === 0) {
-                gridHTML += `<td class="pdf-cell" style="background-color: #f9f9f9;"></td>`;
-            } else {
-                const sessionsHTML = daySessions.map(s => {
-                    const subjectInfo = semesterData.subjects.find(sub => sub.Subject === s.Subject);
-                    const teacher1Info = semesterData.teachers.find(t => t.Initials === s.TeacherInitials);
-                    const teacher2Info = s.TeacherInitials2 ? semesterData.teachers.find(t => t.Initials === s.TeacherInitials2) : null;
-                    const teacherDisplay = s.TeacherInitials
-                    ? (teacher2Info
-                    ? `${teacher1Info?.Name || s.TeacherInitials} & ${teacher2Info.Name}`
-                    : (teacher1Info ? `${teacher1Info.Name} ${teacher1Info.Surname}` : s.TeacherInitials))
-                    : 'UNASSIGNED';
-                    const hours = (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60;
-                    const collegeHTML = semesterData.currentCollege === 'Master View' ? `<div style="font-weight: bold; font-size: 11px; color: #4338ca; margin-bottom: 3px;">${s.colleges?.join(', ') || ''}</div>` : '';
-                    const notesHTML = s.notes ? `<div style="font-style: italic; font-size: 11px; margin-top: 3px;">${s.notes}</div>` : '';
-                    const unitsHTML = subjectInfo?.Units?.length > 0 ? `<div style="font-size: 10px; color: #555; margin-top: 2px;">Units: ${subjectInfo.Units.join(', ')}</div>` : '';
-                    const compulsoryBadge = subjectInfo?.Compulsory ? `<div style="font-weight: bold; font-size: 10px; color: #d32f2f; margin-top: 2px;">COMPULSORY</div>` : '';
-                    const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
-                    const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
-                    const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
+return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
+${collegeHTML}
+<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+${compulsoryBadge}
+${deliveryBadge}
+${unitsHTML}
+<div style="margin-top: 3px; font-size: 11px;">${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}</div>
+${notesHTML}
+<div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
+</div>`;
+}).join('');
 
-                    return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
-                    ${collegeHTML}
-                    <div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
-                    ${compulsoryBadge}
-                    ${deliveryBadge}
-                    ${unitsHTML}
-                    <div style="margin-top: 3px; font-size: 11px;">${teacherDisplay} | ${hours.toFixed(2)} Hrs | Room ${s.Room}${teacher2Info ? ' & ' + teacher2Info.Name : ''}</div>
-                    ${notesHTML}
-                    <div style="margin-top: 3px; font-size: 11px;">${s.ClassStart} - ${s.ClassEnd}</div>
-                    </div>`;
-                }).join('');
+gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
+}
+});
 
-                gridHTML += `<td class="pdf-cell">${sessionsHTML}</td>`;
-            }
-        });
+gridHTML += `</tr>`;
+});
 
-        gridHTML += `</tr>`;
-    });
+gridHTML += `</tbody></table>`;
 
-    gridHTML += `</tbody></table>`;
+const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
 
-    const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
+if (!semesterData.courseNotes) semesterData.courseNotes = {};
+const courseNotes = semesterData.courseNotes[courseCode] || '';
 
-    if (!semesterData.courseNotes) semesterData.courseNotes = {};
-    const courseNotes = semesterData.courseNotes[courseCode] || '';
+const uniqueTeacherInitials = new Set();
+sessions.forEach(s => {
+if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials);
+if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2);
+});
+const courseTeachers = Array.from(uniqueTeacherInitials)
+.map(initials => semesterData.teachers.find(t => t.Initials === initials))
+.filter(t => t && !t.IsHeadTeacher) // Exclude HTs from regular list if needed
+.sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
 
-    const uniqueTeacherInitials = new Set();
-    sessions.forEach(s => {
-    if (s.TeacherInitials) uniqueTeacherInitials.add(s.TeacherInitials);
-    if (s.TeacherInitials2) uniqueTeacherInitials.add(s.TeacherInitials2);
-    });
-    const courseTeachers = Array.from(uniqueTeacherInitials)
-    .map(initials => semesterData.teachers.find(t => t.Initials === initials))
-    .filter(t => t)
-    .sort((a, b) => `${a.Name} ${a.Surname}`.localeCompare(`${b.Name} ${b.Surname}`));
+// Head Teachers Logic
+const headTeachers = semesterData.teachers.filter(t => t.IsHeadTeacher);
 
-    const teacherContactHTML = courseTeachers.length > 0 ? `
-    <div class="pdf-teacher-info">
-    <h4>Teacher Contact:</h4>
-    <div class="pdf-teacher-info-content">
-    ${courseTeachers.map(t => `
-    <div class="pdf-teacher-info-item">
-    <span>${t.Name} ${t.Surname}:</span>
-    ${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}
-    </div>
-    `).join('')}
-    </div>
-    </div>
-    ` : '';
+const teacherContactHTML = (courseTeachers.length > 0 || headTeachers.length > 0) ? `
+<div class="pdf-teacher-info">
+<h4>Teacher Contact:</h4>
+<div class="pdf-teacher-info-content">
+${headTeachers.length > 0 ? `<div style="margin-bottom:8px;border-bottom:1px dashed #ccc;padding-bottom:4px;">
+    <strong style="color:#1e3a8a;font-size: 11px;">Head Teacher:</strong>
+    ${headTeachers.map(t => `
+        <div class="pdf-teacher-info-item">
+            <span>${t.Name} ${t.Surname}</span>
+            ${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}
+        </div>`).join('')}
+</div>` : ''}
+${courseTeachers.map(t => `
+<div class="pdf-teacher-info-item">
+<span>${t.Name} ${t.Surname}:</span>
+${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}
+</div>
+`).join('')}
+</div>
+</div>
+` : '';
 
-    const notesSection = `
-    <div class="pdf-notes-section">
-    <h4>Course Notes:</h4>
-    <div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div>
-    </div>
-    `;
+const notesSection = `
+<div class="pdf-notes-section">
+<h4>Course Notes:</h4>
+<div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div>
+</div>
+`;
 
-    const hasCompulsory = sessions.some(s => semesterData.subjects.find(sub => sub.Subject === s.Subject)?.Compulsory);
-    const hasOnline = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Online'));
-    const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Blended'));
+const hasCompulsory = sessions.some(s => semesterData.subjects.find(sub => sub.Subject === s.Subject)?.Compulsory);
+const hasOnline = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Online'));
+const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Blended'));
 
-    let legendHTML = '';
-    if (hasCompulsory || hasOnline || hasBlended) {
-    legendHTML = `
-    <div class="pdf-legend-section">
-    <h4>Legend:</h4>
-    ${hasCompulsory ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
-    ${hasOnline ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
-    ${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
-    </div>
-    `;
-    }
+let legendHTML = '';
+if (hasCompulsory || hasOnline || hasBlended) {
+legendHTML = `
+<div class="pdf-legend-section">
+<h4>Legend:</h4>
+${hasCompulsory ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #ffff00; border: 2px solid #ffd700;"></div><span>Compulsory</span></div>' : ''}
+${hasOnline ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Online</span></div>' : ''}
+${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" style="background-color: #3b82f6;"></div><span>Blended</span></div>' : ''}
+</div>
+`;
+}
 
-    const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
+const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
 
-    const collegeText = semesterData.currentCollege === 'Master View' ? 'Master View' : semesterData.currentCollege;
-container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode}) - ${collegeText}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
+container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode})</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
 
-    const courseNotesTextarea = container.querySelector('.pdf-notes-content');
-    if (courseNotesTextarea) {
-    courseNotesTextarea.contentEditable = true;
-    courseNotesTextarea.addEventListener('blur', (e) => {
-    semesterData.courseNotes[courseCode] = e.target.textContent;
-    saveData();
-    });
-    }
+const courseNotesTextarea = container.querySelector('.pdf-notes-content');
+if (courseNotesTextarea) {
+courseNotesTextarea.contentEditable = true;
+courseNotesTextarea.addEventListener('blur', (e) => {
+semesterData.courseNotes[courseCode] = e.target.textContent;
+saveData();
+});
+}
 }
 
 function renderTeacherPrintView(teacherInitials) {
 const container = document.getElementById('teacher-print-view');
 const semesterData = getCurrentSemesterData();
-
-// Use persistent teacher state if available
-if (!teacherInitials && window.appState.selectedTeacher) {
-    const exists = semesterData.teachers.some(t => t.Initials === window.appState.selectedTeacher);
-    if (exists) {
-        teacherInitials = window.appState.selectedTeacher;
-    }
-}
 
 if (!teacherInitials && semesterData.teachers.length > 0) {
 teacherInitials = semesterData.teachers[0].Initials;
@@ -1934,9 +2048,6 @@ if (!teacherInitials) {
 container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;
 return;
 }
-
-// Update State
-window.appState.selectedTeacher = teacherInitials;
 
 const teacherInfo = semesterData.teachers.find(t => t.Initials === teacherInitials);
 
@@ -2022,3 +2133,4 @@ processAndRenderAll();
 </script>
 </body>
 </html>
+        

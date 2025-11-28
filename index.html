@@ -1339,42 +1339,53 @@ document.getElementById('teacherDropdown').classList.remove('show');
 };
 
 function arrangeOverlappingSessions(dayCol, sessions) {
+const sortedSessions = [...sessions].sort((a, b) => {
+const startDiff = timeToMinutes(a.ClassStart) - timeToMinutes(b.ClassStart);
+if (startDiff !== 0) return startDiff;
+return timeToMinutes(a.ClassEnd) - timeToMinutes(b.ClassEnd);
+});
+
 const groups = [];
-sessions.forEach(session => {
-let addedToGroup = false;
+sortedSessions.forEach(session => {
+let placed = false;
 for (let group of groups) {
-const overlaps = group.some(s => {
+const overlapsWithGroup = group.some(s => {
 const s1Start = timeToMinutes(session.ClassStart);
 const s1End = timeToMinutes(session.ClassEnd);
 const s2Start = timeToMinutes(s.ClassStart);
 const s2End = timeToMinutes(s.ClassEnd);
 return s1Start < s2End && s2Start < s1End;
 });
-if (overlaps) {
+if (overlapsWithGroup) {
 group.push(session);
-addedToGroup = true;
+placed = true;
 break;
 }
 }
-if (!addedToGroup) {
+if (!placed) {
 groups.push([session]);
 }
 });
 
 groups.forEach(group => {
 const count = group.length;
-if (count > 1) {
 group.forEach((session, index) => {
 const block = dayCol.querySelector(`[data-session-id="${session.id}"]`);
 if (block) {
-const widthPercent = (100 / count);
-const leftPercent = (100 / count) * index;
-block.style.left = `${leftPercent}%`;
-block.style.right = `${100 - leftPercent - widthPercent}%`;
+if (count > 1) {
+const widthPercent = 100 / count;
+const leftPercent = widthPercent * index;
+block.style.width = `calc(${widthPercent}% - 4px)`;
+block.style.left = `calc(${leftPercent}% + 2px)`;
+block.style.right = 'auto';
+block.style.zIndex = 10 + index;
+} else {
+block.style.left = '2px';
+block.style.right = '2px';
 block.style.width = 'auto';
 }
-});
 }
+});
 });
 }
 

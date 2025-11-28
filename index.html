@@ -1976,7 +1976,8 @@ gridHTML += `</tbody></table>`;
 const totalHours = sessions.reduce((sum, s) => sum + (timeToMinutes(s.ClassEnd) - timeToMinutes(s.ClassStart)) / 60, 0);
 
 if (!semesterData.courseNotes) semesterData.courseNotes = {};
-const courseNotes = semesterData.courseNotes[courseCode] || '';
+const noteKey = `${courseCode}_${semesterData.currentCollege}`;
+const courseNotes = semesterData.courseNotes[noteKey] || '';
 
 const uniqueTeacherInitials = new Set();
 sessions.forEach(s => {
@@ -2045,7 +2046,8 @@ const courseNotesTextarea = container.querySelector('.pdf-notes-content');
 if (courseNotesTextarea) {
 courseNotesTextarea.contentEditable = true;
 courseNotesTextarea.addEventListener('blur', (e) => {
-semesterData.courseNotes[courseCode] = e.target.textContent;
+const noteKey = `${courseCode}_${semesterData.currentCollege}`;
+semesterData.courseNotes[noteKey] = e.target.textContent;
 saveData();
 });
 }

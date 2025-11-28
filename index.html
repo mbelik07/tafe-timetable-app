@@ -1329,11 +1329,13 @@ document.getElementById('teacherDropdown').classList.toggle('show');
 }
   
 window.selectCourse = (courseCode) => {
+window.selectedCourseCode = courseCode;
 renderCoursePrintView(courseCode);
 document.getElementById('courseDropdown').classList.remove('show');
 };
 
 window.selectTeacher = (teacherInitials) => {
+window.selectedTeacherInitials = teacherInitials;
 renderTeacherPrintView(teacherInitials);
 document.getElementById('teacherDropdown').classList.remove('show');
 };
@@ -1867,10 +1869,13 @@ function renderCoursePrintView(courseCode) {
 const container = document.getElementById('course-print-view');
 const semesterData = getCurrentSemesterData();
 
-if (!courseCode && semesterData.courses.length > 0) {
+if (!courseCode && window.selectedCourseCode) {
+courseCode = window.selectedCourseCode;
+} else if (!courseCode && semesterData.courses.length > 0) {
 courseCode = semesterData.courses[0].Code;
 }
-
+window.selectedCourseCode = courseCode;
+  
 if (!courseCode) {
 container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add courses in the Data Hub to use this view.</div>`;
 return;
@@ -2050,9 +2055,12 @@ function renderTeacherPrintView(teacherInitials) {
 const container = document.getElementById('teacher-print-view');
 const semesterData = getCurrentSemesterData();
 
-if (!teacherInitials && semesterData.teachers.length > 0) {
+if (!teacherInitials && window.selectedTeacherInitials) {
+teacherInitials = window.selectedTeacherInitials;
+} else if (!teacherInitials && semesterData.teachers.length > 0) {
 teacherInitials = semesterData.teachers[0].Initials;
 }
+window.selectedTeacherInitials = teacherInitials;
 
 if (!teacherInitials) {
 container.innerHTML = `<div class="p-6 bg-white rounded shadow text-center text-gray-500 font-semibold">Please add teachers in the Data Hub to use this view.</div>`;

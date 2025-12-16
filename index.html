@@ -206,6 +206,12 @@ background: rgba(59, 130, 246, 0.5);
 }
 .column-resize-handle.dragging {
 background: rgba(59, 130, 246, 0.7);
+} /* Row highlight across the whole week during drag */
+.time-slot.drag-row-active {
+    background-color: rgba(59, 130, 246, 0.2) !important; /* Light blue tint */
+    border-top: 2px dashed #1e40af !important; /* Strong top guide line */
+    border-bottom: 2px dashed #1e40af !important; /* Strong bottom guide line */
+    z-index: 5;
 } </style>
 </head>
 <body class="bg-gray-100">
@@ -1647,77 +1653,107 @@ const clearSlotSelection = () => grid.querySelectorAll('.slot-selected').forEach
 }
 
 function makeDraggable(element, session, grid) {
-let clone, offsetX, offsetY;
-let isDragging = false;
-let startX, startY;
+    let clone, offsetX, offsetY;
+    let isDragging = false;
+    let startX, startY;
 
-const onMouseDown = (e) => {
-if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
+    const onMouseDown = (e) => {
+        if (e.button !== 0 || e.target.classList.contains('resize-handle')) return;
 
-isDragging = false;
-startX = e.clientX;
-startY = e.clientY;
+        isDragging = false;
+        startX = e.clientX;
+        startY = e.clientY;
 
-e.stopPropagation();
+        e.stopPropagation();
 
-document.addEventListener('mousemove', onMouseMove);
-document.addEventListener('mouseup', onMouseUp);
-};
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    };
 
-const onMouseMove = (e) => {
-if (!isDragging && (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5)) {
-isDragging = true;
-e.preventDefault();
+    const onMouseMove = (e) => {
+        if (!isDragging && (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5)) {
+            isDragging = true;
+            e.preventDefault();
 
-if (grid) grid.classList.add('dragging');
+            if (grid) grid.classList.add('dragging');
 
-clone = element.cloneNode(true);
-Object.assign(clone.style, { position: 'absolute', zIndex: '1000', opacity: '0.7', pointerEvents: 'none' });
-document.body.appendChild(clone);
-const rect = element.getBoundingClientRect();
-offsetX = startX - rect.left;
-offsetY = startY - rect.top;
-clone.style.left = `${startX - offsetX}px`;
-clone.style.top = `${startY - offsetY}px`;
-element.style.visibility = 'hidden';
-}
+            clone = element.cloneNode(true);
+            Object.assign(clone.style, { 
+                position: 'absolute', 
+                zIndex: '1000', 
+                opacity: '0.8', 
+                pointerEvents: 'none',
+                width: element.offsetWidth + 'px', 
+                height: element.offsetHeight + 'px'
+            });
+            document.body.appendChild(clone);
+            const rect = element.getBoundingClientRect();
+            offsetX = startX - rect.left;
+            offsetY = startY - rect.top;
+            clone.style.left = `${startX - offsetX}px`;
+            clone.style.top = `${startY - offsetY}px`;
+            element.style.visibility = 'hidden';
+        }
 
-if (isDragging) {
-e.preventDefault();
-clone.style.left = `${e.clientX - offsetX}px`;
-clone.style.top = `${e.clientY - offsetY}px`;
-}
-};
+        if (isDragging) {
+            e.preventDefault();
+            clone.style.left = `${e.clientX - offsetX}px`;
+            clone.style.top = `${e.clientY - offsetY}px`;
 
-const onMouseUp = (e) => {
-document.removeEventListener('mousemove', onMouseMove);
-document.removeEventListener('mouseup', onMouseUp);
+            // --- Visual Row Highlight Logic ---
+            clone.style.display = 'none'; // Temporarily hide to find slot underneath
+            const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+            clone.style.display = 'block';
+            
+            const timeSlot = dropTarget?.closest('.time-slot');
 
-if (isDragging) {
-if (grid) grid.classList.remove('dragging');
+            // Clear previous highlights
+            grid.querySelectorAll('.drag-row-active').forEach(el => el.classList.remove('drag-row-active'));
 
-clone.style.visibility = 'hidden';
-const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
-const timeSlot = dropTarget?.closest('.time-slot');
+            // Highlight new row
+            if (timeSlot) {
+                const slotIndex = timeSlot.dataset.slotIndex;
+                if (slotIndex) {
+                    const rowSlots = grid.querySelectorAll(`.time-slot[data-slot-index="${slotIndex}"]`);
+                    rowSlots.forEach(slot => slot.classList.add('drag-row-active'));
+                }
+            }
+        }
+    };
 
-if (timeSlot) {
-const semesterData = getCurrentSemesterData();
-const gridStart = semesterData.config?.startTime || 8;
-const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
-const startMins = (gridStart * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
-const endMins = startMins + duration;
-const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
-session.Day = timeSlot.dataset.day;
-session.ClassStart = format(startMins);
-session.ClassEnd = format(endMins);
-}
-document.body.removeChild(clone);
-processAndRenderAll(); 
-}
-element.style.visibility = 'visible';
-};
+    const onMouseUp = (e) => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
 
-element.addEventListener('mousedown', onMouseDown);
+        // Clear highlights immediately
+        if (grid) {
+            grid.classList.remove('dragging');
+            grid.querySelectorAll('.drag-row-active').forEach(el => el.classList.remove('drag-row-active'));
+        }
+
+        if (isDragging) {
+            clone.style.visibility = 'hidden';
+            const dropTarget = document.elementFromPoint(e.clientX, e.clientY);
+            const timeSlot = dropTarget?.closest('.time-slot');
+
+            if (timeSlot) {
+                const semesterData = getCurrentSemesterData();
+                const gridStart = semesterData.config?.startTime || 8;
+                const duration = timeToMinutes(session.ClassEnd) - timeToMinutes(session.ClassStart);
+                const startMins = (gridStart * 60) + (parseInt(timeSlot.dataset.slotIndex, 10) * 30);
+                const endMins = startMins + duration;
+                const format = m => `${Math.floor(m / 60).toString().padStart(2, '0')}:${(m % 60).toString().padStart(2, '0')}`;
+                session.Day = timeSlot.dataset.day;
+                session.ClassStart = format(startMins);
+                session.ClassEnd = format(endMins);
+            }
+            document.body.removeChild(clone);
+            processAndRenderAll(); 
+        }
+        element.style.visibility = 'visible';
+    };
+
+    element.addEventListener('mousedown', onMouseDown);
 }
 
 function makeResizable(element, session) {

@@ -2395,7 +2395,13 @@ function disconnectGithub() {
         openGithubModal();
     }
 }
-
+// Expose GitHub functions to window so onclick handlers can find them
+window.connectGithub = connectGithub;
+window.syncToGithub = syncToGithub;
+window.loadFromGithub = loadFromGithub;
+window.disconnectGithub = disconnectGithub;
+window.openGithubModal = openGithubModal;
+  
 // Button event listeners
 const githubSyncBtn = document.getElementById('githubSyncBtn');
 if (githubSyncBtn) {

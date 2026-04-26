@@ -2249,29 +2249,29 @@ container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${t
 }
 
 // ========== CLOUD SYNC (JSONBin.io) ==========
+// ========== HARDCODED SYNC CODE ==========
+const CLOUD_SYNC_CODE = '69edbc46aaba8821973b3864';
 let cloudApiKey = localStorage.getItem('cloudApiKey') || '';
-let cloudBinId = localStorage.getItem('cloudBinId') || '';
+let cloudBinId = CLOUD_SYNC_CODE;
 const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
 
 window.openCloudModal = function() {
     const content = document.getElementById('cloudModalContent');
     content.innerHTML = `
         <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-bold mb-2">🔑 Your JSONBin API Key (one-time setup):</label>
-                <input type="password" id="cloudApiKeyInput" class="w-full border p-3 rounded text-sm" placeholder="$2a$10$..." value="${cloudApiKey}">
-                <p class="text-xs text-gray-500 mt-1">Get this from jsonbin.io → API Keys</p>
+            <div class="bg-blue-50 p-3 rounded text-sm">
+                <strong>📡 Connected Sync Code:</strong><br>
+                <code class="text-blue-700 break-all text-xs">${CLOUD_SYNC_CODE}</code>
             </div>
             <div>
-                <label class="block text-sm font-bold mb-2">🔗 Sync Code:</label>
-                <input type="text" id="cloudBinIdInput" class="w-full border p-3 rounded text-sm" placeholder="Leave blank on first push to create one" value="${cloudBinId}">
-                <p class="text-xs text-gray-500 mt-1">Share this code with colleagues so they can pull the same data!</p>
+                <label class="block text-sm font-bold mb-2">🔑 API Key <span class="text-gray-500 font-normal">(only needed to PUSH)</span>:</label>
+                <input type="password" id="cloudApiKeyInput" class="w-full border p-3 rounded text-sm" placeholder="Leave blank to just pull data" value="${cloudApiKey}">
+                <p class="text-xs text-gray-500 mt-1">Colleagues don't need an API key — just pull!</p>
             </div>
             <div class="flex gap-2 justify-center pt-4">
                 <button onclick="window.cloudPush()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded flex items-center"><i class="fas fa-cloud-upload-alt mr-2"></i> Push to Cloud</button>
                 <button onclick="window.cloudPull()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded flex items-center"><i class="fas fa-cloud-download-alt mr-2"></i> Pull from Cloud</button>
             </div>
-            ${cloudBinId ? `<div class="text-center text-sm bg-blue-50 p-3 rounded mt-4"><strong>Current Sync Code:</strong><br><code class="text-blue-700 break-all text-xs">${cloudBinId}</code><br><button onclick="window.cloudCopyCode()" class="text-blue-600 underline text-xs mt-2">📋 Copy Code to Clipboard</button></div>` : ''}
         </div>
     `;
     document.getElementById('cloudModal').classList.add('active');
@@ -2284,52 +2284,35 @@ window.cloudCopyCode = function() {
 
 window.cloudPush = async function() {
     const apiKey = document.getElementById('cloudApiKeyInput').value.trim();
-    let binId = document.getElementById('cloudBinIdInput').value.trim();
-    if (!apiKey) { alert('⚠️ Please enter your API key'); return; }
+    if (!apiKey) { alert('⚠️ Please enter your API key to push'); return; }
 
     cloudApiKey = apiKey;
     localStorage.setItem('cloudApiKey', apiKey);
 
     try {
-        let response;
-        if (!binId) {
-            response = await fetch(JSONBIN_BASE, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey, 'X-Bin-Name': 'TAFE-Timetable' },
-                body: JSON.stringify(db)
-            });
-            if (!response.ok) throw new Error('Failed to create bin (check API key)');
-            const data = await response.json();
-            binId = data.metadata.id;
-        } else {
-            response = await fetch(`${JSONBIN_BASE}/${binId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
-                body: JSON.stringify(db)
-            });
-            if (!response.ok) throw new Error('Failed to update (check sync code)');
-        }
-        cloudBinId = binId;
-        localStorage.setItem('cloudBinId', binId);
-        alert(`✅ Data pushed to cloud successfully!\n\n🔗 Sync Code:\n${binId}\n\nShare this code with colleagues so they can pull the data.`);
-        window.openCloudModal();
+        const response = await fetch(`${JSONBIN_BASE}/${CLOUD_SYNC_CODE}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
+            body: JSON.stringify(db)
+        });
+        if (!response.ok) throw new Error('Failed to update (check API key)');
+        alert('✅ Data pushed to cloud successfully!');
+        document.getElementById('cloudModal').classList.remove('active');
     } catch (err) {
         alert('❌ Push failed: ' + err.message);
     }
 };
 
 window.cloudPull = async function() {
-    const apiKey = document.getElementById('cloudApiKeyInput').value.trim();
-    const binId = document.getElementById('cloudBinIdInput').value.trim();
-    if (!binId) { alert('⚠️ Please enter a sync code'); return; }
     if (!confirm('⚠️ This will REPLACE your current data with the cloud version. Continue?')) return;
+    await performCloudPull(false);
+    document.getElementById('cloudModal').classList.remove('active');
+};
 
+async function performCloudPull(silent) {
     try {
-        const headers = apiKey ? { 'X-Master-Key': apiKey } : {};
-        const response = await fetch(`${JSONBIN_BASE}/${binId}/latest`, {
-            headers: headers
-        });
-        if (!response.ok) throw new Error('Failed to fetch (check sync code & API key)');
+        const response = await fetch(`${JSONBIN_BASE}/${CLOUD_SYNC_CODE}/latest`);
+        if (!response.ok) throw new Error('Failed to fetch from cloud');
         const data = await response.json();
         const cloudData = data.record;
         if (!cloudData.semesters) throw new Error('Invalid data format in cloud');
@@ -2342,6 +2325,14 @@ window.cloudPull = async function() {
             if (!db.semesters[semKey].tasks) db.semesters[semKey].tasks = [];
         });
 
+        saveData();
+        processAndRenderAll();
+        if (!silent) alert('✅ Data pulled from cloud successfully!');
+    } catch (err) {
+        if (!silent) alert('❌ Pull failed: ' + err.message);
+        else console.error('Auto-pull failed:', err);
+    }
+}
         cloudApiKey = apiKey;
         cloudBinId = binId;
         localStorage.setItem('cloudApiKey', apiKey);
@@ -2362,6 +2353,14 @@ document.getElementById('closeCloudModalBtn').addEventListener('click', () => do
 
 loadData();
 processAndRenderAll();
+
+// Ask user on startup if they want to sync
+setTimeout(() => {
+    if (confirm('☁️ Load latest shared timetable from the cloud?\n\nClick OK to pull the latest data\nClick Cancel to use your local data')) {
+        performCloudPull(false);
+    }
+}, 500);
+});
 });
 </script>
 </body>

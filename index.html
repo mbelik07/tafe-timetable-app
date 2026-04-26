@@ -2479,6 +2479,7 @@ editNotesBtn.className = 'no-print';
 editNotesBtn.style.cssText = 'margin: 15px 0; text-align: right;';
 editNotesBtn.innerHTML = `<button type="button" onclick="window.openCourseNotesEditor('${courseCode}', '${collegeText.replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded"><i class="fas fa-edit mr-2"></i> Edit Course Notes</button>`;
 container.parentElement.insertBefore(editNotesBtn, container.nextSibling);
+}
 
 function renderTeacherPrintView(teacherInitials) {
 const container = document.getElementById('teacher-print-view');

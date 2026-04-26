@@ -247,6 +247,7 @@ background: rgba(59, 130, 246, 0.7);
 <div id="secondary-selectors"></div>
 <button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded flex items-center" id="printBtn"><i class="fas fa-print mr-2"></i> Print PDF</button>
 <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded flex items-center" id="cloudSyncBtn"><i class="fas fa-cloud mr-2"></i> Cloud Sync</button>
+<button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center" id="revisionHistoryBtn"><i class="fas fa-history mr-2"></i> History</button>
 </div>
 </header>
 <main class="p-4">
@@ -285,7 +286,8 @@ background: rgba(59, 130, 246, 0.7);
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-copy mr-2"></i> Duplicate Session</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-user-plus mr-2"></i> Teacher Details</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" id="teacherHomeCollegeSelect" class="w-full border p-2 rounded" required></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex items-center gap-2"><input type="checkbox" name="IsHeadTeacher" class="w-5 h-5"> <label class="font-bold text-blue-900">Head Teacher (Reporting)</label></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelAddTeacherBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Teacher</button></div></form></div></div>
   <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteTaskBtn" style="display: none;"><i class="fas fa-trash-alt mr-2"></i> Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelTaskBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Task</button></div></div></form></div></div>
-<div class="modal-overlay" id="cloudModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-cloud mr-3"></i> Cloud Sync</h2><button class="text-3xl font-bold" id="closeCloudModalBtn">×</button></div><div id="cloudModalContent"></div></div></div>
+<div class="modal-overlay" id="revisionModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-history mr-3"></i> Revision History</h2><button class="text-3xl font-bold" id="closeRevisionModalBtn">×</button></div><div id="revisionModalContent"></div></div></div>
+  <div class="modal-overlay" id="cloudModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-cloud mr-3"></i> Cloud Sync</h2><button class="text-3xl font-bold" id="closeCloudModalBtn">×</button></div><div id="cloudModalContent"></div></div></div>
   <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl border-2 border-blue-500">
 <i class="fas fa-circle-notch fa-spin text-5xl text-blue-500 mb-4"></i>
@@ -321,8 +323,114 @@ const getNewSemesterData = (collegesList = null, config = {}) => ({
     staffNotes: {}, 
     tasks: [] 
 });
+const saveData = () => {
+    localStorage.setItem('timetableDataV2', JSON.stringify(db));
+    saveRevision(); // Auto-save revision on every change
+};
 
-const saveData = () => localStorage.setItem('timetableDataV2', JSON.stringify(db));
+const MAX_REVISIONS = 10;
+
+const saveRevision = () => {
+    let revisions = JSON.parse(localStorage.getItem('timetableRevisions') || '[]');
+    const timestamp = new Date().toLocaleString('en-AU', { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    
+    revisions.push({
+        timestamp: timestamp,
+        data: JSON.parse(JSON.stringify(db)), // Deep copy
+        semesterName: db.currentSemester
+    });
+    
+    // Keep only last MAX_REVISIONS
+    if (revisions.length > MAX_REVISIONS) {
+        revisions = revisions.slice(-MAX_REVISIONS);
+    }
+    
+    localStorage.setItem('timetableRevisions', JSON.stringify(revisions));
+};
+
+const loadRevision = (revisionIndex) => {
+    const revisions = JSON.parse(localStorage.getItem('timetableRevisions') || '[]');
+    if (revisionIndex < 0 || revisionIndex >= revisions.length) {
+        alert('❌ Invalid revision');
+        return;
+    }
+    
+    const revision = revisions[revisionIndex];
+    if (confirm(`⚠️ Restore to version from ${revision.timestamp}?\n\nThis will replace your current data.`)) {
+        db = JSON.parse(JSON.stringify(revision.data));
+        saveData();
+        processAndRenderAll();
+        alert('✅ Data restored successfully!');
+        document.getElementById('revisionModal').classList.remove('active');
+    }
+};
+
+const openRevisionHistory = () => {
+    const revisions = JSON.parse(localStorage.getItem('timetableRevisions') || '[]');
+    const modal = document.getElementById('revisionModal');
+    const content = document.getElementById('revisionModalContent');
+    
+    if (revisions.length === 0) {
+        content.innerHTML = '<p class="text-center text-gray-500 py-8">No revision history yet. Changes will be saved automatically.</p>';
+        modal.classList.add('active');
+        return;
+    }
+    
+    let html = `
+        <div class="space-y-2">
+            <p class="text-sm text-gray-600 mb-4">📜 Last ${revisions.length} saved versions (newest first):</p>
+            <div class="space-y-2 max-h-96 overflow-y-auto">
+    `;
+    
+    // Show revisions in reverse order (newest first)
+    for (let i = revisions.length - 1; i >= 0; i--) {
+        const rev = revisions[i];
+        const isCurrent = i === revisions.length - 1;
+        const badge = isCurrent ? '<span class="bg-green-500 text-white text-xs px-2 py-1 rounded ml-2">CURRENT</span>' : '';
+        
+        html += `
+            <div class="bg-gray-50 p-3 rounded border border-gray-200 hover:bg-gray-100 transition">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <div class="font-bold text-gray-800">📅 ${rev.timestamp}</div>
+                        <div class="text-xs text-gray-600">Semester: ${rev.semesterName}</div>
+                    </div>
+                    ${badge}
+                </div>
+                ${!isCurrent ? `<button onclick="window.loadRevision(${i})" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded"><i class="fas fa-undo mr-1"></i> Restore This Version</button>` : '<span class="text-xs text-gray-500 italic">This is your current version</span>'}
+            </div>
+        `;
+    }
+    
+    html += `
+            </div>
+            <div class="mt-4 pt-4 border-t">
+                <button onclick="window.clearRevisionHistory()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded"><i class="fas fa-trash-alt mr-1"></i> Clear History</button>
+            </div>
+        </div>
+    `;
+    
+    content.innerHTML = html;
+    modal.classList.add('active');
+};
+
+window.loadRevision = loadRevision;
+
+window.clearRevisionHistory = () => {
+    if (confirm('⚠️ Delete all revision history? This cannot be undone.')) {
+        localStorage.removeItem('timetableRevisions');
+        alert('✅ Revision history cleared');
+        openRevisionHistory();
+    }
+};
+
 const loadData = () => {
 const savedData = localStorage.getItem('timetableDataV2');
 if (savedData) {
@@ -2318,6 +2426,8 @@ async function performCloudPull(silent) {
 
 document.getElementById('cloudSyncBtn').addEventListener('click', window.openCloudModal);
 document.getElementById('closeCloudModalBtn').addEventListener('click', () => document.getElementById('cloudModal').classList.remove('active'));
+document.getElementById('revisionHistoryBtn').addEventListener('click', openRevisionHistory);
+document.getElementById('closeRevisionModalBtn').addEventListener('click', () => document.getElementById('revisionModal').classList.remove('active'));
 // ========== END CLOUD SYNC ==========
 
 loadData();

@@ -2250,7 +2250,7 @@ container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${t
 
 // ========== CLOUD SYNC (JSONBin.io) ==========
 const CLOUD_SYNC_CODE = '69edbc46aaba8821973b3864';
-let cloudApiKey = localStorage.getItem('cloudApiKey') || '';
+const CLOUD_API_KEY = '$2a$10$iNuC80nPv36PVdzr55T/ueGBJ.nz4MG4SkVVcoJcso3.ueMgu1Hsq';
 const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
 
 window.openCloudModal = function() {
@@ -2258,14 +2258,10 @@ window.openCloudModal = function() {
     content.innerHTML = `
         <div class="space-y-4">
             <div class="bg-blue-50 p-3 rounded text-sm">
-                <strong>📡 Connected Sync Code:</strong><br>
-                <code class="text-blue-700 break-all text-xs">${CLOUD_SYNC_CODE}</code>
+                <strong>📡 Connected to shared timetable</strong><br>
+                <span class="text-xs text-gray-600">Sync Code: <code class="text-blue-700">${CLOUD_SYNC_CODE}</code></span>
             </div>
-            <div>
-                <label class="block text-sm font-bold mb-2">🔑 API Key <span class="text-gray-500 font-normal">(only needed to PUSH)</span>:</label>
-                <input type="password" id="cloudApiKeyInput" class="w-full border p-3 rounded text-sm" placeholder="Leave blank to just pull data" value="${cloudApiKey}">
-                <p class="text-xs text-gray-500 mt-1">Colleagues don't need an API key — just pull!</p>
-            </div>
+            <p class="text-sm text-gray-700 text-center">Push your changes to share with colleagues, or pull the latest version from the cloud.</p>
             <div class="flex gap-2 justify-center pt-4">
                 <button onclick="window.cloudPush()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded flex items-center"><i class="fas fa-cloud-upload-alt mr-2"></i> Push to Cloud</button>
                 <button onclick="window.cloudPull()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded flex items-center"><i class="fas fa-cloud-download-alt mr-2"></i> Pull from Cloud</button>
@@ -2276,17 +2272,14 @@ window.openCloudModal = function() {
 };
 
 window.cloudPush = async function() {
-    const apiKey = document.getElementById('cloudApiKeyInput').value.trim();
-    if (!apiKey) { alert('⚠️ Please enter your API key to push'); return; }
-    cloudApiKey = apiKey;
-    localStorage.setItem('cloudApiKey', apiKey);
+    if (!confirm('⚠️ This will overwrite the shared cloud data with your current data. Continue?')) return;
     try {
         const response = await fetch(`${JSONBIN_BASE}/${CLOUD_SYNC_CODE}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
+            headers: { 'Content-Type': 'application/json', 'X-Master-Key': CLOUD_API_KEY },
             body: JSON.stringify(db)
         });
-        if (!response.ok) throw new Error('Failed to update (check API key)');
+        if (!response.ok) throw new Error('Failed to update cloud');
         alert('✅ Data pushed to cloud successfully!');
         document.getElementById('cloudModal').classList.remove('active');
     } catch (err) {

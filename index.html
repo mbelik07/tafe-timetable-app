@@ -582,36 +582,41 @@ window.openCourseNotesEditor = function(courseCode, college) {
     const modal = document.getElementById('courseNotesModal');
     const editorContainer = document.getElementById('courseNotesEditor');
     
+    // Completely clear the container (removes Quill instance and toolbar)
+    editorContainer.innerHTML = '';
+    
     // Destroy old Quill instance if it exists
     if (courseNotesQuill) {
         courseNotesQuill = null;
-        editorContainer.innerHTML = '';
     }
     
     // Get existing notes (HTML format)
     if (!semesterData.courseNotes) semesterData.courseNotes = {};
     const existingNotes = semesterData.courseNotes[noteKey] || '';
     
-    // Initialize Quill editor
-    courseNotesQuill = new Quill('#courseNotesEditor', {
-        theme: 'snow',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline', 'strike'],
-                ['blockquote', 'code-block'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                [{ 'header': [1, 2, 3, false] }],
-                ['link', 'image'],
-                ['clean']
-            ]
-        },
-        placeholder: 'Enter course notes here...'
-    });
-    
-    // Set existing content
-    if (existingNotes) {
-        courseNotesQuill.root.innerHTML = existingNotes;
-    }
+    // Small delay to ensure DOM is clean before creating new Quill
+    setTimeout(() => {
+        // Initialize Quill editor
+        courseNotesQuill = new Quill('#courseNotesEditor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Enter course notes here...'
+        });
+        
+        // Set existing content
+        if (existingNotes) {
+            courseNotesQuill.root.innerHTML = existingNotes;
+        }
+    }, 50);
     
     modal.classList.add('active');
 };
@@ -634,6 +639,11 @@ window.saveCourseNotes = function() {
 
 window.closeCourseNotesModal = function() {
     document.getElementById('courseNotesModal').classList.remove('active');
+    
+    // Completely clean up Quill
+    const editorContainer = document.getElementById('courseNotesEditor');
+    editorContainer.innerHTML = '';
+    
     if (courseNotesQuill) {
         courseNotesQuill = null;
     }

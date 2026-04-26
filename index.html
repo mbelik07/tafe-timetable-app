@@ -2266,10 +2266,10 @@ function openGithubModal() {
                     <a href="https://gist.github.com/${githubGistId}" target="_blank" class="text-blue-600 hover:underline break-all">https://gist.github.com/${githubGistId}</a>
                 </div>
                 <div class="flex gap-2 justify-center">
-                    <button onclick="syncToGithub()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center"><i class="fas fa-upload mr-2"></i> Push to GitHub</button>
-                    <button onclick="loadFromGithub()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"><i class="fas fa-download mr-2"></i> Pull from GitHub</button>
+                    <button onclick="window.syncToGithub()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center"><i class="fas fa-upload mr-2"></i> Push to GitHub</button>
+                    <button onclick="window.loadFromGithub()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"><i class="fas fa-download mr-2"></i> Pull from GitHub</button>
                 </div>
-                <button onclick="disconnectGithub()" class="mt-4 text-red-600 hover:underline text-sm">Disconnect GitHub</button>
+                <button onclick="window.disconnectGithub()" class="mt-4 text-red-600 hover:underline text-sm">Disconnect GitHub</button>
             </div>
         `;
     } else {
@@ -2281,7 +2281,7 @@ function openGithubModal() {
                     <label class="block text-sm font-bold mb-2">Paste your GitHub Personal Access Token:</label>
                     <input type="password" id="githubTokenInput" class="w-full border p-3 rounded text-sm" placeholder="ghp_xxxxxxxxxxxx">
                 </div>
-                <button onclick="connectGithub()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded"><i class="fas fa-link mr-2"></i> Connect to GitHub</button>
+                <button onclick="window.connectGithub()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded"><i class="fas fa-link mr-2"></i> Connect to GitHub</button>
                 <p class="mt-4 text-xs text-gray-500">Don't have a token? <a href="https://github.com/settings/tokens/new?scopes=gist&description=TAFE%20Timetable%20Sync" target="_blank" class="text-blue-600 hover:underline">Create one here</a> (select "Gist" scope)</p>
             </div>
         `;

@@ -2321,13 +2321,13 @@ window.cloudPush = async function() {
 window.cloudPull = async function() {
     const apiKey = document.getElementById('cloudApiKeyInput').value.trim();
     const binId = document.getElementById('cloudBinIdInput').value.trim();
-    if (!apiKey) { alert('⚠️ Please enter your API key'); return; }
     if (!binId) { alert('⚠️ Please enter a sync code'); return; }
     if (!confirm('⚠️ This will REPLACE your current data with the cloud version. Continue?')) return;
 
     try {
+        const headers = apiKey ? { 'X-Master-Key': apiKey } : {};
         const response = await fetch(`${JSONBIN_BASE}/${binId}/latest`, {
-            headers: { 'X-Master-Key': apiKey }
+            headers: headers
         });
         if (!response.ok) throw new Error('Failed to fetch (check sync code & API key)');
         const data = await response.json();

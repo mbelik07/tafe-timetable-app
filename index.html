@@ -1641,14 +1641,8 @@ secondarySelectorsContainer.innerHTML = '';
 if (selectedView === 'course-print') {
 if (semesterData.courses.length > 0) {
 const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-const firstCourseCode = sortedCourses[0].Code;
 let selector = `<div class="dropdown-menu"><button class="dropdown-btn" id="courseDropdownBtn"><i class="fas fa-book mr-2"></i> Course <i class="fas fa-chevron-down ml-1 text-xs opacity-75"></i></button><div class="dropdown-content" id="courseDropdown">${sortedCourses.map(c => `<div class="dropdown-item" onclick="selectCourse('${c.Code}')">${c.Code} - ${c.Name}</div>`).join('')}</div></div>`;
 secondarySelectorsContainer.innerHTML = selector;
-
-// AUTO-SELECT FIRST COURSE AND RENDER
-window.selectedCourseCode = firstCourseCode;
-renderCoursePrintView(firstCourseCode);
-
 document.getElementById('courseDropdownBtn').addEventListener('click', (e) => {
 e.stopPropagation();
 semesterDropdown.classList.remove('show');
@@ -1682,17 +1676,13 @@ document.getElementById('teacherDropdown').classList.toggle('show');
   
 window.selectCourse = (courseCode) => {
 window.selectedCourseCode = courseCode;
-setTimeout(() => {
 renderCoursePrintView(courseCode);
-}, 100);
 document.getElementById('courseDropdown').classList.remove('show');
 };
 
 window.selectTeacher = (teacherInitials) => {
 window.selectedTeacherInitials = teacherInitials;
-setTimeout(() => {
 renderTeacherPrintView(teacherInitials);
-}, 100);
 document.getElementById('teacherDropdown').classList.remove('show');
 };
 

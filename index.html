@@ -2249,10 +2249,8 @@ container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${t
 }
 
 // ========== CLOUD SYNC (JSONBin.io) ==========
-// ========== HARDCODED SYNC CODE ==========
 const CLOUD_SYNC_CODE = '69edbc46aaba8821973b3864';
 let cloudApiKey = localStorage.getItem('cloudApiKey') || '';
-let cloudBinId = CLOUD_SYNC_CODE;
 const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
 
 window.openCloudModal = function() {
@@ -2277,18 +2275,11 @@ window.openCloudModal = function() {
     document.getElementById('cloudModal').classList.add('active');
 };
 
-window.cloudCopyCode = function() {
-    navigator.clipboard.writeText(cloudBinId);
-    alert('✅ Sync code copied! Share it with your colleagues.');
-};
-
 window.cloudPush = async function() {
     const apiKey = document.getElementById('cloudApiKeyInput').value.trim();
     if (!apiKey) { alert('⚠️ Please enter your API key to push'); return; }
-
     cloudApiKey = apiKey;
     localStorage.setItem('cloudApiKey', apiKey);
-
     try {
         const response = await fetch(`${JSONBIN_BASE}/${CLOUD_SYNC_CODE}`, {
             method: 'PUT',
@@ -2316,7 +2307,6 @@ async function performCloudPull(silent) {
         const data = await response.json();
         const cloudData = data.record;
         if (!cloudData.semesters) throw new Error('Invalid data format in cloud');
-
         db = cloudData;
         Object.keys(db.semesters).forEach(semKey => {
             if (!db.semesters[semKey].colleges) db.semesters[semKey].colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
@@ -2324,7 +2314,6 @@ async function performCloudPull(silent) {
             if (!db.semesters[semKey].staffNotes) db.semesters[semKey].staffNotes = {};
             if (!db.semesters[semKey].tasks) db.semesters[semKey].tasks = [];
         });
-
         saveData();
         processAndRenderAll();
         if (!silent) alert('✅ Data pulled from cloud successfully!');
@@ -2333,19 +2322,6 @@ async function performCloudPull(silent) {
         else console.error('Auto-pull failed:', err);
     }
 }
-        cloudApiKey = apiKey;
-        cloudBinId = binId;
-        localStorage.setItem('cloudApiKey', apiKey);
-        localStorage.setItem('cloudBinId', binId);
-
-        saveData();
-        processAndRenderAll();
-        document.getElementById('cloudModal').classList.remove('active');
-        alert('✅ Data pulled from cloud successfully!');
-    } catch (err) {
-        alert('❌ Pull failed: ' + err.message);
-    }
-};
 
 document.getElementById('cloudSyncBtn').addEventListener('click', window.openCloudModal);
 document.getElementById('closeCloudModalBtn').addEventListener('click', () => document.getElementById('cloudModal').classList.remove('active'));
@@ -2360,7 +2336,6 @@ setTimeout(() => {
         performCloudPull(false);
     }
 }, 500);
-});
 });
 </script>
 </body>

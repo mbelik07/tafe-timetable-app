@@ -13,7 +13,9 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+<!-- Quill Rich Text Editor -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <style>
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
 .sidebar { transition: transform 0.3s ease-in-out; }
@@ -123,7 +125,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select
 .pdf-notes-section { flex: 1.3; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; display: flex; flex-direction: column; height: fit-content; }
 .pdf-notes-section h4 { font-weight: bold; margin: 0 0 6px 0; font-size: 13px; flex-shrink: 0; }
 .pdf-notes-content { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; letter-spacing: 0.3px; line-height: 1.6; color: #222; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 10px 12px; flex: 0; white-space: pre-wrap; word-wrap: break-word; hyphens: auto; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-y: auto; }
-
+/* Quill Editor Styling */
+.ql-container { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; }
+.ql-editor { min-height: 200px; max-height: 300px; padding: 12px; }
+.ql-toolbar { background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px 4px 0 0; }
+.ql-container { border: 1px solid #d1d5db; border-radius: 0 0 4px 4px; }
+.quill-wrapper { margin-bottom: 1rem; }
+.quill-label { display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem; }
 .pdf-legend-section { flex: 0; padding: 6px; border: 1px solid #ddd; border-radius: 2px; background: #f9f9f9; display: flex; flex-direction: column; height: fit-content; }
 .pdf-legend-section h4 { font-weight: bold; margin: 0 0 6px 0; font-size: 11px; flex-shrink: 0; }
 .pdf-legend-item { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; font-size: 12px; }
@@ -287,7 +295,9 @@ background: rgba(59, 130, 246, 0.7);
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-copy mr-2"></i> Duplicate Session</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-user-plus mr-2"></i> Teacher Details</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" id="teacherHomeCollegeSelect" class="w-full border p-2 rounded" required></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex items-center gap-2"><input type="checkbox" name="IsHeadTeacher" class="w-5 h-5"> <label class="font-bold text-blue-900">Head Teacher (Reporting)</label></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelAddTeacherBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Teacher</button></div></form></div></div>
   <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteTaskBtn" style="display: none;"><i class="fas fa-trash-alt mr-2"></i> Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelTaskBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Task</button></div></div></form></div></div>
-<div class="modal-overlay" id="localOfferingCodesModal"><div class="modal-container" style="max-width: 900px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-map-location-dot mr-3"></i> Local Offering Codes</h2><button class="text-3xl font-bold" id="closeLocalCodesModalBtn">×</button></div><div id="localOfferingCodesModalContent"></div></div></div>
+
+<div class="modal-overlay" id="courseNotesModal"><div class="modal-container" style="max-width: 700px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-file-alt mr-3"></i> Edit Course Notes</h2><button class="text-3xl font-bold" id="closeCourseNotesModalBtn">×</button></div><div class="space-y-4"><div class="quill-wrapper"><label class="quill-label">📝 Course Notes (Rich Text):</label><div id="courseNotesEditor" style="background: white;"></div></div><div class="flex gap-2 justify-end mt-4"><button onclick="window.closeCourseNotesModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded"><i class="fas fa-times mr-2"></i> Cancel</button><button onclick="window.saveCourseNotes()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"><i class="fas fa-save mr-2"></i> Save Notes</button></div></div></div></div>  
+  <div class="modal-overlay" id="localOfferingCodesModal"><div class="modal-container" style="max-width: 900px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-map-location-dot mr-3"></i> Local Offering Codes</h2><button class="text-3xl font-bold" id="closeLocalCodesModalBtn">×</button></div><div id="localOfferingCodesModalContent"></div></div></div>
   <div class="modal-overlay" id="revisionModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-history mr-3"></i> Revision History</h2><button class="text-3xl font-bold" id="closeRevisionModalBtn">×</button></div><div id="revisionModalContent"></div></div></div>
   <div class="modal-overlay" id="cloudModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-cloud mr-3"></i> Cloud Sync</h2><button class="text-3xl font-bold" id="closeCloudModalBtn">×</button></div><div id="cloudModalContent"></div></div></div>
   <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
@@ -559,6 +569,77 @@ window.getLocalOfferingCode = function(courseCode, college) {
     return semesterData.localOfferingCodes[key] || '';
 };
 // ========== END LOCAL OFFERING CODES ==========
+
+// ========== QUILL RICH TEXT EDITOR ==========
+let courseNotesQuill = null;
+let currentCourseNotesKey = null;
+
+window.openCourseNotesEditor = function(courseCode, college) {
+    const semesterData = getCurrentSemesterData();
+    const noteKey = `${courseCode}_${college}`;
+    currentCourseNotesKey = noteKey;
+    
+    const modal = document.getElementById('courseNotesModal');
+    const editorContainer = document.getElementById('courseNotesEditor');
+    
+    // Destroy old Quill instance if it exists
+    if (courseNotesQuill) {
+        courseNotesQuill = null;
+        editorContainer.innerHTML = '';
+    }
+    
+    // Get existing notes (HTML format)
+    if (!semesterData.courseNotes) semesterData.courseNotes = {};
+    const existingNotes = semesterData.courseNotes[noteKey] || '';
+    
+    // Initialize Quill editor
+    courseNotesQuill = new Quill('#courseNotesEditor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'header': [1, 2, 3, false] }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Enter course notes here...'
+    });
+    
+    // Set existing content
+    if (existingNotes) {
+        courseNotesQuill.root.innerHTML = existingNotes;
+    }
+    
+    modal.classList.add('active');
+};
+
+window.saveCourseNotes = function() {
+    if (!courseNotesQuill || !currentCourseNotesKey) return;
+    
+    const semesterData = getCurrentSemesterData();
+    if (!semesterData.courseNotes) semesterData.courseNotes = {};
+    
+    // Get HTML content from Quill
+    const notesHTML = courseNotesQuill.root.innerHTML;
+    semesterData.courseNotes[currentCourseNotesKey] = notesHTML;
+    
+    saveData();
+    alert('✅ Course notes saved!');
+    window.closeCourseNotesModal();
+    renderCoursePrintView(currentCourseNotesKey.split('_')[0]);
+};
+
+window.closeCourseNotesModal = function() {
+    document.getElementById('courseNotesModal').classList.remove('active');
+    if (courseNotesQuill) {
+        courseNotesQuill = null;
+    }
+};
+// ========== END QUILL EDITOR ==========  
+  
 const loadData = () => {
 const savedData = localStorage.getItem('timetableDataV2');
 if (savedData) {
@@ -818,6 +899,7 @@ document.getElementById('manageCoursesBtn').addEventListener('click', () => open
 document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
 document.getElementById('manageLocalCodesBtn').addEventListener('click', window.openLocalOfferingCodesModal);
 document.getElementById('closeLocalCodesModalBtn').addEventListener('click', () => document.getElementById('localOfferingCodesModal').classList.remove('active'));
+document.getElementById('closeCourseNotesModalBtn').addEventListener('click', window.closeCourseNotesModal);  
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
@@ -2363,10 +2445,12 @@ ${t.Email ? `<a href="mailto:${t.Email}">${t.Email}</a>` : ''}
 const notesSection = `
 <div class="pdf-notes-section">
 <h4>Course Notes:</h4>
-<div class="pdf-notes-content">${courseNotes || '(No notes added)'}</div>
+<div class="pdf-notes-content" id="courseNotesDisplay" style="white-space: normal; word-wrap: break-word;">${courseNotes ? courseNotes.replace(/<p>/g, '<div style="margin-bottom: 8px;">').replace(/<\/p>/g, '</div>').replace(/<strong>/g, '<b>').replace(/<\/strong>/g, '</b>').replace(/<em>/g, '<i>').replace(/<\/em>/g, '</i>').replace(/<ul>/g, '<ul style="margin-left: 20px;">').replace(/<ol>/g, '<ol style="margin-left: 20px;">') : '(No notes added)'}</div>
 </div>
 `;
 
+
+  
 const hasCompulsory = sessions.some(s => semesterData.subjects.find(sub => sub.Subject === s.Subject)?.Compulsory);
 const hasOnline = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Online'));
 const hasBlended = sessions.some(s => (semesterData.subjects.find(sub => sub.Subject === s.Subject)?.DeliveryMode === 'Blended'));
@@ -2383,7 +2467,8 @@ ${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" styl
 `;
 }
 
-const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
+const editNotesBtn = `<button onclick="window.openCourseNotesEditor('${courseCode}', '${collegeText}')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded mb-4"><i class="fas fa-edit mr-2"></i> Edit Notes</button>`;
+const bottomSections = `${editNotesBtn}<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
 
 const collegeText = semesterData.currentCollege === 'Master View' ? 'Master View' : semesterData.currentCollege;
 container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode}) - ${collegeText}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;

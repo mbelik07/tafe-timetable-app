@@ -224,6 +224,7 @@ background: rgba(59, 130, 246, 0.7);
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageCoursesBtn"><i class="fas fa-book-open fa-fw mr-3"></i> Manage Courses</button>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageSubjectsBtn"><i class="fas fa-shapes fa-fw mr-3"></i> Manage Subjects</button>
 <hr class="my-4"/>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageLocalCodesBtn"><i class="fas fa-map-location-dot fa-fw mr-3"></i> Local Offering Codes</button>  
 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
 <button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center" id="exportDataBtn"><i class="fas fa-file-export fa-fw mr-2"></i> Export Data</button>
 <button class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center" id="importDataBtn"><i class="fas fa-file-import fa-fw mr-2"></i> Import Data</button>
@@ -286,7 +287,8 @@ background: rgba(59, 130, 246, 0.7);
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-copy mr-2"></i> Duplicate Session</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-user-plus mr-2"></i> Teacher Details</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" id="teacherHomeCollegeSelect" class="w-full border p-2 rounded" required></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex items-center gap-2"><input type="checkbox" name="IsHeadTeacher" class="w-5 h-5"> <label class="font-bold text-blue-900">Head Teacher (Reporting)</label></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelAddTeacherBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Teacher</button></div></form></div></div>
   <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteTaskBtn" style="display: none;"><i class="fas fa-trash-alt mr-2"></i> Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelTaskBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Task</button></div></div></form></div></div>
-<div class="modal-overlay" id="revisionModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-history mr-3"></i> Revision History</h2><button class="text-3xl font-bold" id="closeRevisionModalBtn">×</button></div><div id="revisionModalContent"></div></div></div>
+<div class="modal-overlay" id="localOfferingCodesModal"><div class="modal-container" style="max-width: 900px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-map-location-dot mr-3"></i> Local Offering Codes</h2><button class="text-3xl font-bold" id="closeLocalCodesModalBtn">×</button></div><div id="localOfferingCodesModalContent"></div></div></div>
+  <div class="modal-overlay" id="revisionModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-history mr-3"></i> Revision History</h2><button class="text-3xl font-bold" id="closeRevisionModalBtn">×</button></div><div id="revisionModalContent"></div></div></div>
   <div class="modal-overlay" id="cloudModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-cloud mr-3"></i> Cloud Sync</h2><button class="text-3xl font-bold" id="closeCloudModalBtn">×</button></div><div id="cloudModalContent"></div></div></div>
   <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl border-2 border-blue-500">
@@ -321,7 +323,8 @@ const getNewSemesterData = (collegesList = null, config = {}) => ({
     colleges: collegesList || [...defaultColleges],
     config: { startTime: 8, endTime: 22, ...config },
     staffNotes: {}, 
-    tasks: [] 
+    tasks: [],
+    localOfferingCodes: {} // NEW: Maps "CourseCode|College" to local code
 });
 const saveData = () => {
     localStorage.setItem('timetableDataV2', JSON.stringify(db));
@@ -430,7 +433,132 @@ window.clearRevisionHistory = () => {
         openRevisionHistory();
     }
 };
+// ========== LOCAL OFFERING CODES MANAGEMENT ==========
+window.openLocalOfferingCodesModal = function() {
+    const semesterData = getCurrentSemesterData();
+    const modal = document.getElementById('localOfferingCodesModal');
+    const content = document.getElementById('localOfferingCodesModalContent');
+    
+    if (!semesterData.courses || semesterData.courses.length === 0) {
+        content.innerHTML = '<p class="text-center text-gray-500 py-8">Please add courses first in the Data Hub.</p>';
+        modal.classList.add('active');
+        return;
+    }
+    
+    const renderLocalOfferingCodes = () => {
+        const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
+        const sortedColleges = [...semesterData.colleges].sort();
+        
+        let html = `
+            <div class="space-y-4">
+                <div class="bg-blue-50 p-3 rounded text-sm">
+                    <strong>📍 Local Offering Codes</strong><br>
+                    <span class="text-xs text-gray-600">Map official course codes to college-specific local offering codes</span>
+                </div>
+                
+                <div class="management-table-wrapper">
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Course Name</th>
+                                <th>College</th>
+                                <th>Local Offering Code</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        // Create a row for each course-college combination
+        sortedCourses.forEach(course => {
+            sortedColleges.forEach(college => {
+                const key = `${course.Code}|${college}`;
+                const localCode = semesterData.localOfferingCodes[key] || '';
+                
+                html += `
+                    <tr>
+                        <td><strong>${course.Code}</strong></td>
+                        <td>${course.Name}</td>
+                        <td>${college}</td>
+                        <td>
+                            <input type="text" 
+                                class="local-code-input" 
+                                data-key="${key}" 
+                                value="${localCode}" 
+                                placeholder="e.g., MVL-0048"
+                                style="width: 120px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;">
+                        </td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="window.saveLocalOfferingCode('${key}')">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t">
+                    <button onclick="window.clearAllLocalCodes()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded">
+                        <i class="fas fa-trash-alt mr-1"></i> Clear All Codes
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        content.innerHTML = html;
+        
+        // Add event listeners for inline editing
+        document.querySelectorAll('.local-code-input').forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    window.saveLocalOfferingCode(input.dataset.key);
+                }
+            });
+        });
+    };
+    
+    renderLocalOfferingCodes();
+    modal.classList.add('active');
+};
 
+window.saveLocalOfferingCode = function(key) {
+    const semesterData = getCurrentSemesterData();
+    const input = document.querySelector(`.local-code-input[data-key="${key}"]`);
+    const value = input.value.trim();
+    
+    if (value) {
+        semesterData.localOfferingCodes[key] = value;
+    } else {
+        delete semesterData.localOfferingCodes[key];
+    }
+    
+    saveData();
+    alert('✅ Local offering code saved!');
+};
+
+window.clearAllLocalCodes = function() {
+    if (confirm('⚠️ Delete all local offering codes? This cannot be undone.')) {
+        const semesterData = getCurrentSemesterData();
+        semesterData.localOfferingCodes = {};
+        saveData();
+        alert('✅ All local codes cleared');
+        window.openLocalOfferingCodesModal();
+    }
+};
+
+window.getLocalOfferingCode = function(courseCode, college) {
+    const semesterData = getCurrentSemesterData();
+    const key = `${courseCode}|${college}`;
+    return semesterData.localOfferingCodes[key] || '';
+};
+// ========== END LOCAL OFFERING CODES ==========
 const loadData = () => {
 const savedData = localStorage.getItem('timetableDataV2');
 if (savedData) {
@@ -448,6 +576,9 @@ db.semesters[semKey].staffNotes = {};
 }
 if (!db.semesters[semKey].tasks) {
 db.semesters[semKey].tasks = [];
+}
+if (!db.semesters[semKey].localOfferingCodes) {
+db.semesters[semKey].localOfferingCodes = {};
 }
 });
 } else {
@@ -685,6 +816,8 @@ document.getElementById('manageSemestersBtn').addEventListener('click', openSeme
 document.getElementById('manageTeachersBtn').addEventListener('click', () => openManagementModal('Teachers', getCurrentSemesterData().teachers, ['Name', 'Surname', 'Initials', 'Email', 'HomeCollege', 'EmploymentType', 'TotalHours']));
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
 document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
+document.getElementById('manageLocalCodesBtn').addEventListener('click', window.openLocalOfferingCodesModal);
+document.getElementById('closeLocalCodesModalBtn').addEventListener('click', () => document.getElementById('localOfferingCodesModal').classList.remove('active'));
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
 document.getElementById('deleteSessionBtn').addEventListener('click', handleDeleteSession);
 document.getElementById('sessionModal').addEventListener('click', (e) => { if (e.target.id === 'sessionModal') e.currentTarget.classList.remove('active'); });
@@ -1598,7 +1731,9 @@ const sessionBlock = document.createElement('div');
 sessionBlock.className = `session-block ${session.dispute ? 'dispute-warning' : ''} ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}`;
 sessionBlock.setAttribute('data-session-id', session.id);
 Object.assign(sessionBlock.style, { top: `${start * slotHeight}px`, height: `${height}px`, backgroundColor: subjectInfo?.Color || '#e5e7eb', left: '2px', right: '2px' });
-sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${session.CourseCode} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
+const localCode = window.getLocalOfferingCode(session.CourseCode, session.colleges?.[0] || semesterData.currentCollege);
+const courseDisplay = localCode ? `${session.CourseCode} | ${localCode}` : session.CourseCode;
+sessionBlock.innerHTML = `${collegeInfo}<div class="font-bold">${courseDisplay} - ${session.Subject}</div>${compulsoryBadge}${unitsHTML}<div>${teacherDisplay} | Room ${session.Room}</div>${notesHTML}<div class="text-xs">${session.ClassStart} - ${session.ClassEnd}</div><div class="resize-handle"></div>`;
 sessionBlock.addEventListener('dblclick', () => openSessionModal(session));
 sessionBlock.addEventListener('contextmenu', (e) => showContextMenu(e, session));
 dayCol.appendChild(sessionBlock);
@@ -2161,9 +2296,11 @@ const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
 const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
 const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
+const localCode = window.getLocalOfferingCode(s.CourseCode, s.colleges?.[0] || semesterData.currentCollege);
+const courseDisplay = localCode ? `${s.CourseCode} | ${localCode}` : s.CourseCode;
 return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
-<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${courseDisplay} | ${s.Subject}</div>
 ${compulsoryBadge}
 ${deliveryBadge}
 ${unitsHTML}
@@ -2333,9 +2470,11 @@ const deliveryMode = subjectInfo?.DeliveryMode || 'Face-to-Face';
 const deliveryBadge = (deliveryMode === 'Online' || deliveryMode === 'Blended') ? `<div style="font-weight: bold; font-size: 10px; color: #3b82f6; margin-top: 2px;">${deliveryMode.toUpperCase()}</div>` : '';
 const deliveryClass = deliveryMode === 'Online' ? 'online' : (deliveryMode === 'Blended' ? 'blended' : '');
 
+const localCode = window.getLocalOfferingCode(s.CourseCode, s.colleges?.[0] || semesterData.currentCollege);
+const courseDisplay = localCode ? `${s.CourseCode} | ${localCode}` : s.CourseCode;
 return `<div class="pdf-session ${subjectInfo?.Compulsory ? 'compulsory' : ''} ${deliveryClass}" style="background-color:${subjectInfo?.Color || '#eee'}">
 ${collegeHTML}
-<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${s.CourseCode} | ${s.Subject}</div>
+<div style="font-weight: bold; margin-bottom: 3px; font-size: 12px;">${courseDisplay} | ${s.Subject}</div>
 ${compulsoryBadge}
 ${deliveryBadge}
 ${unitsHTML}

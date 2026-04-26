@@ -2397,7 +2397,15 @@ function disconnectGithub() {
 }
 
 // Button event listeners
-document.getElementById('githubSyncBtn').addEventListener('click', openGithubModal);
+const githubSyncBtn = document.getElementById('githubSyncBtn');
+if (githubSyncBtn) {
+    githubSyncBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('GitHub button clicked'); // Debug log
+        openGithubModal();
+    });
+}
 document.getElementById('closeGithubModalBtn').addEventListener('click', () => document.getElementById('githubModal').classList.remove('active'));
 // ========== END GITHUB SYNC ==========
 // ========== GITHUB SYNC FUNCTIONS ==========

@@ -2469,11 +2469,16 @@ ${hasBlended ? '<div class="pdf-legend-item"><div class="pdf-legend-circle" styl
 
 const collegeText = semesterData.currentCollege === 'Master View' ? 'Master View' : semesterData.currentCollege;
 
-const editNotesBtn = `<div class="no-print" style="margin: 10px 0; text-align: right;"><button type="button" onclick="window.openCourseNotesEditor('${courseCode}', '${collegeText.replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded"><i class="fas fa-edit mr-2"></i> Edit Course Notes</button></div>`;
-const bottomSections = `${editNotesBtn}<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
+const bottomSections = `<div class="pdf-bottom-section">${teacherContactHTML}${notesSection}${legendHTML}</div>`;
 
 container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${courseInfo.Name} (${courseCode}) - ${collegeText}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div>${bottomSections}</div>`;
-}
+
+// Add Edit Notes button AFTER the container (not inside it)
+const editNotesBtn = document.createElement('div');
+editNotesBtn.className = 'no-print';
+editNotesBtn.style.cssText = 'margin: 15px 0; text-align: right;';
+editNotesBtn.innerHTML = `<button type="button" onclick="window.openCourseNotesEditor('${courseCode}', '${collegeText.replace(/'/g, "\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded"><i class="fas fa-edit mr-2"></i> Edit Course Notes</button>`;
+container.parentElement.insertBefore(editNotesBtn, container.nextSibling);
 
 function renderTeacherPrintView(teacherInitials) {
 const container = document.getElementById('teacher-print-view');

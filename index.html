@@ -246,6 +246,7 @@ background: rgba(59, 130, 246, 0.7);
 </div>
 <div id="secondary-selectors"></div>
 <button class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded flex items-center" id="printBtn"><i class="fas fa-print mr-2"></i> Print PDF</button>
+<button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded flex items-center" id="cloudSyncBtn"><i class="fas fa-cloud mr-2"></i> Cloud Sync</button>
 </div>
 </header>
 <main class="p-4">
@@ -284,7 +285,8 @@ background: rgba(59, 130, 246, 0.7);
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-copy mr-2"></i> Duplicate Session</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-user-plus mr-2"></i> Teacher Details</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" id="teacherHomeCollegeSelect" class="w-full border p-2 rounded" required></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex items-center gap-2"><input type="checkbox" name="IsHeadTeacher" class="w-5 h-5"> <label class="font-bold text-blue-900">Head Teacher (Reporting)</label></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelAddTeacherBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Teacher</button></div></form></div></div>
   <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteTaskBtn" style="display: none;"><i class="fas fa-trash-alt mr-2"></i> Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelTaskBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Task</button></div></div></form></div></div>
-<div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
+<div class="modal-overlay" id="cloudModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-cloud mr-3"></i> Cloud Sync</h2><button class="text-3xl font-bold" id="closeCloudModalBtn">×</button></div><div id="cloudModalContent"></div></div></div>
+  <div class="modal-overlay" id="loadingOverlay" style="display: none; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.9); z-index: 200;">
 <div class="text-center p-8 bg-white rounded-lg shadow-xl border-2 border-blue-500">
 <i class="fas fa-circle-notch fa-spin text-5xl text-blue-500 mb-4"></i>
 <h2 class="text-2xl font-bold text-blue-900 mb-2">Generating PDF...</h2>
@@ -2245,6 +2247,118 @@ gridHTML += `</tbody></table>`;
 
 container.innerHTML = `<div class="pdf-container"><div class="pdf-title"><h2>${title}</h2><h3>TAFE NSW Timetable (${db.currentSemester})</h3></div>${gridHTML}<div class="pdf-total-hours">Total Hours: <span class="pdf-total-hours-value">${totalHours.toFixed(2)}</span></div></div>`;
 }
+
+// ========== CLOUD SYNC (JSONBin.io) ==========
+let cloudApiKey = localStorage.getItem('cloudApiKey') || '';
+let cloudBinId = localStorage.getItem('cloudBinId') || '';
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
+
+window.openCloudModal = function() {
+    const content = document.getElementById('cloudModalContent');
+    content.innerHTML = `
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-bold mb-2">🔑 Your JSONBin API Key (one-time setup):</label>
+                <input type="password" id="cloudApiKeyInput" class="w-full border p-3 rounded text-sm" placeholder="$2a$10$..." value="${cloudApiKey}">
+                <p class="text-xs text-gray-500 mt-1">Get this from jsonbin.io → API Keys</p>
+            </div>
+            <div>
+                <label class="block text-sm font-bold mb-2">🔗 Sync Code:</label>
+                <input type="text" id="cloudBinIdInput" class="w-full border p-3 rounded text-sm" placeholder="Leave blank on first push to create one" value="${cloudBinId}">
+                <p class="text-xs text-gray-500 mt-1">Share this code with colleagues so they can pull the same data!</p>
+            </div>
+            <div class="flex gap-2 justify-center pt-4">
+                <button onclick="window.cloudPush()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded flex items-center"><i class="fas fa-cloud-upload-alt mr-2"></i> Push to Cloud</button>
+                <button onclick="window.cloudPull()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded flex items-center"><i class="fas fa-cloud-download-alt mr-2"></i> Pull from Cloud</button>
+            </div>
+            ${cloudBinId ? `<div class="text-center text-sm bg-blue-50 p-3 rounded mt-4"><strong>Current Sync Code:</strong><br><code class="text-blue-700 break-all text-xs">${cloudBinId}</code><br><button onclick="window.cloudCopyCode()" class="text-blue-600 underline text-xs mt-2">📋 Copy Code to Clipboard</button></div>` : ''}
+        </div>
+    `;
+    document.getElementById('cloudModal').classList.add('active');
+};
+
+window.cloudCopyCode = function() {
+    navigator.clipboard.writeText(cloudBinId);
+    alert('✅ Sync code copied! Share it with your colleagues.');
+};
+
+window.cloudPush = async function() {
+    const apiKey = document.getElementById('cloudApiKeyInput').value.trim();
+    let binId = document.getElementById('cloudBinIdInput').value.trim();
+    if (!apiKey) { alert('⚠️ Please enter your API key'); return; }
+
+    cloudApiKey = apiKey;
+    localStorage.setItem('cloudApiKey', apiKey);
+
+    try {
+        let response;
+        if (!binId) {
+            response = await fetch(JSONBIN_BASE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey, 'X-Bin-Name': 'TAFE-Timetable' },
+                body: JSON.stringify(db)
+            });
+            if (!response.ok) throw new Error('Failed to create bin (check API key)');
+            const data = await response.json();
+            binId = data.metadata.id;
+        } else {
+            response = await fetch(`${JSONBIN_BASE}/${binId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': apiKey },
+                body: JSON.stringify(db)
+            });
+            if (!response.ok) throw new Error('Failed to update (check sync code)');
+        }
+        cloudBinId = binId;
+        localStorage.setItem('cloudBinId', binId);
+        alert(`✅ Data pushed to cloud successfully!\n\n🔗 Sync Code:\n${binId}\n\nShare this code with colleagues so they can pull the data.`);
+        window.openCloudModal();
+    } catch (err) {
+        alert('❌ Push failed: ' + err.message);
+    }
+};
+
+window.cloudPull = async function() {
+    const apiKey = document.getElementById('cloudApiKeyInput').value.trim();
+    const binId = document.getElementById('cloudBinIdInput').value.trim();
+    if (!apiKey) { alert('⚠️ Please enter your API key'); return; }
+    if (!binId) { alert('⚠️ Please enter a sync code'); return; }
+    if (!confirm('⚠️ This will REPLACE your current data with the cloud version. Continue?')) return;
+
+    try {
+        const response = await fetch(`${JSONBIN_BASE}/${binId}/latest`, {
+            headers: { 'X-Master-Key': apiKey }
+        });
+        if (!response.ok) throw new Error('Failed to fetch (check sync code & API key)');
+        const data = await response.json();
+        const cloudData = data.record;
+        if (!cloudData.semesters) throw new Error('Invalid data format in cloud');
+
+        db = cloudData;
+        Object.keys(db.semesters).forEach(semKey => {
+            if (!db.semesters[semKey].colleges) db.semesters[semKey].colleges = ['Moss Vale', 'Goulburn', 'Queanbeyan'];
+            if (!db.semesters[semKey].config) db.semesters[semKey].config = { startTime: 8, endTime: 18 };
+            if (!db.semesters[semKey].staffNotes) db.semesters[semKey].staffNotes = {};
+            if (!db.semesters[semKey].tasks) db.semesters[semKey].tasks = [];
+        });
+
+        cloudApiKey = apiKey;
+        cloudBinId = binId;
+        localStorage.setItem('cloudApiKey', apiKey);
+        localStorage.setItem('cloudBinId', binId);
+
+        saveData();
+        processAndRenderAll();
+        document.getElementById('cloudModal').classList.remove('active');
+        alert('✅ Data pulled from cloud successfully!');
+    } catch (err) {
+        alert('❌ Pull failed: ' + err.message);
+    }
+};
+
+document.getElementById('cloudSyncBtn').addEventListener('click', window.openCloudModal);
+document.getElementById('closeCloudModalBtn').addEventListener('click', () => document.getElementById('cloudModal').classList.remove('active'));
+// ========== END CLOUD SYNC ==========
 
 loadData();
 processAndRenderAll();

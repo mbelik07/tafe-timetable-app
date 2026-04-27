@@ -455,111 +455,217 @@ window.openLocalOfferingCodesModal = function() {
         return;
     }
     
-    const renderLocalOfferingCodes = () => {
-        const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
-        const sortedColleges = [...semesterData.colleges].sort();
-        
-        let html = `
-            <div class="space-y-4">
-                <div class="bg-blue-50 p-3 rounded text-sm">
-                    <strong>📍 Local Offering Codes</strong><br>
-                    <span class="text-xs text-gray-600">Map official course codes to college-specific local offering codes</span>
+    // Sort courses and colleges for dropdowns
+    const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
+    const sortedColleges = [...semesterData.colleges].sort();
+    
+    let html = `
+        <div class="space-y-4">
+            <div class="bg-blue-50 p-3 rounded text-sm">
+                <strong>📍 Local Offering Codes</strong><br>
+                <span class="text-xs text-gray-600">Map official course codes to college-specific local offering codes. Select a course and college to filter, then edit directly in the table.</span>
+            </div>
+            
+            <!-- Filter Section -->
+            <div class="bg-white p-4 rounded border border-gray-200">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="block text-sm font-bold mb-2">📚 Course</label>
+                        <select id="locCodeCourseFilter" class="w-full border p-2 rounded font-medium" onchange="window.filterLocalOfferingCodes()">
+                            <option value="ALL">-- All Courses --</option>
+                            ${sortedCourses.map(c => `<option value="${c.Code}">${c.Code} - ${c.Name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-bold mb-2">🏫 College</label>
+                        <select id="locCodeCollegeFilter" class="w-full border p-2 rounded font-medium" onchange="window.filterLocalOfferingCodes()">
+                            <option value="ALL">-- All Colleges --</option>
+                            ${sortedColleges.map(c => `<option value="${c}">${c}</option>`).join('')}
+                        </select>
+                    </div>
                 </div>
-                
-                <div class="management-table-wrapper">
-                    <table class="management-table">
-                        <thead>
-                            <tr>
-                                <th>Course Code</th>
-                                <th>Course Name</th>
-                                <th>College</th>
-                                <th>Local Offering Code</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-        `;
-        
-        // Create a row for each course-college combination
-        sortedCourses.forEach(course => {
-            sortedColleges.forEach(college => {
-                const key = `${course.Code}|${college}`;
-                const localCode = semesterData.localOfferingCodes[key] || '';
-                
-                html += `
-                    <tr>
-                        <td><strong>${course.Code}</strong></td>
-                        <td>${course.Name}</td>
-                        <td>${college}</td>
-                        <td>
-                            <input type="text" 
-                                class="local-code-input" 
-                                data-key="${key}" 
-                                value="${localCode}" 
-                                placeholder="e.g., MVL-0048"
-                                style="width: 120px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px;">
-                        </td>
-                        <td>
-                            <button class="action-btn edit-btn" onclick="window.saveLocalOfferingCode('${key}')">
-                                <i class="fas fa-save"></i> Save
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-        });
-        
-        html += `
-                        </tbody>
-                    </table>
+            </div>
+            
+            <!-- Table Section -->
+            <div class="management-table-wrapper">
+                <table class="management-table">
+                    <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>College</th>
+                            <th>Local Offering Code</th>
+                        </tr>
+                    </thead>
+                    <tbody id="localOfferingCodesTableBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty state message -->
+            <div id="locCodeEmptyState" class="hidden text-center py-4 text-gray-500">
+                <i class="fas fa-search text-2xl mb-2"></i>
+                <p>No matching offering codes found. Try different filters.</p>
+            </div>
+            
+            <!-- Save Section -->
+            <div class="flex justify-between items-center pt-4 border-t">
+                <div class="text-sm text-gray-600">
+                    <span id="locCodeCount">0</span> entries | <span class="text-green-600 font-bold">Unsaved changes: <span id="locCodeUnsavedCount">0</span></span>
                 </div>
-                
-                <div class="mt-4 pt-4 border-t">
-                    <button onclick="window.clearAllLocalCodes()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded">
-                        <i class="fas fa-trash-alt mr-1"></i> Clear All Codes
+                <div class="flex gap-3">
+                    <button onclick="window.clearAllLocalCodes()" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded flex items-center">
+                        <i class="fas fa-trash-alt mr-2"></i> Clear All Codes
+                    </button>
+                    <button onclick="window.saveAllLocalOfferingCodes()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded text-lg flex items-center shadow-lg">
+                        <i class="fas fa-save mr-2"></i> Save All Changes
                     </button>
                 </div>
             </div>
-        `;
-        
-        content.innerHTML = html;
-        
-        // Add event listeners for inline editing
-        document.querySelectorAll('.local-code-input').forEach(input => {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    window.saveLocalOfferingCode(input.dataset.key);
-                }
-            });
-        });
-    };
+        </div>
+    `;
     
-    renderLocalOfferingCodes();
+    content.innerHTML = html;
+    
+    // Initial render with all codes
+    window.filterLocalOfferingCodes();
+    
     modal.classList.add('active');
 };
 
-window.saveLocalOfferingCode = function(key) {
+window.filterLocalOfferingCodes = function() {
     const semesterData = getCurrentSemesterData();
-    const input = document.querySelector(`.local-code-input[data-key="${key}"]`);
-    const value = input.value.trim();
+    const courseFilter = document.getElementById('locCodeCourseFilter')?.value || 'ALL';
+    const collegeFilter = document.getElementById('locCodeCollegeFilter')?.value || 'ALL';
     
-    if (value) {
-        semesterData.localOfferingCodes[key] = value;
-    } else {
-        delete semesterData.localOfferingCodes[key];
+    const sortedCourses = [...semesterData.courses].sort((a, b) => (a.Code || '').localeCompare(b.Code || ''));
+    const sortedColleges = [...semesterData.colleges].sort();
+    
+    const tableBody = document.getElementById('localOfferingCodesTableBody');
+    const emptyState = document.getElementById('locCodeEmptyState');
+    
+    if (!tableBody) return;
+    
+    let html = '';
+    let count = 0;
+    
+    // Filter courses
+    const filteredCourses = courseFilter === 'ALL' ? sortedCourses : sortedCourses.filter(c => c.Code === courseFilter);
+    const filteredColleges = collegeFilter === 'ALL' ? sortedColleges : sortedColleges.filter(c => c === collegeFilter);
+    
+    filteredCourses.forEach(course => {
+        filteredColleges.forEach(college => {
+            const key = `${course.Code}|${college}`;
+            const localCode = semesterData.localOfferingCodes[key] || '';
+            count++;
+            
+            html += `
+                <tr>
+                    <td><strong>${course.Code}</strong></td>
+                    <td>${course.Name}</td>
+                    <td>${college}</td>
+                    <td>
+                        <input type="text" 
+                            class="loc-code-input" 
+                            data-key="${key}" 
+                            value="${localCode}" 
+                            placeholder="e.g., MVL-0048"
+                            style="width: 150px; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-weight: 500;"
+                            oninput="window.markLocalCodeUnsaved(this)">
+                    </td>
+                </tr>
+            `;
+        });
+    });
+    
+    tableBody.innerHTML = html;
+    
+    // Update count
+    const countEl = document.getElementById('locCodeCount');
+    const unsavedEl = document.getElementById('locCodeUnsavedCount');
+    if (countEl) countEl.textContent = count;
+    if (unsavedEl) unsavedEl.textContent = count;
+    
+    // Show/hide empty state
+    if (emptyState) {
+        emptyState.classList.toggle('hidden', count > 0);
     }
     
+    // Add Enter key support
+    document.querySelectorAll('.loc-code-input').forEach(input => {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Move to next input or save all
+                const inputs = Array.from(document.querySelectorAll('.loc-code-input'));
+                const currentIndex = inputs.indexOf(e.target);
+                if (currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                } else {
+                    window.saveAllLocalOfferingCodes();
+                }
+            }
+        });
+    });
+};
+
+window.markLocalCodeUnsaved = function(input) {
+    // Visual feedback for unsaved changes
+    input.style.borderColor = '#f59e0b';
+    input.style.backgroundColor = '#fffbeb';
+    input.classList.add('unsaved');
+};
+
+window.saveAllLocalOfferingCodes = function() {
+    const semesterData = getCurrentSemesterData();
+    const inputs = document.querySelectorAll('.loc-code-input');
+    let savedCount = 0;
+    let clearedCount = 0;
+    
+    inputs.forEach(input => {
+        const key = input.dataset.key;
+        const value = input.value.trim();
+        
+        if (value) {
+            semesterData.localOfferingCodes[key] = value;
+            savedCount++;
+        } else {
+            delete semesterData.localOfferingCodes[key];
+            clearedCount++;
+        }
+        
+        // Visual feedback for saved
+        input.style.borderColor = '#10b981';
+        input.style.backgroundColor = '#ecfdf5';
+        input.classList.remove('unsaved');
+    });
+    
     saveData();
-    alert('✅ Local offering code saved!');
+    
+    // Update unsaved count
+    const unsavedEl = document.getElementById('locCodeUnsavedCount');
+    if (unsavedEl) unsavedEl.textContent = '0';
+    
+    alert(`✅ Saved ${savedCount} local offering codes! (Cleared ${clearedCount} empty entries)`);
 };
 
 window.clearAllLocalCodes = function() {
-    if (confirm('⚠️ Delete all local offering codes? This cannot be undone.')) {
+    if (confirm('⚠️ Delete ALL local offering codes? This cannot be undone.')) {
         const semesterData = getCurrentSemesterData();
         semesterData.localOfferingCodes = {};
         saveData();
-        alert('✅ All local codes cleared');
-        window.openLocalOfferingCodesModal();
+        
+        // Clear all inputs
+        document.querySelectorAll('.loc-code-input').forEach(input => {
+            input.value = '';
+            input.style.borderColor = '';
+            input.style.backgroundColor = '';
+        });
+        
+        const unsavedEl = document.getElementById('locCodeUnsavedCount');
+        if (unsavedEl) unsavedEl.textContent = '0';
+        
+        alert('✅ All local offering codes cleared!');
     }
 };
 

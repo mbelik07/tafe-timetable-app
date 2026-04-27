@@ -1106,7 +1106,10 @@ db.currentSemester = 'Default Semester';
 const data = db.semesters[db.currentSemester];
 if(!data.colleges) data.colleges = [...defaultColleges];
 if(!data.config) data.config = { startTime: 8, endTime: 18 };
+if(!data.localOfferingCodes) data.localOfferingCodes = {};
+if(!data.rooms) data.rooms = {};
 return data;
+};
 };
 
 const collegeTabsContainer = document.getElementById('college-tabs-container');

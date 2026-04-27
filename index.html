@@ -233,7 +233,8 @@ background: rgba(59, 130, 246, 0.7);
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageSubjectsBtn"><i class="fas fa-shapes fa-fw mr-3"></i> Manage Subjects</button>
 <hr class="my-4"/>
 <button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageLocalCodesBtn"><i class="fas fa-map-location-dot fa-fw mr-3"></i> Local Offering Codes</button>  
-<h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
+<button class="w-full text-left bg-blue-100 hover:bg-blue-200 p-3 rounded font-semibold flex items-center" id="manageRoomsBtn"><i class="fas fa-door-open fa-fw mr-3"></i> Manage Rooms</button>
+  <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Data Actions</h3>
 <button class="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center" id="exportDataBtn"><i class="fas fa-file-export fa-fw mr-2"></i> Export Data</button>
 <button class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center" id="importDataBtn"><i class="fas fa-file-import fa-fw mr-2"></i> Import Data</button>
 <button class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded flex items-center" id="loadSampleDataBtn"><i class="fas fa-vial fa-fw mr-2"></i> Load Sample Data</button>
@@ -291,12 +292,25 @@ background: rgba(59, 130, 246, 0.7);
 <div class="context-menu" id="contextMenu"></div>
 <div class="modal-overlay" id="managementModal"><div class="modal-container"><div class="management-modal-header"><h2 class="management-modal-title" id="modalTitle">Manage</h2><div class="management-modal-actions"><button class="add-btn" id="addItemBtn" style="display: none;"><i class="fas fa-plus"></i> Add</button><button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button></div></div><div id="modalContent"></div></div></div>
 <div class="modal-overlay" id="semesterModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-calendar-alt mr-3"></i> Manage Semesters</h2><button class="text-3xl font-bold" id="closeSemesterModalBtn">×</button></div><div id="semesterModalContent"></div></div></div>
-<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle"><i class="fas fa-clock mr-2"></i> Session Details</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><label class="block font-medium">Room</label><input class="w-full border p-2 rounded" id="sessionRoom" required="" type="text"/></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4" id="sessionCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteSessionBtn" type="button"><i class="fas fa-trash-alt mr-2"></i> Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center" type="submit"><i class="fas fa-save mr-2"></i> Save Session</button></div></form></div></div>
+<div class="modal-overlay" id="sessionModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="sessionModalTitle"><i class="fas fa-clock mr-2"></i> Session Details</h2><button class="text-3xl font-bold" id="closeSessionModalBtn" type="button">×</button></div><form class="space-y-4" id="sessionForm"><input id="sessionId" type="hidden"/><input id="sessionDay" type="hidden"/><div><label class="block font-medium">Course</label><select class="w-full border p-2 rounded" id="sessionCourse" required=""></select></div><div><label class="block font-medium">Subject</label><select class="w-full border p-2 rounded" id="sessionSubject" required=""></select></div><div><label class="block font-medium">Teacher 1 (Primary) <span class="text-gray-500 text-sm">(Optional)</span></label><select class="w-full border p-2 rounded" id="sessionTeacher"></select></div><div><label class="block font-medium">Teacher 2 (Co-teacher - Optional)</label><select class="w-full border p-2 rounded" id="sessionTeacher2"><option value="">-- None --</option></select></div><div><div class="form-group">
+<label class="block font-medium">Room</label>
+<select class="w-full border p-2 rounded" id="sessionRoom" required="">
+<option value="">-- Select Room --</option>
+</select>
+<div id="sessionRoomCustomOption" class="mt-1">
+<label class="flex items-center gap-2 text-sm text-gray-600">
+<input type="checkbox" id="sessionRoomUseCustom" onchange="window.toggleRoomCustomInput()">
+Use custom room name
+</label>
+<input type="text" id="sessionRoomCustom" class="w-full border p-2 rounded mt-2 hidden" placeholder="Enter custom room name...">
+</div>
+</div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="flex gap-4" id="sessionCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Start Time</label><input class="w-full border p-2 rounded" id="sessionStartTime" required="" step="1800" type="time"/></div><div><label class="block font-medium">End Time</label><input class="w-full border p-2 rounded" id="sessionEndTime" required="" step="1800" type="time"/></div></div><div><label class="block font-medium">Notes (e.g., Face-to-Face)</label><textarea class="w-full border p-2 rounded" id="sessionNotes" rows="2"></textarea></div><div class="flex justify-between items-center mt-6"><button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteSessionBtn" type="button"><i class="fas fa-trash-alt mr-2"></i> Delete</button><button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center" type="submit"><i class="fas fa-save mr-2"></i> Save Session</button></div></form></div></div>
 <div class="modal-overlay" id="duplicateDayModal"><div class="modal-container" style="max-width: 400px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-copy mr-2"></i> Duplicate Session</h2><button class="text-3xl font-bold" id="closeDuplicateDayModalBtn">×</button></div><div class="space-y-3" id="duplicateDayContent"></div></div></div>
 <div class="modal-overlay" id="addTeacherModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900"><i class="fas fa-user-plus mr-2"></i> Teacher Details</h2><button class="text-3xl font-bold" id="closeAddTeacherModalBtn">×</button></div><form class="space-y-4" id="addTeacherForm"><input type="hidden" name="editIndex"><div><label class="block text-sm font-medium">Name</label><input type="text" name="Name" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Surname</label><input type="text" name="Surname" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Initials</label><input type="text" name="Initials" class="w-full border p-2 rounded bg-gray-200" readonly></div><div><label class="block text-sm font-medium">Email</label><input type="email" name="Email" class="w-full border p-2 rounded" required></div><div><label class="block text-sm font-medium">Home College</label><select name="HomeCollege" id="teacherHomeCollegeSelect" class="w-full border p-2 rounded" required></select></div><div><label class="block text-sm font-medium">Employment Type</label><select name="EmploymentType" class="w-full border p-2 rounded" required><option value="Full-Time">Full-Time</option><option value="Casual">Casual</option></select></div><div><label class="block text-sm font-medium">Total Hours</label><input type="number" name="TotalHours" class="w-full border p-2 rounded" required value="0" step="0.5"></div><div class="flex items-center gap-2"><input type="checkbox" name="IsHeadTeacher" class="w-5 h-5"> <label class="font-bold text-blue-900">Head Teacher (Reporting)</label></div><div class="flex gap-2 justify-end"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelAddTeacherBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Teacher</button></div></form></div></div>
   <div class="modal-overlay" id="taskModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900" id="taskModalTitle">Add New Task</h2><button class="text-3xl font-bold" id="closeTaskModalBtn">×</button></div><form class="space-y-4" id="taskForm"><input id="taskId" type="hidden"/><div><label class="block font-medium">Task Title</label><input type="text" id="taskTitle" class="w-full border p-2 rounded" required placeholder="Enter task title"/></div><div><label class="block font-medium">Description</label><textarea id="taskDescription" class="w-full border p-2 rounded" rows="3" placeholder="Enter task description (optional)"></textarea></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Assign to Teacher</label><select id="taskTeacher" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div><div><label class="block font-medium">Assign to Course</label><select id="taskCourse" class="w-full border p-2 rounded"><option value="">-- None --</option></select></div></div><div><label class="block font-medium mb-2">Colleges (select one or more)</label><div class="college-checkboxes" id="taskCollegeCheckboxes"></div></div><div class="grid grid-cols-2 gap-4"><div><label class="block font-medium">Priority</label><select id="taskPriority" class="w-full border p-2 rounded" required><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label class="block font-medium">Status</label><select id="taskStatus" class="w-full border p-2 rounded" required><option value="todo" selected>To Do</option><option value="inprogress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div></div><div><label class="block font-medium">Due Date</label><input type="date" id="taskDueDate" class="w-full border p-2 rounded"/></div><div class="flex justify-between items-center mt-6"><button type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center" id="deleteTaskBtn" style="display: none;"><i class="fas fa-trash-alt mr-2"></i> Delete Task</button><div class="flex gap-2"><button type="button" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center" id="cancelTaskBtn"><i class="fas fa-times mr-2"></i> Cancel</button><button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"><i class="fas fa-save mr-2"></i> Save Task</button></div></div></form></div></div>
 
 <div class="modal-overlay" id="courseNotesModal"><div class="modal-container" style="max-width: 700px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-file-alt mr-3"></i> Edit Course Notes</h2><button class="text-3xl font-bold" id="closeCourseNotesModalBtn">×</button></div><div class="space-y-4"><div class="quill-wrapper"><label class="quill-label">📝 Course Notes (Rich Text):</label><div id="courseNotesEditor" style="background: white;"></div></div><div class="flex gap-2 justify-end mt-4"><button onclick="window.closeCourseNotesModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded"><i class="fas fa-times mr-2"></i> Cancel</button><button onclick="window.saveCourseNotes()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"><i class="fas fa-save mr-2"></i> Save Notes</button></div></div></div></div>  
+  <div class="modal-overlay" id="roomsModal"><div class="modal-container" style="max-width: 700px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-door-open mr-3"></i> Manage Rooms</h2><button class="text-3xl font-bold" id="closeRoomsModalBtn">×</button></div><div id="roomsModalContent"></div></div></div>
   <div class="modal-overlay" id="localOfferingCodesModal"><div class="modal-container" style="max-width: 900px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-map-location-dot mr-3"></i> Local Offering Codes</h2><button class="text-3xl font-bold" id="closeLocalCodesModalBtn">×</button></div><div id="localOfferingCodesModalContent"></div></div></div>
   <div class="modal-overlay" id="revisionModal"><div class="modal-container" style="max-width: 600px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-history mr-3"></i> Revision History</h2><button class="text-3xl font-bold" id="closeRevisionModalBtn">×</button></div><div id="revisionModalContent"></div></div></div>
   <div class="modal-overlay" id="cloudModal"><div class="modal-container" style="max-width: 500px;"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-blue-900 flex items-center"><i class="fas fa-cloud mr-3"></i> Cloud Sync</h2><button class="text-3xl font-bold" id="closeCloudModalBtn">×</button></div><div id="cloudModalContent"></div></div></div>
@@ -334,7 +348,8 @@ const getNewSemesterData = (collegesList = null, config = {}) => ({
     config: { startTime: 8, endTime: 22, ...config },
     staffNotes: {}, 
     tasks: [],
-    localOfferingCodes: {} // NEW: Maps "CourseCode|College" to local code
+    localOfferingCodes: {} // NEW: localOfferingCodes: {}, // Maps "CourseCode|College" to local code
+rooms: {} // NEW: Maps "CollegeName" to array of room names "CourseCode|College" to local code
 });
 const saveData = () => {
     localStorage.setItem('timetableDataV2', JSON.stringify(db));
@@ -675,7 +690,210 @@ window.getLocalOfferingCode = function(courseCode, college) {
     return semesterData.localOfferingCodes[key] || '';
 };
 // ========== END LOCAL OFFERING CODES ==========
+// ========== ROOMS MANAGEMENT ==========
+window.openRoomsModal = function() {
+    const semesterData = getCurrentSemesterData();
+    const modal = document.getElementById('roomsModal');
+    const content = document.getElementById('roomsModalContent');
+    
+    const sortedColleges = [...semesterData.colleges].sort();
+    
+    // Ensure rooms data exists for all colleges
+    sortedColleges.forEach(college => {
+        if (!semesterData.rooms[college]) {
+            semesterData.rooms[college] = [];
+        }
+    });
+    
+    let html = `
+        <div class="space-y-4">
+            <div class="bg-blue-50 p-3 rounded text-sm">
+                <strong>🚪 Room Management</strong><br>
+                <span class="text-xs text-gray-600">Add, edit, or remove rooms for each college. Rooms will be available in session creation dropdowns.</span>
+            </div>
+            
+            <!-- College Tabs -->
+            <div class="flex items-center gap-2 mb-[-1px] flex-wrap" id="roomsCollegeTabs">
+                ${sortedColleges.map((college, index) => `
+                    <button class="college-tab ${index === 0 ? 'active' : ''}" data-college="${college}" onclick="window.selectRoomsCollege('${college}')">
+                        <i class="fas fa-building"></i> ${college}
+                    </button>
+                `).join('')}
+            </div>
+            
+            <!-- Room List for Selected College -->
+            <div id="roomsListContainer" class="bg-white p-4 rounded-lg border border-gray-200 min-h-[200px]">
+            </div>
+            
+            <!-- Add New Room -->
+            <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                <h4 class="font-bold text-gray-700 mb-3"><i class="fas fa-plus-circle mr-2 text-green-600"></i> Add New Room</h4>
+                <div class="flex gap-3 items-end">
+                    <div class="form-group flex-grow">
+                        <label class="block text-sm font-medium mb-1">Room Name / Number</label>
+                        <input type="text" id="newRoomName" class="w-full border p-2 rounded" placeholder="e.g., C1, Lab A, Room 101">
+                    </div>
+                    <button onclick="window.addRoom()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add Room
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    content.innerHTML = html;
+    
+    // Event listeners
+    document.getElementById('closeRoomsModalBtn').addEventListener('click', () => modal.classList.remove('active'));
+    
+    // Enter key to add room
+    document.getElementById('newRoomName').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') window.addRoom();
+    });
+    
+    // Initial render
+    window.currentRoomsCollege = sortedColleges[0] || 'Moss Vale';
+    window.renderRoomsList();
+    
+    modal.classList.add('active');
+};
 
+window.currentRoomsCollege = 'Moss Vale';
+
+window.selectRoomsCollege = function(college) {
+    window.currentRoomsCollege = college;
+    
+    // Update tab styling
+    document.querySelectorAll('#roomsCollegeTabs .college-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.college === college);
+    });
+    
+    window.renderRoomsList();
+};
+
+window.renderRoomsList = function() {
+    const semesterData = getCurrentSemesterData();
+    const college = window.currentRoomsCollege;
+    const rooms = semesterData.rooms[college] || [];
+    const sortedRooms = [...rooms].sort();
+    
+    const container = document.getElementById('roomsListContainer');
+    
+    if (sortedRooms.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-door-open text-4xl mb-3 text-gray-300"></i>
+                <p>No rooms added for <strong>${college}</strong> yet.</p>
+                <p class="text-sm">Use the form below to add rooms.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div class="flex justify-between items-center mb-3">
+            <h4 class="font-bold text-lg"><i class="fas fa-list mr-2 text-blue-600"></i> Rooms for ${college}</h4>
+            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold text-sm">${sortedRooms.length} room${sortedRooms.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+    `;
+    
+    sortedRooms.forEach((room, index) => {
+        html += `
+            <div class="bg-white border border-gray-200 rounded-lg p-3 flex justify-between items-center hover:bg-gray-50 transition">
+                <div>
+                    <i class="fas fa-door-open text-gray-400 mr-2"></i>
+                    <span class="font-bold text-gray-800">${room}</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.editRoom(${index})" class="text-blue-600 hover:text-blue-800 p-1" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="window.deleteRoom(${index})" class="text-red-600 hover:text-red-800 p-1" title="Delete">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `</div>`;
+    container.innerHTML = html;
+};
+
+window.addRoom = function() {
+    const semesterData = getCurrentSemesterData();
+    const college = window.currentRoomsCollege;
+    const newRoomInput = document.getElementById('newRoomName');
+    const roomName = newRoomInput.value.trim();
+    
+    if (!roomName) {
+        alert('Please enter a room name.');
+        return;
+    }
+    
+    if (!semesterData.rooms[college]) {
+        semesterData.rooms[college] = [];
+    }
+    
+    // Check for duplicates (case-insensitive)
+    const exists = semesterData.rooms[college].some(r => r.toLowerCase() === roomName.toLowerCase());
+    if (exists) {
+        alert(`Room "${roomName}" already exists in ${college}!`);
+        return;
+    }
+    
+    semesterData.rooms[college].push(roomName);
+    saveData();
+    
+    newRoomInput.value = '';
+    newRoomInput.focus();
+    
+    window.renderRoomsList();
+};
+
+window.editRoom = function(index) {
+    const semesterData = getCurrentSemesterData();
+    const college = window.currentRoomsCollege;
+    const rooms = semesterData.rooms[college] || [];
+    const currentRoom = rooms[index];
+    
+    const newRoomName = prompt(`Edit room name:`, currentRoom);
+    
+    if (newRoomName === null) return; // User cancelled
+    
+    const trimmedName = newRoomName.trim();
+    
+    if (!trimmedName) {
+        alert('Room name cannot be empty.');
+        return;
+    }
+    
+    // Check for duplicates (excluding current room)
+    const exists = rooms.some((r, i) => i !== index && r.toLowerCase() === trimmedName.toLowerCase());
+    if (exists) {
+        alert(`Room "${trimmedName}" already exists in ${college}!`);
+        return;
+    }
+    
+    rooms[index] = trimmedName;
+    saveData();
+    window.renderRoomsList();
+};
+
+window.deleteRoom = function(index) {
+    const semesterData = getCurrentSemesterData();
+    const college = window.currentRoomsCollege;
+    const rooms = semesterData.rooms[college] || [];
+    const roomName = rooms[index];
+    
+    if (confirm(`Delete room "${roomName}" from ${college}?\n\nThis will NOT affect existing sessions using this room.`)) {
+        rooms.splice(index, 1);
+        saveData();
+        window.renderRoomsList();
+    }
+};
+// ========== END ROOMS MANAGEMENT ==========
 // ========== QUILL RICH TEXT EDITOR ==========
 let courseNotesQuill = null;
 let currentCourseNotesKey = null;
@@ -801,6 +1019,9 @@ db.semesters[semKey].tasks = [];
 }
 if (!db.semesters[semKey].localOfferingCodes) {
 db.semesters[semKey].localOfferingCodes = {};
+}
+  if (!db.semesters[semKey].rooms) {
+db.semesters[semKey].rooms = {};
 }
 });
 } else {
@@ -1039,6 +1260,7 @@ document.getElementById('manageTeachersBtn').addEventListener('click', () => ope
 document.getElementById('manageCoursesBtn').addEventListener('click', () => openManagementModal('Courses', getCurrentSemesterData().courses, ['Code', 'Name']));
 document.getElementById('manageSubjectsBtn').addEventListener('click', () => openManagementModal('Subjects', getCurrentSemesterData().subjects, ['Subject', 'CourseCode', 'Color', 'Units', 'Compulsory', 'DeliveryMode']));
 document.getElementById('manageLocalCodesBtn').addEventListener('click', window.openLocalOfferingCodesModal);
+  document.getElementById('manageRoomsBtn').addEventListener('click', window.openRoomsModal);
 document.getElementById('closeLocalCodesModalBtn').addEventListener('click', () => document.getElementById('localOfferingCodesModal').classList.remove('active'));
 document.getElementById('closeCourseNotesModalBtn').addEventListener('click', window.closeCourseNotesModal);  
 sessionForm.addEventListener('submit', handleSessionFormSubmit);
@@ -2300,6 +2522,63 @@ teacher2Select.innerHTML = `<option value="">-- None --</option>` + sortedTeache
 
 const checkboxesContainer = document.getElementById('sessionCollegeCheckboxes');
 checkboxesContainer.innerHTML = semesterData.colleges.map(c => `
+// Update room dropdown based on selected colleges
+const updateRoomDropdown = () => {
+    const roomSelect = document.getElementById('sessionRoom');
+    const useCustom = document.getElementById('sessionRoomUseCustom')?.checked;
+    
+    const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges"]:checked')).map(cb => cb.value);
+    
+    // Collect rooms from all selected colleges
+    const roomsSet = new Set();
+    selectedColleges.forEach(college => {
+        if (semesterData.rooms[college]) {
+            semesterData.rooms[college].forEach(room => roomsSet.add(room));
+        }
+    });
+    
+    const sortedRooms = Array.from(roomsSet).sort();
+    
+    // Update dropdown
+    if (useCustom) {
+        roomSelect.innerHTML = '<option value="">-- Select Room --</option>';
+        roomSelect.disabled = true;
+    } else {
+        roomSelect.disabled = false;
+        roomSelect.innerHTML = '<option value="">-- Select Room --</option>' + 
+            sortedRooms.map(r => `<option value="${r}">${r}</option>`).join('');
+    }
+    
+    // If editing existing session, set the value
+    const sessionId = document.getElementById('sessionId').value;
+    if (sessionId && session) {
+        roomSelect.value = session.Room || '';
+    }
+};
+
+// Initial room dropdown update
+updateRoomDropdown();
+
+// Add change listeners to college checkboxes
+const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
+collegeCheckboxes.forEach(cb => {
+    cb.addEventListener('change', updateRoomDropdown);
+});
+
+window.toggleRoomCustomInput = function() {
+    const useCustom = document.getElementById('sessionRoomUseCustom')?.checked;
+    const roomSelect = document.getElementById('sessionRoom');
+    const customInput = document.getElementById('sessionRoomCustom');
+    
+    if (useCustom) {
+        roomSelect.disabled = true;
+        customInput.classList.remove('hidden');
+        customInput.focus();
+    } else {
+        roomSelect.disabled = false;
+        customInput.classList.add('hidden');
+    }
+};
 <label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="${c}" ${session?.colleges?.includes(c) || (!session && c === semesterData.currentCollege) ? 'checked' : ''} class="w-4 h-4"> ${c}</label>
 `).join('');
 
@@ -2321,7 +2600,9 @@ CourseCode: document.getElementById('sessionCourse').value,
 Subject: document.getElementById('sessionSubject').value,
 TeacherInitials: document.getElementById('sessionTeacher').value || '',
 TeacherInitials2: document.getElementById('sessionTeacher2').value || '',
-Room: document.getElementById('sessionRoom').value,
+Room: document.getElementById('sessionRoom').Room: (document.getElementById('sessionRoomUseCustom')?.checked 
+    ? document.getElementById('sessionRoomCustom').value 
+    : document.getElementById('sessionRoom').value),,
 notes: document.getElementById('sessionNotes').value,
 colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
 dispute: null

@@ -348,8 +348,8 @@ const getNewSemesterData = (collegesList = null, config = {}) => ({
     config: { startTime: 8, endTime: 22, ...config },
     staffNotes: {}, 
     tasks: [],
-    localOfferingCodes: {} // NEW: localOfferingCodes: {}, // Maps "CourseCode|College" to local code
-rooms: {} // NEW: Maps "CollegeName" to array of room names "CourseCode|College" to local code
+    localOfferingCodes: {}, 
+    rooms: {}
 });
 const saveData = () => {
     localStorage.setItem('timetableDataV2', JSON.stringify(db));
@@ -2600,9 +2600,9 @@ CourseCode: document.getElementById('sessionCourse').value,
 Subject: document.getElementById('sessionSubject').value,
 TeacherInitials: document.getElementById('sessionTeacher').value || '',
 TeacherInitials2: document.getElementById('sessionTeacher2').value || '',
-Room: document.getElementById('sessionRoom').Room: (document.getElementById('sessionRoomUseCustom')?.checked 
+Room: (document.getElementById('sessionRoomUseCustom')?.checked 
     ? document.getElementById('sessionRoomCustom').value 
-    : document.getElementById('sessionRoom').value),,
+    : document.getElementById('sessionRoom').value),
 notes: document.getElementById('sessionNotes').value,
 colleges: selectedColleges.length > 0 ? selectedColleges : [semesterData.currentCollege],
 dispute: null

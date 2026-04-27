@@ -2521,6 +2521,7 @@ teacherSelect.innerHTML = '<option value="">-- Unassigned --</option>' + sortedT
 teacher2Select.innerHTML = `<option value="">-- None --</option>` + sortedTeachers.map(t => `<option value="${t.Initials}" ${session?.TeacherInitials2 === t.Initials ? 'selected' : ''}>${t.Name} ${t.Surname}</option>`).join('');
 
 const checkboxesContainer = document.getElementById('sessionCollegeCheckboxes');
+checkboxesContainer.innerHTML = semesterData.colleges.map(c => `<label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="${c}" ${session?.colleges?.includes(c) || (!session && c === semesterData.currentCollege) ? 'checked' : ''} class="w-4 h-4"> ${c}</label>`).join('');
 
 // Update room dropdown based on selected colleges
 const updateRoomDropdown = () => {
@@ -2532,7 +2533,7 @@ const updateRoomDropdown = () => {
     // Collect rooms from all selected colleges
     const roomsSet = new Set();
     selectedColleges.forEach(college => {
-        if (semesterData.rooms[college]) {
+        if (semesterData.rooms && semesterData.rooms[college]) {
             semesterData.rooms[college].forEach(room => roomsSet.add(room));
         }
     });
@@ -2550,9 +2551,8 @@ const updateRoomDropdown = () => {
     }
     
     // If editing existing session, set the value
-    const sessionId = document.getElementById('sessionId').value;
-    if (sessionId && session) {
-        roomSelect.value = session.Room || '';
+    if (session && session.Room) {
+        roomSelect.value = session.Room;
     }
 };
 
@@ -2579,68 +2579,6 @@ window.toggleRoomCustomInput = function() {
         customInput.classList.add('hidden');
     }
 };
-
-// Now render the college checkboxes
-checkboxesContainer.innerHTML = semesterData.colleges.map(c => `
-<label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="${c}" ${session?.colleges?.includes(c) || (!session && c === semesterData.currentCollege) ? 'checked' : ''} class="w-4 h-4"> ${c}</label>
-`).join('');
-    const roomSelect = document.getElementById('sessionRoom');
-    const useCustom = document.getElementById('sessionRoomUseCustom')?.checked;
-    
-    const selectedColleges = Array.from(document.querySelectorAll('input[name="colleges"]:checked')).map(cb => cb.value);
-    
-    // Collect rooms from all selected colleges
-    const roomsSet = new Set();
-    selectedColleges.forEach(college => {
-        if (semesterData.rooms[college]) {
-            semesterData.rooms[college].forEach(room => roomsSet.add(room));
-        }
-    });
-    
-    const sortedRooms = Array.from(roomsSet).sort();
-    
-    // Update dropdown
-    if (useCustom) {
-        roomSelect.innerHTML = '<option value="">-- Select Room --</option>';
-        roomSelect.disabled = true;
-    } else {
-        roomSelect.disabled = false;
-        roomSelect.innerHTML = '<option value="">-- Select Room --</option>' + 
-            sortedRooms.map(r => `<option value="${r}">${r}</option>`).join('');
-    }
-    
-    // If editing existing session, set the value
-    const sessionId = document.getElementById('sessionId').value;
-    if (sessionId && session) {
-        roomSelect.value = session.Room || '';
-    }
-};
-
-// Initial room dropdown update
-updateRoomDropdown();
-
-// Add change listeners to college checkboxes
-const collegeCheckboxes = document.querySelectorAll('input[name="colleges"]');
-collegeCheckboxes.forEach(cb => {
-    cb.addEventListener('change', updateRoomDropdown);
-});
-
-window.toggleRoomCustomInput = function() {
-    const useCustom = document.getElementById('sessionRoomUseCustom')?.checked;
-    const roomSelect = document.getElementById('sessionRoom');
-    const customInput = document.getElementById('sessionRoomCustom');
-    
-    if (useCustom) {
-        roomSelect.disabled = true;
-        customInput.classList.remove('hidden');
-        customInput.focus();
-    } else {
-        roomSelect.disabled = false;
-        customInput.classList.add('hidden');
-    }
-};
-<label class="flex items-center gap-2"><input type="checkbox" name="colleges" value="${c}" ${session?.colleges?.includes(c) || (!session && c === semesterData.currentCollege) ? 'checked' : ''} class="w-4 h-4"> ${c}</label>
-`).join('');
 
 document.getElementById('sessionModal').classList.add('active');
 }

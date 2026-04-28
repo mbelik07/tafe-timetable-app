@@ -334,7 +334,8 @@ const getNewSemesterData = (collegesList = null, config = {}) => ({
     config: { startTime: 8, endTime: 22, ...config },
     staffNotes: {}, 
     tasks: [],
-    localOfferingCodes: {} // NEW: Maps "CourseCode|College" to local code
+    localOfferingCodes: {},
+    courseNotes: {}
 });
 const saveData = () => {
     localStorage.setItem('timetableDataV2', JSON.stringify(db));
@@ -799,8 +800,8 @@ db.semesters[semKey].staffNotes = {};
 if (!db.semesters[semKey].tasks) {
 db.semesters[semKey].tasks = [];
 }
-if (!db.semesters[semKey].localOfferingCodes) {
-db.semesters[semKey].localOfferingCodes = {};
+if (!db.semesters[semKey].courseNotes) {
+db.semesters[semKey].courseNotes = {};
 }
 });
 } else {

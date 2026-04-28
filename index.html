@@ -335,6 +335,7 @@ const getNewSemesterData = (collegesList = null, config = {}) => ({
     tasks: [],
     localOfferingCodes: {},
     courseNotes: {}
+  rooms: {}
 });
 const saveData = () => {
     localStorage.setItem('timetableDataV2', JSON.stringify(db));
@@ -801,6 +802,12 @@ db.semesters[semKey].tasks = [];
 }
 if (!db.semesters[semKey].courseNotes) {
 db.semesters[semKey].courseNotes = {};
+}
+  if (!db.semesters[semKey].localOfferingCodes) {
+db.semesters[semKey].localOfferingCodes = {};
+}
+if (!db.semesters[semKey].rooms) {
+db.semesters[semKey].rooms = {};
 }
 });
 } else {
